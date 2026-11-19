@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Code Day 2 設定</title>
+<style>
+/* Layout: header band, then a sticky step index (left) beside one reading column; one column under 1100px.
+   Palette and surfaces follow docs/BRAND.md (Midnight ink, Sea Green / Marigold / Cerulean / Raspberry). */
+:root {
+  --bg: #F0F4F5;
+  --panel: #FFFFFF;
+  --ink: #073B4C;
+  --ink-soft: #46656F;
+  --line: #D6E1E4;
+  --link: #0B6E8F;
+  --code-bg: #073B4C;
+  --code-fg: #E4EDEF;
+  --code-muted: #8FB0B8;
+  --code-btn: #0E4B5F;
+  --code-btn-hover: #145C73;
+  --tint-green: #DDF5EE;
+  --tint-marigold: #FFF2D6;
+  --tint-cerulean: #E0EFF5;
+  --tint-raspberry: #FCE4EA;
+  --tint-coral: #FDEBE4;
+  --tint-neutral: #E4EBED;
+  --ink-green: #036B53;
+  --ink-marigold: #7A5200;
+  --ink-cerulean: #0B5C78;
+  --ink-raspberry: #A11E43;
+  --ink-coral: #9A3E22;
+  --neutral-fill: #D3DEE1;
+  --claude-col: #E6F4F8;
+  /* fills that stay the same in both themes */
+  --sea: #06D6A0;
+  --marigold: #FFC145;
+  --cerulean-deep: #0B6E8F;
+  --raspberry-deep: #C9264F;
+  --midnight: #073B4C;
+  --white: #FFFFFF;
+
+  --font-body: "Instrument Sans", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --radius-panel: 16px;
+  --radius-inner: 12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #04232E;
+    --panel: #000000;
+    --ink: #CDD8DB;
+    --ink-soft: #93AAB1;
+    --line: #17404C;
+    --link: #62C6E8;
+    --code-bg: #0B2F3B;
+    --code-fg: #DCE6E8;
+    --code-muted: #7F9CA4;
+    --code-btn: #164454;
+    --code-btn-hover: #1D5466;
+    --tint-green: #0A3A31;
+    --tint-marigold: #3A2F14;
+    --tint-cerulean: #0B3142;
+    --tint-raspberry: #3E1622;
+    --tint-coral: #3D2219;
+    --tint-neutral: #122F38;
+    --ink-green: #5BE7C0;
+    --ink-marigold: #FFD47A;
+    --ink-cerulean: #7FD0EC;
+    --ink-raspberry: #FF8FA9;
+    --ink-coral: #FFAD93;
+    --neutral-fill: #24434D;
+    --claude-col: #0B3142;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #04232E;
+  --panel: #000000;
+  --ink: #CDD8DB;
+  --ink-soft: #93AAB1;
+  --line: #17404C;
+  --link: #62C6E8;
+  --code-bg: #0B2F3B;
+  --code-fg: #DCE6E8;
+  --code-muted: #7F9CA4;
+  --code-btn: #164454;
+  --code-btn-hover: #1D5466;
+  --tint-green: #0A3A31;
+  --tint-marigold: #3A2F14;
+  --tint-cerulean: #0B3142;
+  --tint-raspberry: #3E1622;
+  --tint-coral: #3D2219;
+  --tint-neutral: #122F38;
+  --ink-green: #5BE7C0;
+  --ink-marigold: #FFD47A;
+  --ink-cerulean: #7FD0EC;
+  --ink-raspberry: #FF8FA9;
+  --ink-coral: #FFAD93;
+  --neutral-fill: #24434D;
+  --claude-col: #0B3142;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+code, kbd, pre { font-family: var(--font-mono); }
+:not(pre) > code {
+  font-size: 0.86em;
+  background: var(--tint-neutral);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+kbd {
+  font-size: 0.82em;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 0.1em 0.45em;
+  border-radius: 6px;
+  box-shadow: inset 0 -2px 0 var(--line), 0 0 0 1px var(--line);
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3em; }
+li + li { margin-top: 4px; }
+
+/* ---------- header ---------- */
+.masthead {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-block: 48px 32px;
+  display: grid;
+  gap: 14px;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-green);
+}
+.masthead h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+.lede { font-size: 17px; color: var(--ink-soft); max-width: 46em; }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.meta span { display: inline-flex; gap: 6px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.meta b { font-weight: 600; color: var(--ink); }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+.toc-side { display: none; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 232px minmax(0, 1fr); gap: 56px; }
+  .toc-side { display: block; }
+  .toc-mobile { display: none; }
+}
+.content { display: grid; gap: 28px; min-width: 0; max-width: 800px; }
+
+/* ---------- table of contents ---------- */
+.toc-side nav {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.toc-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 10px; }
+.toc-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+.toc-list li + li { margin-top: 0; }
+.toc-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.toc-list a:hover { background: var(--panel); }
+.toc-list a[aria-current="true"] { background: var(--panel); font-weight: 600; }
+.toc-sep { height: 1px; background: var(--line); margin: 8px 10px; }
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-width: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-left: auto; }
+.toc-mobile {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 4px 18px;
+}
+.toc-mobile summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.toc-mobile .toc-list { padding-bottom: 12px; }
+
+/* ---------- status ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.s-done { background: var(--sea); color: var(--midnight); }
+.s-ok { background: var(--tint-green); color: var(--ink-green); box-shadow: inset 0 0 0 1.5px var(--ink-green); }
+.s-part { background: var(--marigold); color: var(--midnight); }
+.s-todo { background: var(--raspberry-deep); color: var(--white); }
+.s-info { background: var(--cerulean-deep); color: var(--white); }
+.s-none { background: var(--neutral-fill); color: var(--ink); }
+.dot.s-ok { box-shadow: inset 0 0 0 2px var(--ink-green); background: transparent; }
+
+/* ---------- panels & sections ---------- */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+@media (max-width: 600px) { .panel { padding: 20px 18px; } }
+.panel > h2 { font-size: 24px; font-weight: 700; }
+.section-note { color: var(--ink-soft); font-size: 15px; }
+.prose { display: grid; gap: 12px; }
+
+/* ---------- overview ---------- */
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.counts .pill { font-variant-numeric: tabular-nums; gap: 6px; }
+.overview { list-style: none; padding: 0; display: grid; gap: 0; }
+.overview li + li { margin-top: 0; }
+.overview li {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.overview li:last-child { border-bottom: 0; }
+.overview .num { font-family: var(--font-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.overview a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.overview a:hover { text-decoration: underline; }
+.overview .why { grid-column: 2 / 4; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.next { background: var(--tint-neutral); border-radius: var(--radius-inner); padding: 14px 16px; font-size: 15px; }
+
+/* ---------- glossary ---------- */
+.glossary { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
+@media (min-width: 720px) { .glossary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; } }
+.glossary div { padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.glossary dt { font-weight: 700; margin-bottom: 2px; }
+.glossary dd { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-inner); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font-size: 13px; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+.cmd-table { min-width: 860px; }
+.cmd-table td:not(:first-child) { white-space: nowrap; }
+.cmd-table td code { background: transparent; padding: 0; }
+.cmd-table .cc { background: var(--claude-col); }
+.cmd-table thead .cc { color: var(--ink); }
+.cmd-table .what b { display: block; }
+.cmd-table .what span { display: block; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+.muted { color: var(--ink-soft); }
+
+/* ---------- steps ---------- */
+.step-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.step-no {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight);
+  color: var(--sea);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  flex: none;
+}
+.step-titles { flex: 1 1 220px; min-width: 0; }
+.step-titles h2 { font-size: 22px; font-weight: 700; }
+.step-titles .en { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); }
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.block { display: grid; gap: 12px; min-width: 0; }
+.callout { border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.callout .label { margin-bottom: 0; }
+.plain { background: var(--tint-cerulean); }
+.plain .label { color: var(--ink-cerulean); }
+.note { background: var(--tint-coral); }
+.note .label { color: var(--ink-coral); }
+.addon {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  background: var(--panel);
+  color: var(--ink-soft);
+  vertical-align: 1px;
+}
+.progress { display: grid; gap: 10px; }
+.progress .row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.progress .label { margin-bottom: 0; }
+.progress ul { font-size: 15px; }
+.p-done, .p-ok { background: var(--tint-green); }
+.p-done .label, .p-ok .label { color: var(--ink-green); }
+.p-part { background: var(--tint-marigold); }
+.p-part .label { color: var(--ink-marigold); }
+.p-todo { background: var(--tint-raspberry); }
+.p-todo .label { color: var(--ink-raspberry); }
+.p-info { background: var(--tint-cerulean); }
+.p-info .label { color: var(--ink-cerulean); }
+.p-none { background: var(--tint-neutral); }
+
+/* ---------- code ---------- */
+.code { background: var(--code-bg); border-radius: var(--radius-inner); min-width: 0; overflow: hidden; }
+.code-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 0 16px;
+  font-size: 12.5px;
+  color: var(--code-muted);
+  font-family: var(--font-mono);
+}
+.copy {
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--code-fg);
+  background: var(--code-btn);
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+.copy:hover { background: var(--code-btn-hover); }
+.code pre {
+  margin: 0;
+  padding: 10px 16px 16px;
+  overflow-x: auto;
+  color: var(--code-fg);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.code pre code { background: transparent; padding: 0; font-size: inherit; }
+/* inline code on tinted areas sits on the panel color so the chip stays visible in both themes */
+.callout code, .where-box code, .scope code, .rule code, .mode code, .checklist code, .next code { background: var(--panel); }
+.translation { font-size: 15px; color: var(--ink-soft); }
+
+/* ---------- step 4 diagrams ---------- */
+.where { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 720px) { .where { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.where-box { border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.where-box.project { background: var(--tint-green); }
+.where-box.home { background: var(--tint-neutral); }
+.where-box h3 { font-size: 16px; }
+.where-box .sub { font-size: 13.5px; color: var(--ink-soft); }
+.where-box ul { list-style: none; padding: 0; display: grid; gap: 8px; font-size: 14.5px; line-height: 1.55; }
+.where-box li + li { margin-top: 0; }
+.where-box li code { display: inline-block; margin-bottom: 2px; }
+
+.scopes { list-style: none; padding: 0; display: grid; gap: 6px; }
+.scopes li + li { margin-top: 0; }
+.scope {
+  display: grid;
+  grid-template-columns: 5.5em minmax(0, 1fr);
+  gap: 4px 14px;
+  align-items: baseline;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 0;
+}
+.scope .name { font-weight: 700; }
+.scope .who { grid-column: 2; font-size: 14px; color: var(--ink-soft); }
+@media (max-width: 600px) {
+  .scope { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .scope .who { grid-column: 1; }
+}
+.scope.cli { background: transparent; padding: 2px 14px; font-size: 13.5px; color: var(--ink-soft); grid-template-columns: minmax(0, 1fr); }
+.priority { font-size: 13.5px; color: var(--ink-soft); font-weight: 600; }
+
+/* ---------- step 6 rules & modes ---------- */
+.rules { list-style: none; padding: 0; display: grid; gap: 8px; }
+.rules li + li { margin-top: 0; }
+.rule {
+  display: grid;
+  grid-template-columns: 4.6em minmax(0, 1fr);
+  gap: 4px 14px;
+  align-items: baseline;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.rule .pill { justify-content: center; }
+.rule .why { grid-column: 2; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.r-allow { background: var(--sea); color: var(--midnight); }
+.r-ask { background: var(--marigold); color: var(--midnight); }
+.r-deny { background: var(--raspberry-deep); color: var(--white); }
+.order { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
+.modes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 640px) { .modes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.mode { background: var(--tint-neutral); border-radius: 10px; padding: 12px 14px; display: grid; gap: 4px; align-content: start; }
+.mode b { font-size: 15px; }
+.mode p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.mode .current { font-size: 12px; font-weight: 700; color: var(--ink-green); margin-left: 6px; }
+
+/* ---------- step 11 tree & checklist ---------- */
+.tree {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: var(--radius-inner);
+  padding: 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.75;
+}
+@media (max-width: 600px) { .tree { font-size: 12.5px; padding: 14px 12px; } }
+.tree-row { display: flex; align-items: center; gap: 12px; white-space: pre; }
+.tag {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.t-new { background: var(--sea); color: var(--midnight); }
+.t-changed { background: var(--marigold); color: var(--midnight); }
+.t-ignored { background: var(--code-btn); color: var(--code-fg); }
+
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist li + li { margin-top: 0; }
+.checklist label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.checklist input { width: 18px; height: 18px; margin: 3px 0 0; flex: none; accent-color: var(--ink-green); }
+.checklist input:checked + span { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+.check-count { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+.footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
+@media (min-width: 1100px) { .footer { padding-left: 288px; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Accountable 課程筆記 · Week 1 Day 2</div>
+  <h1>Claude Code 的 Day 2 設定</h1>
+  <p class="lede">把講義 <code>claude_code.md</code> 翻成中文，每一步附上白話說明，並標出你目前做到哪裡。</p>
+  <div class="meta">
+    <span><b>原文</b><a href="../course/coding_agents/claude_code.md"><code>course/coding_agents/claude_code.md</code></a></span>
+    <span><b>進度快照</b>2026-11-19</span>
+    <span><b>Claude Code 版本</b>2.1.311</span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc-side" aria-label="目錄">
+    <nav>
+      <div class="toc-title">目錄</div>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>指令對照表</a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#step-1"><span class="toc-num">1</span>安裝與登入<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>Markdown 與 AGENTS.md<span class="dot s-ok" title="條件符合"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <details class="toc-mobile">
+      <summary>目錄</summary>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>指令對照表</a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#step-1"><span class="toc-num">1</span>安裝與登入<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>Markdown 與 AGENTS.md<span class="dot s-ok" title="條件符合"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
+      </ol>
+    </details>
+
+    <!-- ===================== intro ===================== -->
+    <section class="panel" id="intro">
+      <h2>這一天在做什麼</h2>
+      <div class="prose">
+        <p>Day 2 是在這個專案裡設定 Claude Code 的工作環境：它要讀哪些說明文件、哪些指令可以不經詢問直接執行、可以使用哪些外部工具和 skill。專案層級的設定會 commit 進 repo，之後任何人 clone 這個 repo，都會拿到同一套設定。</p>
+        <p>做完之後，repo 會多出 <code>.claude/settings.json</code>、<code>.claude/skills/brand/SKILL.md</code>、<code>.mcp.json</code>，<code>AGENTS.md</code> 也會修改。</p>
+        <p>指令都在 VS Code 的終端機、<code>accountable</code> 資料夾裡執行。Windows 的終端機是 PowerShell。<code>~</code> 代表你的家目錄，PowerShell 裡寫成 <code>$HOME</code>。</p>
+        <p>同一個資料夾裡還有 Codex、GitHub Copilot、Cursor、OpenCode、Pi、Antigravity CLI 的版本，步驟和標題都相同。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">怎麼讀這份頁面</div>
+        <ul>
+          <li><b>要做什麼</b>：講義原文的翻譯。指令、檔名、設定值保留英文。</li>
+          <li><b>白話說明</b>：解釋這一步為什麼要這樣做。</li>
+          <li><b>你的進度</b>：2026-11-19 檢查你電腦得到的結果，之後的操作不會自動更新到這裡。</li>
+          <li>標示 <span class="addon" style="margin-left:0">補充</span> 的內容是講義沒有寫、另外加上的說明。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== progress ===================== -->
+    <section class="panel" id="progress">
+      <h2>進度總覽</h2>
+      <p class="section-note">2026-11-19 的檢查結果，共 11 步。</p>
+      <div class="counts">
+        <span class="pill s-done">完成 1</span>
+        <span class="pill s-ok">條件符合 1</span>
+        <span class="pill s-part">部分完成 1</span>
+        <span class="pill s-todo">未完成 5</span>
+        <span class="pill s-info">說明性質 2</span>
+        <span class="pill s-none">不需操作 1</span>
+      </div>
+      <ol class="overview">
+        <li><span class="num">1</span><a href="#step-1">安裝與登入</a><span class="pill s-done">完成</span><span class="why">Claude Code 2.1.311、已信任資料夾、auto memory 已關閉</span></li>
+        <li><span class="num">2</span><a href="#step-2">Markdown 與 AGENTS.md</a><span class="pill s-ok">條件符合</span><span class="why"><code>AGENTS.md</code> 存在、沒有 <code>CLAUDE.md</code>、版本符合；有沒有讀過由你自己確認</span></li>
+        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-todo">未完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 不存在</span></li>
+        <li><span class="num">4</span><a href="#step-4">設定資料夾與範圍</a><span class="pill s-info">說明性質</span><span class="why">專案的 <code>.claude/</code> 會在第 6、9、10 步產生</span></li>
+        <li><span class="num">5</span><a href="#step-5">設定檔</a><span class="pill s-info">說明性質</span><span class="why"><code>.gitignore</code> 已排除 <code>.claude/settings.local.json</code></span></li>
+        <li><span class="num">6</span><a href="#step-6">權限</a><span class="pill s-todo">未完成</span><span class="why"><code>.claude/settings.json</code> 不存在</span></li>
+        <li><span class="num">7</span><a href="#step-7">MCP：Playwright</a><span class="pill s-todo">未完成</span><span class="why"><code>.mcp.json</code> 不存在</span></li>
+        <li><span class="num">8</span><a href="#step-8">Code Mode</a><span class="pill s-none">不需操作</span><span class="why">Claude Code 沒有這個功能</span></li>
+        <li><span class="num">9</span><a href="#step-9">Skill：brand</a><span class="pill s-todo">未完成</span><span class="why"><code>docs/BRAND.md</code> 還沒搬成 skill</span></li>
+        <li><span class="num">10</span><a href="#step-10">Plugin</a><span class="pill s-part">部分完成</span><span class="why">已裝在使用者層級，還沒裝在專案層級</span></li>
+        <li><span class="num">11</span><a href="#step-11">檢查並 commit</a><span class="pill s-todo">未完成</span><span class="why">前面的步驟做完後進行</span></li>
+      </ol>
+      <p class="next">還沒做的步驟依序是 3、6、7、9、10、11。</p>
+    </section>
+
+    <!-- ===================== glossary ===================== -->
+    <section class="panel" id="glossary">
+      <h2>名詞解釋</h2>
+      <dl class="glossary">
+        <div><dt>repo</dt><dd>用 git 管理版本的專案資料夾，這裡指 <code>accountable/</code>。</dd></div>
+        <div><dt>commit</dt><dd>把目前的變更存成一筆版本紀錄。只存在你的電腦上，執行 <code>git push</code> 之後才會上傳。</dd></div>
+        <div><dt><code>~</code>（家目錄）</dt><dd>你帳號的個人資料夾。Mac 上是 <code>/Users/你的帳號名稱</code>，PowerShell 寫成 <code>$HOME</code>。</dd></div>
+        <div><dt>session</dt><dd>從啟動 <code>claude</code> 到離開為止的一段對話。</dd></div>
+        <div><dt>context window</dt><dd>Claude 在一段對話中能同時看到的內容量。檔案、對話、工具說明都會佔用它。</dd></div>
+        <div><dt>scope（範圍）</dt><dd>一項設定對誰有效。Claude Code 有 Managed、Local、Project、User 四種，見第 4 步。</dd></div>
+        <div><dt><code>settings.json</code> 與 <code>settings.local.json</code></dt><dd>Claude Code 的設定檔。前者 commit 進 repo，所有人共用；後者只給你自己，不進 git。</dd></div>
+        <div><dt>permission rule（權限規則）</dt><dd>針對某個動作，規定 Claude 可以直接做（allow）、要先問你（ask），或不准做（deny）。</dd></div>
+        <div><dt>permission mode（權限模式）</dt><dd>Claude 整體上多常停下來問你。用 <kbd>Shift</kbd>+<kbd>Tab</kbd> 切換，見第 6 步。</dd></div>
+        <div><dt>MCP server</dt><dd>讓 Claude 使用外部工具的連接程式。例如 Playwright MCP 讓 Claude 可以操作瀏覽器。</dd></div>
+        <div><dt>skill</dt><dd>說明某類工作怎麼做的文件（<code>SKILL.md</code>）。平常只有名稱和描述放在 context 裡，需要時才載入全文。</dd></div>
+        <div><dt>plugin</dt><dd>一個安裝包，可以包含 skill、MCP server、指令等，用 <code>/plugin</code> 安裝和管理。</dd></div>
+        <div><dt>auto memory</dt><dd>Claude Code 自動把筆記存在 repo 外面，並在下一個 session 載入。課程要求關閉。</dd></div>
+        <div><dt><code>AGENTS.md</code> 與 <code>CLAUDE.md</code></dt><dd>給 coding agent 讀的專案說明。repo 裡沒有 <code>CLAUDE.md</code> 時，Claude Code 才會讀 <code>AGENTS.md</code>。</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===================== commands ===================== -->
+    <section class="panel" id="commands">
+      <h2>指令對照表</h2>
+      <p class="section-note">課程中用到的 Claude Code 指令，以及其他 agent 裡最接近的指令。在 agent 的輸入框裡輸入；只有 <code>pi install</code> 是在終端機執行。表格可以左右捲動。</p>
+      <div class="table-wrap">
+        <table class="cmd-table">
+          <thead>
+            <tr>
+              <th>用途</th>
+              <th class="cc">Claude Code</th>
+              <th>Codex</th>
+              <th>Copilot CLI</th>
+              <th>Cursor CLI</th>
+              <th>OpenCode</th>
+              <th>Pi</th>
+              <th>Antigravity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="what"><b>選擇模型</b><span>換用哪一個 Claude 模型</span></td>
+              <td class="cc"><code>/model</code></td><td><code>/model</code></td><td><code>/model</code></td><td><code>/model</code></td><td><code>/models</code></td><td><code>/model</code></td><td><code>/model</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>設定推理強度</b><span>模型回答前要思考多少</span></td>
+              <td class="cc"><code>/effort</code></td><td class="muted">在 <code>/model</code> 裡</td><td class="muted">在 <code>/model</code> 裡</td><td class="muted">在 <code>/model</code> 裡</td><td><code>/variants</code></td><td><code>/thinking</code></td><td><code>/effort</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>查看用量</b><span>這次 session 的花費與方案的用量上限</span></td>
+              <td class="cc"><code>/usage</code></td><td><code>/usage</code></td><td><code>/usage</code></td><td><code>/usage</code></td><td><code>/usage</code></td><td><code>/session</code></td><td><code>/usage</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>查看 context 被什麼佔用</b><span>檔案、對話、工具各佔多少</span></td>
+              <td class="cc"><code>/context</code></td><td><code>/status</code></td><td><code>/context</code></td><td><code>/context</code></td><td class="muted">側邊欄</td><td class="muted">底部列</td><td><code>/context</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>摘要對話以釋出 context</b><span>把前面的對話壓縮成摘要</span></td>
+              <td class="cc"><code>/compact</code></td><td><code>/compact</code></td><td><code>/compact</code></td><td><code>/compact</code></td><td><code>/compact</code></td><td><code>/compact</code></td><td><code>/compact</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>列出 skill</b><span>看目前有哪些 skill 可用</span></td>
+              <td class="cc"><code>/skills</code></td><td><code>/skills</code></td><td><code>/skills</code></td><td><code>/skills</code></td><td><code>/skills</code></td><td><code>/skill:</code></td><td><code>/skills</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>管理 MCP server</b><span>查看連線狀態、啟用或停用</span></td>
+              <td class="cc"><code>/mcp</code></td><td><code>/mcp</code></td><td><code>/mcp</code></td><td><code>/mcp</code></td><td><code>/mcps</code></td><td><code>/mcp</code></td><td><code>/mcp</code></td>
+            </tr>
+            <tr>
+              <td class="what"><b>管理 plugin</b><span>安裝、停用、查看已安裝的 plugin</span></td>
+              <td class="cc"><code>/plugin</code></td><td><code>/plugins</code></td><td><code>/plugin</code></td><td><code>/plugin</code></td><td><code>/plugins</code></td><td><code>pi install</code></td><td><code>/plugin</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>在 <code>/model</code> 選單裡，左右方向鍵也可以調整 effort。</li>
+        <li><code>/usage</code> 顯示這次 session 的花費和方案的用量上限，<code>/cost</code> 和 <code>/stats</code> 也會打開同一個畫面。</li>
+        <li><code>/compact</code> 後面可以加說明，指定摘要要著重哪些內容。</li>
+      </ul>
+    </section>
+
+    <!-- ===================== step 1 ===================== -->
+    <section class="panel" id="step-1">
+      <div class="step-head">
+        <span class="step-no">1</span>
+        <div class="step-titles"><h2>安裝與登入</h2><div class="en">Install and sign in</div></div>
+        <span class="pill s-done">完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>需要 Claude Pro 以上的方案，方案和價格在 <a href="https://claude.com/pricing" target="_blank" rel="noopener">claude.com/pricing</a>。使用預付 API 額度的 Claude Console 帳號也可以。Claude Code 沒有免費方案，不想花錢的話，改用 OpenCode、Pi 或 Antigravity 的講義。</p>
+        <div class="code"><div class="code-head"><span>Mac</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre></div>
+        <div class="code"><div class="code-head"><span>Windows (PowerShell)</span><button class="copy" type="button">複製</button></div><pre><code>irm https://claude.ai/install.ps1 | iex</code></pre></div>
+        <p>先執行一次 <code>claude</code> 登入。clone repo 之後（步驟見 <a href="../course/SETUP.md"><code>course/SETUP.md</code></a>），在 <code>accountable</code> 資料夾裡啟動 Claude Code：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>claude</code></pre></div>
+        <p>第一次執行會打開瀏覽器讓你登入。還沒登入或要切換帳號時，用 <code>/login</code>。Claude Code 也會問你是否信任這個資料夾，選「是」：在你同意之前，它會忽略專案的設定。</p>
+        <p>接著執行 <code>/memory</code>，關閉 auto memory。開著的時候，Claude Code 會在你工作時存自己的筆記，並在之後的 session 載入。<code>/memory</code> 裡的開關會套用到所有專案。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>安裝是把 <code>claude</code> 這個指令裝到電腦上。「信任資料夾」是允許 Claude Code 套用這個專案裡的設定檔，例如之後的 <code>.claude/settings.json</code>。</p>
+        <p>講義沒有寫關閉 auto memory 的原因 <span class="addon">補充</span>。課程的做法是把 agent 需要知道的事寫在 repo 的檔案裡（Week 1 Day 4 的「The repo as memory」）。關掉 auto memory，Claude 就不會依據 repo 外、你看不到的筆記工作。</p>
+      </div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
+        <ul>
+          <li>Claude Code 版本 2.1.311</li>
+          <li><code>~/.claude.json</code> 記錄這個資料夾已信任</li>
+          <li><code>~/.claude/settings.json</code> 裡是 <code>"autoMemoryEnabled": false</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 2 ===================== -->
+    <section class="panel" id="step-2">
+      <div class="step-head">
+        <span class="step-no">2</span>
+        <div class="step-titles"><h2>Markdown 與 AGENTS.md</h2><div class="en">Markdown and AGENTS.md</div></div>
+        <span class="pill s-ok">條件符合</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>在 VS Code 打開 <code>AGENTS.md</code> 和 <code>docs/intent.md</code> 讀過一遍。這是 Claude Code 開始工作前會讀的內容。<code>AGENTS.md</code> 很短，內容是指向 <code>docs/</code> 裡的檔案，agent 需要時才會打開它們。</p>
+        <p>只有 repo 裡沒有 <code>CLAUDE.md</code>（也沒有 <code>.claude/CLAUDE.md</code> 或 <code>CLAUDE.local.md</code>）時，Claude Code 才會讀 <code>AGENTS.md</code>。這個 repo 刻意不放 <code>CLAUDE.md</code>，讓每個 coding agent 都讀同一份檔案。session 開始時，你會看到一行訊息，說找不到 <code>CLAUDE.md</code>、已載入 <code>AGENTS.md</code>。</p>
+        <p>Claude Code 從 2.1.277 版開始讀 <code>AGENTS.md</code>（Amazon Bedrock 上是 2.1.281）。如果公司鎖定在較舊的版本，在 repo 根目錄加一個 <code>CLAUDE.md</code>，內容只有這一行：</p>
+        <div class="code"><div class="code-head"><span>CLAUDE.md</span><button class="copy" type="button">複製</button></div><pre><code>@AGENTS.md</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>AGENTS.md</code> 是 agent 進入這個專案時第一個讀的檔案。它只列出其他文件放在哪裡，細節放在 <code>docs/</code>，需要時才讀。<code>@AGENTS.md</code> 這一行的意思是「把 <code>AGENTS.md</code> 的內容引進來」，只有舊版 Claude Code 才需要。</p>
+      </div>
+      <div class="callout note">
+        <div class="label">注意 <span class="addon">補充</span></div>
+        <p><code>/memory</code> 畫面上的「Project instructions」會在 repo 裡建立 <code>./CLAUDE.md</code>。建立之後，Claude Code 就不再讀 <code>AGENTS.md</code>，所以不要選它。</p>
+      </div>
+      <div class="callout progress p-ok">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-ok">條件符合</span></div>
+        <ul>
+          <li><code>AGENTS.md</code> 存在，repo 裡沒有 <code>CLAUDE.md</code></li>
+          <li>版本 2.1.311，高於 2.1.277，不需要加 <code>CLAUDE.md</code></li>
+          <li>有沒有讀過 <code>AGENTS.md</code> 和 <code>docs/intent.md</code>，由你自己確認</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 3 ===================== -->
+    <section class="panel" id="step-3">
+      <div class="step-head">
+        <span class="step-no">3</span>
+        <div class="step-titles"><h2>你自己的指示檔</h2><div class="en">Your own instructions file</div></div>
+        <span class="pill s-todo">未完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>適用於所有專案的個人指示，放在 <code>~/.claude/CLAUDE.md</code>。Claude Code 會把它和專案的 <code>AGENTS.md</code> 一起載入。</p>
+        <p>執行 <code>/memory</code>，選你的使用者檔案（畫面上是「User instructions」），或用 VS Code 打開：</p>
+        <div class="code"><div class="code-head"><span>Mac</span><button class="copy" type="button">複製</button></div><pre><code>code ~/.claude/CLAUDE.md</code></pre></div>
+        <div class="code"><div class="code-head"><span>Windows (PowerShell)</span><button class="copy" type="button">複製</button></div><pre><code>code $HOME\.claude\CLAUDE.md</code></pre></div>
+        <p>加一條你自己的偏好，例如：</p>
+        <div class="code"><div class="code-head"><span>~/.claude/CLAUDE.md</span><button class="copy" type="button">複製</button></div><pre><code>- Use uv for Python: `uv run` and `uv add`, never `pip install`.</code></pre></div>
+        <p class="translation">這一條的意思是：Python 一律用 uv，執行用 <code>uv run</code>、安裝套件用 <code>uv add</code>，不要用 <code>pip install</code>。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>AGENTS.md</code> 是這個專案的規則，所有人共用。<code>~/.claude/CLAUDE.md</code> 是你個人的習慣，放在家目錄，對你所有的專案都有效，不會進任何 repo。</p>
+      </div>
+      <div class="callout progress p-todo">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+        <ul>
+          <li><code>~/.claude/CLAUDE.md</code> 不存在</li>
+          <li><span class="addon" style="margin-left:0">補充</span> <code>~/.claude/rules/</code> 裡已經有 <code>context7.md</code> 和 <code>no-rhetoric.md</code>。它們也是使用者層級的指示，但這一步要建立的是 <code>~/.claude/CLAUDE.md</code>。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 4 ===================== -->
+    <section class="panel" id="step-4">
+      <div class="step-head">
+        <span class="step-no">4</span>
+        <div class="step-titles"><h2>設定資料夾與範圍</h2><div class="en">Config folders and scopes</div></div>
+        <span class="pill s-info">說明性質</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>這一步沒有指令要執行，說明的是設定檔放在哪裡、對誰有效。</p>
+        <div class="where">
+          <div class="where-box project">
+            <h3>專案裡：<code>accountable/</code></h3>
+            <div class="sub">跟著 repo 走。<code>.claude/</code> 除了 <code>settings.local.json</code>，全部 commit。</div>
+            <ul>
+              <li><code>.claude/settings.json</code><br>共用設定，例如權限和 plugin</li>
+              <li><code>.claude/settings.local.json</code><br>你在這個專案的個人設定，不進 git</li>
+              <li><code>.claude/</code> 底下的 <code>skills/</code>、<code>agents/</code>、<code>rules/</code>、<code>commands/</code></li>
+              <li><code>.mcp.json</code>（在 repo 根目錄）<br>專案的 MCP server</li>
+            </ul>
+          </div>
+          <div class="where-box home">
+            <h3>家目錄：<code>~</code></h3>
+            <div class="sub">只在你的電腦上，不屬於任何 repo。</div>
+            <ul>
+              <li><code>~/.claude/</code><br>你的 <code>settings.json</code>、<code>CLAUDE.md</code>、你自己的 skill 和 agent、已安裝的 plugin、session 紀錄</li>
+              <li><code>~/.claude.json</code>（另一個檔案，不在 <code>~/.claude/</code> 裡）<br>你的帳號、信任過的資料夾、你自己加的 MCP server。不需要手動編輯。</li>
+            </ul>
+          </div>
+        </div>
+        <p>想看家目錄裡的內容，在終端機執行 <code>ls ~/.claude</code>。Finder 會隱藏名稱以點開頭的資料夾。</p>
+        <div class="label" style="margin-top:8px">四種範圍</div>
+        <p class="priority">由上到下，優先順序由高到低</p>
+        <ol class="scopes">
+          <li class="scope"><span class="name">Managed</span><span>由組織的 IT 設定</span><span class="who">部署範圍內的所有人</span></li>
+          <li class="scope cli"><span>命令列傳入的 <code>--settings</code> 排在這裡</span></li>
+          <li class="scope"><span class="name">Local</span><span><code>.claude/settings.local.json</code></span><span class="who">只有你，只在這個專案（不 commit）</span></li>
+          <li class="scope"><span class="name">Project</span><span><code>.claude/settings.json</code></span><span class="who">repo 裡的所有人（要 commit）</span></li>
+          <li class="scope"><span class="name">User</span><span><code>~/.claude/settings.json</code></span><span class="who">你，在所有專案</span></li>
+        </ol>
+        <p>兩個檔案設定同一件事時，上面的優先。權限規則這類清單會合併，不會互相取代。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>要不要進 git，看檔案放在哪一邊。想讓所有人都用的設定放 Project；只給自己用的，只限這個專案就放 Local，所有專案都要就放 User。</p>
+      </div>
+      <div class="callout progress p-info">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-info">說明性質</span></div>
+        <ul>
+          <li>專案的 <code>.claude/</code> 還不存在，第 6、9、10 步會產生</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 5 ===================== -->
+    <section class="panel" id="step-5">
+      <div class="step-head">
+        <span class="step-no">5</span>
+        <div class="step-titles"><h2>設定檔</h2><div class="en">Settings</div></div>
+        <span class="pill s-info">說明性質</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>Claude Code 把專案的設定放在 <code>.claude/</code> 裡的兩個檔案：</p>
+        <ul>
+          <li><code>settings.json</code>：repo 裡所有人共用的設定，要 commit。</li>
+          <li><code>settings.local.json</code>：你在這個專案的個人設定，不進 git。這個 repo 的 <code>.gitignore</code> 已經列出它。</li>
+        </ul>
+        <p>兩個檔案能放的設定種類相同，例如權限。很少需要手動編輯：<code>/permissions</code>、<code>/plugin</code> 這類指令會問你要存到哪個範圍，再替你寫入。你在提示中回答「Yes, and don't ask again」時，Claude Code 會把這條規則存進 <code>settings.local.json</code>。</p>
+        <p>第 6 步會在 <code>settings.json</code> 加入第一批規則。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>平常不用自己打開這兩個檔案。在提示中選「Yes, and don't ask again」，規則只會存進你自己的 <code>settings.local.json</code>，不影響其他人。</p>
+      </div>
+      <div class="callout progress p-info">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-info">說明性質</span></div>
+        <ul>
+          <li><code>.gitignore</code> 第 59 行已排除 <code>.claude/settings.local.json</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 6 ===================== -->
+    <section class="panel" id="step-6">
+      <div class="step-head">
+        <span class="step-no">6</span>
+        <div class="step-titles"><h2>權限</h2><div class="en">Permissions</div></div>
+        <span class="pill s-todo">未完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>執行 <code>/permissions</code>，加入下面三條規則，每一條都存到 project settings：</p>
+        <ul class="rules">
+          <li class="rule"><span class="pill r-allow">Allow</span><code>Bash(npm test)</code><span class="why">執行測試不用問你。<code>docs/TECH_STACK.md</code> 寫明測試使用自己的資料庫，不會改到你的資料。</span></li>
+          <li class="rule"><span class="pill r-ask">Ask</span><code>Bash(git push *)</code><span class="why">任何 <code>git push</code> 都先問你，因為 push 會把 commit 上傳到 GitHub。</span></li>
+          <li class="rule"><span class="pill r-deny">Deny</span><code>Read(./.env)</code><span class="why">禁止讀 <code>.env</code>，這個檔案放的是 API key 這類密碼。</span></li>
+        </ul>
+        <p><code>.claude/settings.json</code> 會變成這樣：</p>
+        <div class="code"><div class="code-head"><span>.claude/settings.json</span><button class="copy" type="button">複製</button></div><pre><code>{
+  "permissions": {
+    "allow": ["Bash(npm test)"],
+    "ask": ["Bash(git push *)"],
+    "deny": ["Read(./.env)"]
+  }
+}</code></pre></div>
+        <div class="order"><span>檢查順序</span><span class="pill r-deny">deny</span><span aria-hidden="true">→</span><span class="pill r-ask">ask</span><span aria-hidden="true">→</span><span class="pill r-allow">allow</span></div>
+        <p>Claude Code 先檢查 deny 規則，再檢查 ask，最後才是 allow。deny 規則在每種模式都有效，ask 規則在 Auto 模式下也照樣會問。在 Auto 模式下，讓 agent 能執行任意程式碼的大範圍 allow 規則會被擱置，例如 <code>Bash(npm run *)</code> 或 <code>Bash(uv run *)</code>；<code>Bash(npm test)</code> 這種範圍窄的規則則保留。</p>
+        <div class="label" style="margin-top:8px">權限模式（按 <kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換）</div>
+        <div class="modes">
+          <div class="mode"><b>Auto<span class="current">你目前的模式</span></b><p>預設模式。Claude 不逐一詢問就工作，背景有另一個模型審查 shell 指令、網路請求這類動作。</p></div>
+          <div class="mode"><b>Manual</b><p>編輯檔案和執行指令前都會問你。舊資料稱為「default mode」。</p></div>
+          <div class="mode"><b>Accept edits</b><p>編輯檔案和簡單的檔案指令直接執行，其他指令會問。</p></div>
+          <div class="mode"><b>Plan</b><p>Claude 只讀取和規劃，你核准計畫之前不做任何修改。</p></div>
+        </div>
+        <p>另外兩種模式 Don't ask 和 Bypass permissions 用於自動化和容器，預設不在 <kbd>Shift</kbd>+<kbd>Tab</kbd> 的循環裡。只有用 <code>--allow-dangerously-skip-permissions</code> 這類旗標啟動 Claude Code 時，Bypass 才會加入，排在 Plan 之後。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>npm run</code> 後面可以接任何 script，允許它等於允許執行任意程式，所以 Auto 模式不採用這種規則。<code>npm test</code> 只會執行固定的測試指令，範圍明確。</p>
+        <p>三條規則存到 project settings，commit 之後，repo 裡的每個人都套用同樣的限制。</p>
+      </div>
+      <div class="callout progress p-todo">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+        <ul>
+          <li><code>.claude/settings.json</code> 不存在</li>
+          <li>目前的權限模式是 Auto（<code>~/.claude/settings.json</code> 沒有另外設定預設模式）</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 7 ===================== -->
+    <section class="panel" id="step-7">
+      <div class="step-head">
+        <span class="step-no">7</span>
+        <div class="step-titles"><h2>MCP：Playwright server</h2><div class="en">MCP: the Playwright server</div></div>
+        <span class="pill s-todo">未完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>在 repo 的終端機裡執行（在 Claude Code 外面）：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>claude mcp add -s project playwright -- npx @playwright/mcp@latest</code></pre></div>
+        <p>這會在 repo 根目錄寫入 <code>.mcp.json</code>。<code>-s</code> 是 <code>--scope</code> 的縮寫。不加 <code>-s project</code> 的話，server 會存在 <code>~/.claude.json</code>，只給你自己用，也就沒有東西可以 commit。</p>
+        <p>重新啟動 <code>claude</code>。它說在這個專案找到新的 MCP server 時，選「Use this MCP server」。直接按 <kbd>Enter</kbd> 會選到「Continue without using this MCP server」。你的選擇存在 <code>.claude/settings.local.json</code>，所以每個 clone 這個 repo 的人都會被問一次。</p>
+        <p>接著執行 <code>/mcp</code>，確認 <code>playwright</code> 已連線。如果不小心拒絕了，在終端機執行下面的指令，再重新啟動 <code>claude</code>：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>claude mcp reset-project-choices</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>Playwright 是控制瀏覽器的工具。接上這個 MCP server 之後，Claude 可以自己打開網頁、點擊、截圖，用來檢查它做出來的畫面。</p>
+        <p><code>-s project</code> 決定設定寫在哪裡：寫進 repo 的 <code>.mcp.json</code>，就能 commit 給其他人用。要不要啟用則是每個人自己決定，所以這個選擇存在不進 git 的 <code>settings.local.json</code>。</p>
+      </div>
+      <div class="callout note">
+        <div class="label">注意 <span class="addon">補充</span></div>
+        <p>你已經在使用者層級啟用了 <code>playwright</code> plugin，它附帶自己的 playwright server（<code>/plugin</code> 畫面上 playwright 底下那一列）。做完這一步後會有兩個：<code>plugin:playwright:playwright</code> 和專案的 <code>playwright</code>。課程需要的是專案這一份。如果不想重複，可以比照 context7 的做法，在 <code>/mcp</code> 停用 plugin 那一份，只影響這個專案。</p>
+      </div>
+      <div class="callout progress p-todo">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+        <ul>
+          <li><code>.mcp.json</code> 不存在</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 8 ===================== -->
+    <section class="panel" id="step-8">
+      <div class="step-head">
+        <span class="step-no">8</span>
+        <div class="step-titles"><h2>Code Mode</h2><div class="en">Code Mode</div></div>
+        <span class="pill s-none">不需操作</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>Claude Code 沒有 Code Mode。它用另一種方式節省 context：MCP tool search 預設開啟，啟動時只載入 MCP 工具的名稱，Claude 需要用到時才載入完整定義。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>其他 agent 的講義在這一節有設定要做。Claude Code 預設就只在需要時載入工具說明，所以這裡不用操作。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">不需操作</span></div>
+      </div>
+    </section>
+
+    <!-- ===================== step 9 ===================== -->
+    <section class="panel" id="step-9">
+      <div class="step-head">
+        <span class="step-no">9</span>
+        <div class="step-titles"><h2>Skill：brand skill</h2><div class="en">A skill: the brand skill</div></div>
+        <span class="pill s-todo">未完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>對 Claude 輸入這段話（照原文貼英文）：</p>
+        <div class="code"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Please move docs/BRAND.md into a project skill called brand in .claude/skills/brand/SKILL.md. Give it a name and a description that says to use it for any UI work, and move all the brand content into it. Then delete docs/BRAND.md and remove its line from AGENTS.md.</code></pre></div>
+        <p class="translation">中文意思：把 <code>docs/BRAND.md</code> 移成名為 brand 的專案 skill，路徑是 <code>.claude/skills/brand/SKILL.md</code>。給它名稱和描述，描述寫明任何 UI 工作都要使用它，並把所有品牌內容搬進去。然後刪除 <code>docs/BRAND.md</code>，並從 <code>AGENTS.md</code> 移除它那一行。</p>
+        <p>新檔案的開頭會像這樣，下面接著品牌規範：</p>
+        <div class="code"><div class="code-head"><span>.claude/skills/brand/SKILL.md</span><button class="copy" type="button">複製</button></div><pre><code>---
+name: brand
+description: Accountable's brand guidelines for fonts, colors, surfaces and tone. Use for any UI work.
+---</code></pre></div>
+        <p>執行 <code>/skills</code> 查看。在出現 UI 工作之前，Claude 的 context 裡只有這個 skill 的名稱和描述，需要時才載入全文。</p>
+        <p>要安裝別人發布的 skill，Vercel 的 skills 工具適用課程裡所有的 agent（需要 Node 22.20 以上），例如：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>npx skills add vercel-labs/agent-skills --skill web-design-guidelines -a claude-code</code></pre></div>
+        <p><code>npx skills find</code> 可以搜尋 skill。今天不需要安裝任何 skill。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>BRAND.md</code> 是做 UI 時用的品牌規範。改成 skill 之後，Claude 平常只看到一行描述，做 UI 時才載入全文，不做 UI 的時候不佔 context。</p>
+      </div>
+      <div class="callout progress p-todo">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+        <ul>
+          <li><code>docs/BRAND.md</code> 還在</li>
+          <li><code>AGENTS.md</code> 第 9 行還列著 <code>docs/BRAND.md</code></li>
+          <li><code>.claude/skills/brand/</code> 不存在</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 10 ===================== -->
+    <section class="panel" id="step-10">
+      <div class="step-head">
+        <span class="step-no">10</span>
+        <div class="step-titles"><h2>Plugin</h2><div class="en">A plugin</div></div>
+        <span class="pill s-part">部分完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>在 Claude Code 執行 <code>/plugin</code>。在 Discover 分頁輸入 <code>frontend-design</code>，在它上面按 <kbd>Enter</kbd>，選「Install for all collaborators on this repository (project scope)」。</p>
+        <p>這個 plugin 會以 <code>frontend-design@anthropic-plugin-directory</code> 記錄在 <code>.claude/settings.json</code>。repo 裡的其他人，要在自己的電腦上各裝一次。它包含一個 skill <code>frontend-design</code>，Claude 做前端工作時會用到。如果 Claude Code 要求，執行 <code>/reload-plugins</code>。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>選 project scope，會把「這個 repo 使用 frontend-design」寫進 <code>.claude/settings.json</code>，跟著 repo 一起 commit。</p>
+      </div>
+      <div class="callout progress p-part">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-part">部分完成</span></div>
+        <ul>
+          <li>已裝在使用者層級：<code>~/.claude/settings.json</code> 裡有 <code>frontend-design@claude-plugins-official</code></li>
+          <li>這一步要的是專案層級，也就是 <code>.claude/settings.json</code> 裡出現這個 plugin 的紀錄，目前還沒有</li>
+          <li><span class="addon" style="margin-left:0">補充</span> 講義寫的名稱結尾是 <code>@anthropic-plugin-directory</code>，你電腦上的 marketplace 名稱是 <code>claude-plugins-official</code>，安裝後以實際寫入的名稱為準。因為已經裝在使用者層級，安裝畫面可能和講義的描述不同。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 11 ===================== -->
+    <section class="panel" id="step-11">
+      <div class="step-head">
+        <span class="step-no">11</span>
+        <div class="step-titles"><h2>檢查並 commit</h2><div class="en">Check and commit your setup</div></div>
+        <span class="pill s-todo">未完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>你的 repo 現在應該是這樣：</p>
+        <div class="tree" role="img" aria-label="完成後的 accountable 資料夾結構">
+          <div class="tree-row">accountable/</div>
+          <div class="tree-row">├── .claude/</div>
+          <div class="tree-row">│   ├── skills/brand/SKILL.md <span class="tag t-new">今天新增</span></div>
+          <div class="tree-row">│   ├── settings.json         <span class="tag t-new">今天新增</span></div>
+          <div class="tree-row">│   └── settings.local.json   <span class="tag t-ignored">git 忽略</span></div>
+          <div class="tree-row">├── assets/</div>
+          <div class="tree-row">├── community_contributions/</div>
+          <div class="tree-row">├── course/</div>
+          <div class="tree-row">├── docs/</div>
+          <div class="tree-row">│   ├── intent.md</div>
+          <div class="tree-row">│   ├── STATUS.md</div>
+          <div class="tree-row">│   └── TECH_STACK.md</div>
+          <div class="tree-row">├── .gitignore</div>
+          <div class="tree-row">├── .mcp.json                 <span class="tag t-new">今天新增</span></div>
+          <div class="tree-row">├── AGENTS.md                 <span class="tag t-changed">今天修改</span></div>
+          <div class="tree-row">└── README.md</div>
+        </div>
+        <div class="label" style="margin-top:8px">逐項檢查 <span class="check-count" id="check-count"></span></div>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="chk-permissions"><span><code>/permissions</code> 顯示那三條規則</span></label></li>
+          <li><label><input type="checkbox" id="chk-mcp"><span><code>/mcp</code> 顯示 <code>playwright</code> 已連線</span></label></li>
+          <li><label><input type="checkbox" id="chk-skills"><span><code>/skills</code> 列出 <code>brand</code></span></label></li>
+          <li><label><input type="checkbox" id="chk-plugin"><span><code>/plugin</code> 的 Installed 分頁列出 <code>frontend-design</code></span></label></li>
+          <li><label><input type="checkbox" id="chk-brand"><span><code>docs/BRAND.md</code> 已刪除，<code>AGENTS.md</code> 也不再列出它</span></label></li>
+        </ul>
+        <p>然後 commit 今天的變更：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Day 2 setup"</code></pre></div>
+        <p><code>.gitignore</code> 會讓 <code>.claude/settings.local.json</code> 和 <code>.env</code> 不被 commit。</p>
+        <p>想直接跳到 Ed 這一天的結束狀態：先 commit 或 stash 你自己的變更，再執行：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git checkout week1day2-end</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>git add .</code> 會把 repo 裡所有的變更都加進這次 commit，包括新檔案。檢查清單確認的是前面每一步都真的生效了，再存成一筆紀錄。</p>
+      </div>
+      <div class="callout note">
+        <div class="label">注意 <span class="addon">補充</span></div>
+        <p>這份頁面存在 <code>notes/week1day2-claude-code.html</code>，也在 repo 裡。如果想讓「Day 2 setup」這個 commit 只包含設定，先單獨 commit 這份頁面：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add notes/week1day2-claude-code.html
+git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pre></div>
+      </div>
+      <div class="callout progress p-todo">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+        <ul>
+          <li>目前在 <code>main</code>，快照當時沒有未 commit 的變更</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="footer">
+  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理。進度是 2026-11-19 的檢查結果。
+</footer>
+
+<script>
+(function () {
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = block.querySelector('.copy');
+    var code = block.querySelector('pre code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function () {
+      var text = code.textContent;
+      function done(ok) {
+        btn.textContent = ok ? '已複製' : '請手動選取';
+        setTimeout(function () { btn.textContent = '複製'; }, 1600);
+      }
+      function fallback() {
+        try {
+          var range = document.createRange();
+          range.selectNodeContents(code);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          var ok = document.execCommand('copy');
+          if (ok) sel.removeAllRanges();
+          done(ok);
+        } catch (e) { done(false); }
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  // Checklist, remembered in this browser only
+  var KEY = 'w1d2-claude-code-checklist';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.checklist input'));
+  var counter = document.getElementById('check-count');
+  function updateCount() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    counter.textContent = n + ' / ' + boxes.length;
+  }
+  boxes.forEach(function (box) {
+    box.checked = saved[box.id] === true;
+    box.addEventListener('change', function () {
+      saved[box.id] = box.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      updateCount();
+    });
+  });
+  updateCount();
+
+  // Highlight the current section in the side index
+  if ('IntersectionObserver' in window) {
+    var links = {};
+    document.querySelectorAll('.toc-side a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && links[entry.target.id]) {
+          Object.keys(links).forEach(function (k) { links[k].removeAttribute('aria-current'); });
+          links[entry.target.id].setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { observer.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

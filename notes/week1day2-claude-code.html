@@ -499,6 +499,88 @@ tbody tr:last-child td { border-bottom: 0; }
 .checklist input:checked + span { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--ink-soft); }
 .check-count { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 
+/* ---------- step 2 slide: progressive disclosure ---------- */
+.slide { border-top: 1px solid var(--line); padding-top: 22px; display: grid; gap: 14px; min-width: 0; }
+.slide-head { display: grid; gap: 4px; }
+.slide-head h3 { font-size: 19px; font-weight: 700; }
+.slide-head .en { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+.sub-h { font-size: 16.5px; font-weight: 700; margin: 10px 0 0; line-height: 1.4; }
+.fine { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+.code.wrap pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.layers { display: grid; gap: 0; min-width: 0; }
+.layer { border-radius: var(--radius-inner); padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.layer.always { background: var(--tint-green); }
+.layer.ondemand { background: var(--tint-neutral); }
+.layer-tag { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
+.layer.always .layer-tag { color: var(--ink-green); }
+.layer.ondemand .layer-tag { color: var(--ink-soft); }
+.layer-main { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; }
+.layer-size { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.layer p { font-size: 14.5px; }
+.layer-link { font-size: 13.5px; color: var(--ink-soft); padding: 6px 0 6px 22px; position: relative; }
+.layer-link::before { content: ""; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.layer table { font-size: 14px; }
+.layer th, .layer td { padding: 8px 10px 8px 0; border-bottom-color: var(--neutral-fill); }
+.layer td.n, .layer th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-right: 0; }
+.layer tfoot td { font-weight: 700; border-bottom: 0; }
+.layer code, .anno code, .tip code { background: var(--panel); }
+
+.anno { list-style: none; padding: 0; display: grid; gap: 8px; }
+.anno li + li { margin-top: 0; }
+.anno li {
+  display: grid;
+  grid-template-columns: 5.6em minmax(0, 1fr);
+  gap: 2px 12px;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.anno .ln { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); padding-top: 2px; white-space: nowrap; }
+.anno .src { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
+.anno .what { grid-column: 2; color: var(--ink-soft); }
+
+.tips { list-style: none; padding: 0; display: grid; gap: 12px; }
+.tips li + li { margin-top: 0; }
+.tip { border: 1px solid var(--line); border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+@media (max-width: 600px) { .tip { padding: 14px; } }
+.tip-head { display: flex; gap: 12px; align-items: flex-start; }
+.tip-no {
+  width: 28px; height: 28px; flex: none;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight); color: var(--sea);
+  font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+}
+.tip-head b { font-size: 16px; display: block; line-height: 1.45; }
+.tip-head .en { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+.tip p, .tip li { font-size: 15px; }
+.ex { display: grid; gap: 6px; }
+.ex-row {
+  display: grid;
+  grid-template-columns: 4.4em minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: baseline;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.ex-row.before { background: var(--tint-raspberry); }
+.ex-row.after { background: var(--tint-green); }
+.ex-tag { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.ex-row.before .ex-tag { color: var(--ink-raspberry); }
+.ex-row.after .ex-tag { color: var(--ink-green); }
+.ex-row .gloss { grid-column: 2; font-size: 13.5px; color: var(--ink-soft); }
+.ex-row code { background: var(--panel); }
+@media (max-width: 600px) {
+  .anno li, .ex-row { grid-template-columns: minmax(0, 1fr); }
+  .anno .what, .ex-row .gloss { grid-column: 1; }
+}
+.tip .callout { padding: 12px 14px; }
+
 .footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
 @media (min-width: 1100px) { .footer { padding-left: 288px; } }
 </style>
@@ -528,7 +610,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <li class="toc-sep" aria-hidden="true"></li>
         <li><a href="#step-1"><span class="toc-num">1</span>安裝與登入<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-2"><span class="toc-num">2</span>Markdown 與 AGENTS.md<span class="dot s-ok" title="條件符合"></span></a></li>
-        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
@@ -553,7 +635,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <li class="toc-sep" aria-hidden="true"></li>
         <li><a href="#step-1"><span class="toc-num">1</span>安裝與登入<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-2"><span class="toc-num">2</span>Markdown 與 AGENTS.md<span class="dot s-ok" title="條件符合"></span></a></li>
-        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
@@ -581,6 +663,7 @@ tbody tr:last-child td { border-bottom: 0; }
           <li><b>白話說明</b>：解釋這一步為什麼要這樣做。</li>
           <li><b>你的進度</b>：2026-11-19 檢查你電腦得到的結果，之後的操作不會自動更新到這裡。</li>
           <li>標示 <span class="addon" style="margin-left:0">補充</span> 的內容是講義沒有寫、另外加上的說明。</li>
+          <li>標示 <span class="addon" style="margin-left:0">投影片</span> 的內容來自課程投影片，講義裡沒有。目前在第 2 步。</li>
         </ul>
       </div>
     </section>
@@ -590,17 +673,17 @@ tbody tr:last-child td { border-bottom: 0; }
       <h2>進度總覽</h2>
       <p class="section-note">2026-11-19 的檢查結果，共 11 步。</p>
       <div class="counts">
-        <span class="pill s-done">完成 1</span>
+        <span class="pill s-done">完成 2</span>
         <span class="pill s-ok">條件符合 1</span>
         <span class="pill s-part">部分完成 1</span>
-        <span class="pill s-todo">未完成 5</span>
+        <span class="pill s-todo">未完成 4</span>
         <span class="pill s-info">說明性質 2</span>
         <span class="pill s-none">不需操作 1</span>
       </div>
       <ol class="overview">
         <li><span class="num">1</span><a href="#step-1">安裝與登入</a><span class="pill s-done">完成</span><span class="why">Claude Code 2.1.311、已信任資料夾、auto memory 已關閉</span></li>
         <li><span class="num">2</span><a href="#step-2">Markdown 與 AGENTS.md</a><span class="pill s-ok">條件符合</span><span class="why"><code>AGENTS.md</code> 存在、沒有 <code>CLAUDE.md</code>、版本符合；有沒有讀過由你自己確認</span></li>
-        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-todo">未完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 不存在</span></li>
+        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-done">完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 已建立，2 條 Python 工具的規則</span></li>
         <li><span class="num">4</span><a href="#step-4">設定資料夾與範圍</a><span class="pill s-info">說明性質</span><span class="why">專案的 <code>.claude/</code> 會在第 6、9、10 步產生</span></li>
         <li><span class="num">5</span><a href="#step-5">設定檔</a><span class="pill s-info">說明性質</span><span class="why"><code>.gitignore</code> 已排除 <code>.claude/settings.local.json</code></span></li>
         <li><span class="num">6</span><a href="#step-6">權限</a><span class="pill s-todo">未完成</span><span class="why"><code>.claude/settings.json</code> 不存在</span></li>
@@ -610,7 +693,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><span class="num">10</span><a href="#step-10">Plugin</a><span class="pill s-part">部分完成</span><span class="why">已裝在使用者層級，還沒裝在專案層級</span></li>
         <li><span class="num">11</span><a href="#step-11">檢查並 commit</a><span class="pill s-todo">未完成</span><span class="why">前面的步驟做完後進行</span></li>
       </ol>
-      <p class="next">還沒做的步驟依序是 3、6、7、9、10、11。</p>
+      <p class="next">還沒做的步驟依序是 6、7、9、10、11。</p>
     </section>
 
     <!-- ===================== glossary ===================== -->
@@ -631,6 +714,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <div><dt>plugin</dt><dd>一個安裝包，可以包含 skill、MCP server、指令等，用 <code>/plugin</code> 安裝和管理。</dd></div>
         <div><dt>auto memory</dt><dd>Claude Code 自動把筆記存在 repo 外面，並在下一個 session 載入。課程要求關閉。</dd></div>
         <div><dt><code>AGENTS.md</code> 與 <code>CLAUDE.md</code></dt><dd>給 coding agent 讀的專案說明。repo 裡沒有 <code>CLAUDE.md</code> 時，Claude Code 才會讀 <code>AGENTS.md</code>。</dd></div>
+        <div><dt>Markdown</dt><dd>用 <code>#</code>、<code>-</code>、反引號這幾個符號標出標題、清單、程式碼的純文字格式，副檔名是 <code>.md</code>。</dd></div>
+        <div><dt>漸進式揭露（progressive disclosure）</dt><dd>先給簡短的索引，細節放在別的檔案，需要時才打開。見第 2 步的投影片段落。</dd></div>
       </dl>
     </section>
 
@@ -749,6 +834,124 @@ tbody tr:last-child td { border-bottom: 0; }
         <div class="label">注意 <span class="addon">補充</span></div>
         <p><code>/memory</code> 畫面上的「Project instructions」會在 repo 裡建立 <code>./CLAUDE.md</code>。建立之後，Claude Code 就不再讀 <code>AGENTS.md</code>，所以不要選它。</p>
       </div>
+
+      <!-- slide: Markdown and progressive disclosure -->
+      <div class="slide" id="step-2-slide">
+        <div class="slide-head">
+          <div><span class="addon" style="margin-left:0">投影片</span></div>
+          <h3>Markdown 與漸進式揭露</h3>
+          <div class="en">Markdown and progressive disclosure — Keep AGENTS.md short and point to the files the agent needs</div>
+        </div>
+        <p>投影片的副標題是重點：讓 <code>AGENTS.md</code> 保持簡短，裡面寫出 agent 需要的檔案在哪裡，內容留在那些檔案裡。下面分三段說明：漸進式揭露是什麼、<code>AGENTS.md</code> 每一段在做什麼、投影片右邊的四個寫法建議。</p>
+
+        <h4 class="sub-h">一、漸進式揭露是什麼</h4>
+        <p>漸進式揭露（progressive disclosure）的意思是：先給一份簡短的索引，細節放在別的檔案，需要時才打開。類似查一本手冊：先看目錄，知道每一章講什麼、在哪一頁，要用到哪一章才翻過去，不用先把整本讀完。</p>
+        <p>放到 Claude Code 裡，分成兩層：</p>
+        <div class="layers">
+          <div class="layer always">
+            <div class="layer-tag">第一層：每個 session 都讀</div>
+            <div class="layer-main"><code>AGENTS.md</code><span class="layer-size">12 行，359 字元</span></div>
+            <p>session 開始時，整份放進 context。相當於手冊的目錄。</p>
+          </div>
+          <div class="layer-link">Claude 看第一層寫的用途，判斷現在要不要打開下面哪個檔案</div>
+          <div class="layer ondemand">
+            <div class="layer-tag">第二層：需要時才打開</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>檔案</th><th>什麼時候需要</th><th class="n">字元數</th></tr></thead>
+                <tbody>
+                  <tr><td><code>docs/intent.md</code></td><td>要知道這個產品要做什麼</td><td class="n">7,335</td></tr>
+                  <tr><td><code>docs/TECH_STACK.md</code></td><td>寫程式、選套件、跑測試</td><td class="n">1,660</td></tr>
+                  <tr><td><code>docs/BRAND.md</code></td><td>做 UI（第 9 步會改成 skill）</td><td class="n">1,444</td></tr>
+                  <tr><td><code>docs/STATUS.md</code></td><td>要知道做到哪裡；做完一段工作後更新</td><td class="n">32</td></tr>
+                  <tr><td><code>course/for_agents/</code>（4 個檔案）</td><td>學生需要課程上的協助</td><td class="n">67,199</td></tr>
+                </tbody>
+                <tfoot><tr><td>合計 8 個檔案</td><td></td><td class="n">77,670</td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p>每個 session 固定讀的是 359 字元。其他 8 個檔案共 77,670 字元，只有用到時才讀，而且通常只讀其中一兩個。如果把這些內容全部寫進 <code>AGENTS.md</code>，每個 session 一開始就要讀 78,029 字元，大部分和當下的工作無關。</p>
+        <p class="fine">字元數是 2026-11-19 用 <code>wc -m</code> 量的。context 實際用 token 計算，數字會不同；這些檔案都是英文，各檔案之間的比例差不多。</p>
+
+        <h4 class="sub-h">二、AGENTS.md 是純 Markdown</h4>
+        <p>Markdown 是一般的文字檔，用幾個符號標出結構：<code>#</code> 是標題、<code>##</code> 是下一層標題、行首的 <code>-</code> 是清單的一項、反引號 <code>`</code> 包住的是程式碼或路徑。不需要特殊工具，任何編輯器都能改，各家 coding agent 都讀得懂。</p>
+        <p>這是 repo 裡 <code>AGENTS.md</code> 的全文：</p>
+        <div class="code wrap"><div class="code-head"><span>AGENTS.md</span><button class="copy" type="button">複製</button></div><pre><code># Accountable
+
+SIDENOTE: this repo is part of a course by Ed Donner. If the student needs help, read `course/for_agents/`
+
+## Where to find things
+
+- `docs/intent.md`: what we're building
+- `docs/TECH_STACK.md`: the stack
+- `docs/BRAND.md`: the look, for UI work
+- `docs/STATUS.md`: what's done so far
+
+Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
+        <p>逐段說明：</p>
+        <ol class="anno">
+          <li><span class="ln">第 1 行</span><span class="src"># Accountable</span><span class="what">標題，寫專案名稱。</span></li>
+          <li><span class="ln">第 3 行</span><span class="src">SIDENOTE: …</span><span class="what">說明這個 repo 屬於 Ed Donner 的課程，學生需要協助時去讀 <code>course/for_agents/</code>。這一行也是「指向其他檔案」：那 4 個檔案共 67,199 字元，平常不讀。</span></li>
+          <li><span class="ln">第 5–10 行</span><span class="src">## Where to find things</span><span class="what">四個清單項目，格式都是「路徑: 一句用途」。Claude 看用途決定要不要打開，例如 <code>the look, for UI work</code> 表示做 UI 時才需要讀 <code>docs/BRAND.md</code>。</span></li>
+          <li><span class="ln">第 12 行</span><span class="src">Update docs/STATUS.md …</span><span class="what">一條動作指示：完成一段工作後，更新 <code>docs/STATUS.md</code>。</span></li>
+        </ol>
+
+        <h4 class="sub-h">三、四個寫法建議（Pro tips）</h4>
+        <ol class="tips">
+          <li class="tip">
+            <div class="tip-head"><span class="tip-no">1</span><div><b>寫清楚、寫簡短</b><div class="en">Be clear and concise — The agent reads it every session</div></div></div>
+            <p>agent 每個 session 都讀整份檔案。多寫一行，每個 session 的 context 就多佔一行；寫得模糊的句子，agent 每次都得自己猜意思。</p>
+            <div class="ex">
+              <div class="ex-row before"><span class="ex-tag">改寫前</span><span>Please try to keep the project docs up to date where appropriate.</span><span class="gloss">請在適當的時候盡量更新專案文件。沒說什麼時候、哪一份。</span></div>
+              <div class="ex-row after"><span class="ex-tag">改寫後</span><span><code>Update docs/STATUS.md when you finish a piece of work</code></span><span class="gloss">寫明時機（完成一段工作）和檔案（<code>docs/STATUS.md</code>）。這是 <code>AGENTS.md</code> 的第 12 行。</span></div>
+            </div>
+            <p class="fine"><span class="addon" style="margin-left:0">補充</span> Claude Code 文件建議每份 <code>CLAUDE.md</code> 在 200 行以內：超過會佔更多 context，Claude 照著做的程度也會下降，啟動時和 <code>/status</code> 會顯示警告。<code>AGENTS.md</code> 在這個 repo 扮演同樣的角色，目前是 12 行。</p>
+          </li>
+          <li class="tip">
+            <div class="tip-head"><span class="tip-no">2</span><div><b>多寫「要做什麼」，少寫「不要做什麼」</b><div class="en">Favor positives over negatives — Say what to do</div></div></div>
+            <p>只寫「不要做 X」，agent 知道 X 不能用，但不知道該用什麼，只能自己挑一個替代做法。直接寫出要用的做法，agent 照著做就好。真的要禁止某件事時，把替代做法寫在同一句。</p>
+            <div class="ex">
+              <div class="ex-row before"><span class="ex-tag">改寫前</span><span><code>Don't use pip.</code></span><span class="gloss">不要用 pip。那要用什麼，沒有寫。</span></div>
+              <div class="ex-row after"><span class="ex-tag">改寫後</span><span><code>Use uv for Python: `uv run` and `uv add`, never `pip install`.</code></span><span class="gloss">先寫要用的指令，最後才補一句不要用什麼。這是<a href="#step-3">第 3 步</a>的範例句。</span></div>
+            </div>
+          </li>
+          <li class="tip">
+            <div class="tip-head"><span class="tip-no">3</span><div><b>指向其他檔案</b><div class="en">Point to other files — Opened only when needed</div></div></div>
+            <p><code>AGENTS.md</code> 只放路徑和一句用途，細節留在原本的檔案。agent 用到時才打開，用不到的檔案不佔 context。</p>
+            <div class="ex">
+              <div class="ex-row before"><span class="ex-tag">改寫前</span><span>把 <code>docs/TECH_STACK.md</code> 的 26 行全文貼進 <code>AGENTS.md</code></span><span class="gloss">每個 session 多讀 1,660 字元，包括做 UI、寫文件這些用不到技術棧的工作。</span></div>
+              <div class="ex-row after"><span class="ex-tag">改寫後</span><span><code>- `docs/TECH_STACK.md`: the stack</code></span><span class="gloss"><code>AGENTS.md</code> 只多一行，全文在需要時才讀。</span></div>
+            </div>
+            <div class="callout note">
+              <div class="label">注意 <span class="addon">補充</span></div>
+              <p>路徑前面不要加 <code>@</code>。在 <code>CLAUDE.md</code> 和 <code>AGENTS.md</code> 裡，沒有用反引號包住的 <code>@docs/intent.md</code> 是匯入語法：session 開始時就把整份檔案載入，又變回每次都讀。只有確定每次都要整份載入的檔案才用 <code>@</code>，例如本步驟前面給舊版 Claude Code 用的 <code>@AGENTS.md</code>。</p>
+            </div>
+            <p><a href="#step-9">第 9 步</a>把 <code>docs/BRAND.md</code> 改成 skill，是同一個做法：context 裡只留 skill 的名稱和一行描述，做 UI 時才載入全文。</p>
+          </li>
+          <li class="tip">
+            <div class="tip-head"><span class="tip-no">4</span><div><b>實際測試</b><div class="en">Experiment — Watch what your agent does</div></div></div>
+            <p>寫下的指示，agent 不一定照你預期的方式使用。改完 <code>AGENTS.md</code> 之後，拿實際的問題測試，看它讀了哪些檔案。</p>
+            <ol>
+              <li><code>AGENTS.md</code> 在 session 開始時載入。改完後離開 Claude Code，重新執行 <code>claude</code>。</li>
+              <li>執行 <code>/memory</code>，確認清單裡有 <code>AGENTS.md</code> 的路徑；<code>/context</code> 可以看它佔了多少 context。</li>
+              <li>問一個要讀某份文件才答得出來的問題，看 Claude 回答前讀了哪些檔案。畫面上的工具呼叫會顯示 Read 和檔名。</li>
+              <li>沒有讀到預期的檔案，就改 <code>AGENTS.md</code> 裡那一項的用途說明，再測一次。</li>
+            </ol>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>可以這樣問</th><th>預期它打開</th></tr></thead>
+                <tbody>
+                  <tr><td>Accountable 的 MVP 有哪幾個區塊？</td><td><code>docs/intent.md</code></td></tr>
+                  <tr><td>跑測試要用什麼指令？</td><td><code>docs/TECH_STACK.md</code></td></tr>
+                  <tr><td>專案目前做到哪裡了？</td><td><code>docs/STATUS.md</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+        </ol>
+      </div>
+
       <div class="callout progress p-ok">
         <div class="row"><span class="label">你的進度</span><span class="pill s-ok">條件符合</span></div>
         <ul>
@@ -764,7 +967,7 @@ tbody tr:last-child td { border-bottom: 0; }
       <div class="step-head">
         <span class="step-no">3</span>
         <div class="step-titles"><h2>你自己的指示檔</h2><div class="en">Your own instructions file</div></div>
-        <span class="pill s-todo">未完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -780,10 +983,15 @@ tbody tr:last-child td { border-bottom: 0; }
         <div class="label">白話說明</div>
         <p><code>AGENTS.md</code> 是這個專案的規則，所有人共用。<code>~/.claude/CLAUDE.md</code> 是你個人的習慣，放在家目錄，對你所有的專案都有效，不會進任何 repo。</p>
       </div>
-      <div class="callout progress p-todo">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li><code>~/.claude/CLAUDE.md</code> 不存在</li>
+          <li><code>~/.claude/CLAUDE.md</code> 已建立（2026-11-19），共 2 行。第 1 行是上面的 uv 範例改得更精確：補上 <code>uv add --dev</code>、<code>uvx</code>，並把 <code>uv pip install</code> 也列為不要用（它不會寫進 <code>pyproject.toml</code> 和 <code>uv.lock</code>）。第 2 行是專案已經用別的 Python 工具時，照專案的做。
+            <div class="code wrap" style="margin-top:8px"><div class="code-head"><span>~/.claude/CLAUDE.md</span><button class="copy" type="button">複製</button></div><pre><code>- Use uv for Python: `uv run` to run code and tools, `uv add` for dependencies (`uv add --dev` for test and lint tools), `uvx` for one-off tools. Never `pip install` or `uv pip install`.
+- If a project already uses a different Python tool (for example Poetry, or pip with requirements.txt), follow the project.</code></pre></div>
+          </li>
+          <li>這個檔案在 session 開始時載入，要重新啟動 <code>claude</code> 才會生效。開新 session 後執行 <code>/memory</code>，清單裡應該會出現它的路徑。</li>
+          <li><span class="addon" style="margin-left:0">補充</span> 這台電腦的終端機目前沒有 <code>code</code> 指令，上面的 <code>code ~/.claude/CLAUDE.md</code> 會顯示 <code>command not found</code>。在 VS Code 按 <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>，執行「Shell Command: Install 'code' command in PATH」，開新的終端機後就能用；或改用 <code>/memory</code> 打開。</li>
           <li><span class="addon" style="margin-left:0">補充</span> <code>~/.claude/rules/</code> 裡已經有 <code>context7.md</code> 和 <code>no-rhetoric.md</code>。它們也是使用者層級的指示，但這一步要建立的是 <code>~/.claude/CLAUDE.md</code>。</li>
         </ul>
       </div>
@@ -1100,7 +1308,7 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
 </div>
 
 <footer class="footer">
-  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理。進度是 2026-11-19 的檢查結果。
+  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容。進度是 2026-11-19 的檢查結果。
 </footer>
 
 <script>

@@ -624,8 +624,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
         <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
-        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
-        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
       </ol>
     </nav>
   </aside>
@@ -649,8 +649,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
         <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
-        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
-        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
       </ol>
     </details>
 
@@ -680,9 +680,9 @@ tbody tr:last-child td { border-bottom: 0; }
       <h2>進度總覽</h2>
       <p class="section-note">2026-11-20 的檢查結果，共 11 步。</p>
       <div class="counts">
-        <span class="pill s-done">完成 6</span>
-        <span class="pill s-part">部分完成 1</span>
-        <span class="pill s-todo">未完成 1</span>
+        <span class="pill s-done">完成 8</span>
+        <span class="pill s-part">部分完成 0</span>
+        <span class="pill s-todo">未完成 0</span>
         <span class="pill s-info">說明性質 2</span>
         <span class="pill s-none">不需操作 1</span>
       </div>
@@ -696,10 +696,10 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><span class="num">7</span><a href="#step-7">MCP：Playwright</a><span class="pill s-done">完成</span><span class="why"><code>.mcp.json</code> 已建立，專案的 <code>playwright</code> 已連線，plugin 那一份已在這個專案停用</span></li>
         <li><span class="num">8</span><a href="#step-8">Code Mode</a><span class="pill s-none">不需操作</span><span class="why">Claude Code 沒有這個功能</span></li>
         <li><span class="num">9</span><a href="#step-9">Skill：brand</a><span class="pill s-done">完成</span><span class="why"><code>.claude/skills/brand/SKILL.md</code> 已建立，<code>docs/BRAND.md</code> 已刪除，<code>AGENTS.md</code> 已移除那一行，已在 <code>5a988ff</code> commit</span></li>
-        <li><span class="num">10</span><a href="#step-10">Plugin</a><span class="pill s-part">部分完成</span><span class="why">已裝在使用者層級，還沒裝在專案層級</span></li>
-        <li><span class="num">11</span><a href="#step-11">檢查並 commit</a><span class="pill s-todo">未完成</span><span class="why">前面的步驟做完後進行</span></li>
+        <li><span class="num">10</span><a href="#step-10">Plugin</a><span class="pill s-done">完成</span><span class="why">以 <code>frontend-design@claude-plugins-official</code> 裝在專案層級，和使用者層級是同一個 ID，已在 <code>4bb50e6</code> commit</span></li>
+        <li><span class="num">11</span><a href="#step-11">檢查並 commit</a><span class="pill s-done">完成</span><span class="why">設定分兩個 commit：<code>5a988ff</code>、<code>4bb50e6</code>；檢查清單對應的檔案狀態都核對過</span></li>
       </ol>
-      <p class="next">還沒做的步驟依序是 10、11。</p>
+      <p class="next">11 步都已完成或不需操作。下一步是 Day 3。</p>
     </section>
 
     <!-- ===================== glossary ===================== -->
@@ -1054,7 +1054,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
         <div class="row"><span class="label">你的進度</span><span class="pill s-info">說明性質</span></div>
         <ul>
           <li>專案的 <code>.claude/</code> 已在第 6 步建立，目前有 <code>settings.json</code>（第 6 步）、<code>settings.local.json</code>（第 7 步，git 忽略）和 <code>skills/brand/SKILL.md</code>（第 9 步）</li>
-          <li>第 10 步會在 <code>settings.json</code> 加上 plugin 的紀錄</li>
+          <li>第 10 步在 <code>settings.json</code> 加上了 <code>enabledPlugins</code>，記錄 frontend-design</li>
         </ul>
       </div>
     </section>
@@ -1284,7 +1284,7 @@ description: Accountable's brand guidelines for fonts, colors, surfaces and tone
       <div class="step-head">
         <span class="step-no">10</span>
         <div class="step-titles"><h2>Plugin</h2><div class="en">A plugin</div></div>
-        <span class="pill s-part">部分完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -1295,12 +1295,18 @@ description: Accountable's brand guidelines for fonts, colors, surfaces and tone
         <div class="label">白話說明</div>
         <p>選 project scope，會把「這個 repo 使用 frontend-design」寫進 <code>.claude/settings.json</code>，跟著 repo 一起 commit。</p>
       </div>
-      <div class="callout progress p-part">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-part">部分完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li>已裝在使用者層級：<code>~/.claude/settings.json</code> 裡有 <code>frontend-design@claude-plugins-official</code></li>
-          <li>這一步要的是專案層級，也就是 <code>.claude/settings.json</code> 裡出現這個 plugin 的紀錄，目前還沒有</li>
-          <li><span class="addon" style="margin-left:0">補充</span> 講義寫的名稱結尾是 <code>@anthropic-plugin-directory</code>，你電腦上的 marketplace 名稱是 <code>claude-plugins-official</code>，安裝後以實際寫入的名稱為準。因為已經裝在使用者層級，安裝畫面可能和講義的描述不同。</li>
+          <li>2026-11-20 在終端機用指令安裝，沒有走 <code>/plugin</code> 的 Discover 分頁：
+            <div class="code wrap" style="margin-top:8px"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>claude plugin install frontend-design@claude-plugins-official --scope project</code></pre></div>
+          </li>
+          <li>原因：之前已經以 <code>frontend-design@claude-plugins-official</code> 裝在使用者層級。Discover 分頁的 frontend-design 來源是 plugin directory，可能寫成另一個 ID（講義的 <code>@anthropic-plugin-directory</code>），變成兩個同名的 plugin。用指令指定 marketplace，兩個層級就是同一個 ID</li>
+          <li><code>.claude/settings.json</code> 多了 <code>"enabledPlugins": { "frontend-design@claude-plugins-official": true }</code>，已在 <code>4bb50e6</code> commit。指令改寫檔案時把 <code>ask</code> 移到 <code>deny</code> 後面，三條權限規則的內容不變</li>
+          <li><code>~/.claude/plugins/installed_plugins.json</code> 裡這個 ID 有兩筆：<code>scope: user</code> 和 <code>scope: project</code>（<code>projectPath</code> 是這個 repo）。兩筆的 <code>installPath</code> 都是 <code>~/.claude/plugins/cache/claude-plugins-official/frontend-design/1.1.1</code>，沒有重複下載</li>
+          <li>這個 plugin 只有一個 skill（<code>skills/frontend-design/SKILL.md</code>），沒有 hooks。你在 <code>/plugin</code> 和 <code>/skills</code> 確認過，frontend-design 各只出現一次</li>
+          <li><span class="addon" style="margin-left:0">補充</span> project 設定優先於 user 設定。之後在 <code>~/.claude/settings.json</code> 停用它，這個 repo 照樣啟用；要在這個 repo 關掉，在 <code>.claude/settings.local.json</code> 設成 <code>false</code></li>
+          <li><span class="addon" style="margin-left:0">補充</span> repo 的其他人 clone 之後，執行同一行指令安裝。<code>claude-plugins-official</code> 這個 marketplace 會在第一次啟動互動式 session 時自動加入</li>
         </ul>
       </div>
     </section>
@@ -1310,7 +1316,7 @@ description: Accountable's brand guidelines for fonts, colors, surfaces and tone
       <div class="step-head">
         <span class="step-no">11</span>
         <div class="step-titles"><h2>檢查並 commit</h2><div class="en">Check and commit your setup</div></div>
-        <span class="pill s-todo">未完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -1358,12 +1364,24 @@ git commit -m "Day 2 setup"</code></pre></div>
         <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add notes/week1day2-claude-code.html
 git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pre></div>
       </div>
-      <div class="callout progress p-todo">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li>目前在 <code>main</code>。第 6、7、9 步的設定已在 <code>5a988ff</code>（Day 2 setup: permissions, Playwright MCP and brand skill）commit，筆記頁在下一個 commit，兩個都推到 <code>fork</code> 的 <code>main</code></li>
+          <li>目前在 <code>main</code>。設定分兩個 commit，講義是一個 <code>Day 2 setup</code>：
+            <div class="table-wrap" style="margin-top:8px">
+              <table>
+                <thead><tr><th>commit</th><th>內容</th></tr></thead>
+                <tbody>
+                  <tr><td><code>5a988ff</code></td><td>第 6、7、9 步：<code>.claude/settings.json</code> 的權限、<code>.mcp.json</code>、brand skill、<code>AGENTS.md</code></td></tr>
+                  <tr><td><code>4bb50e6</code></td><td>第 10 步：<code>.claude/settings.json</code> 的 <code>enabledPlugins</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+          <li>筆記頁另外 commit，訊息開頭是 <code>Notes:</code></li>
+          <li>檢查清單對應的檔案狀態都核對過：<code>settings.json</code> 有三條權限規則；<code>claude mcp get playwright</code> 顯示 Connected；brand 出現在 skill 清單；frontend-design 有 project scope 的紀錄；<code>docs/BRAND.md</code> 已刪除，<code>AGENTS.md</code> 不再列出它。上面的勾選框要你自己勾</li>
           <li><code>.claude/settings.local.json</code> 被 git 忽略，沒有 commit</li>
-          <li>還沒做的是第 10 步的 plugin，以及上面的逐項檢查。第 10 步會改 <code>.claude/settings.json</code>，做完要再 commit 一次</li>
+          <li><code>main</code> 的 upstream 是 <code>fork/main</code>，執行 <code>git push</code> 會推到你的 fork</li>
         </ul>
       </div>
     </section>

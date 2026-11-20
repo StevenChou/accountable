@@ -581,6 +581,13 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .tip .callout { padding: 12px 14px; }
 
+/* ---------- step 9: AGENTS.md vs skill ---------- */
+.compare { min-width: 680px; font-size: 14px; }
+.compare thead th { white-space: normal; }
+.compare tbody th { font-weight: 700; width: 8.5em; }
+.compare tbody tr:last-child th { border-bottom: 0; }
+.compare code, .slide ul code { background: var(--panel); }
+
 .footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
 @media (min-width: 1100px) { .footer { padding-left: 288px; } }
 </style>
@@ -593,7 +600,7 @@ tbody tr:last-child td { border-bottom: 0; }
   <p class="lede">把講義 <code>claude_code.md</code> 翻成中文，每一步附上白話說明，並標出你目前做到哪裡。</p>
   <div class="meta">
     <span><b>原文</b><a href="../course/coding_agents/claude_code.md"><code>course/coding_agents/claude_code.md</code></a></span>
-    <span><b>進度快照</b>2026-11-19</span>
+    <span><b>進度快照</b>2026-11-20</span>
     <span><b>Claude Code 版本</b>2.1.311</span>
   </div>
 </header>
@@ -926,7 +933,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
               <div class="label">注意 <span class="addon">補充</span></div>
               <p>路徑前面不要加 <code>@</code>。在 <code>CLAUDE.md</code> 和 <code>AGENTS.md</code> 裡，沒有用反引號包住的 <code>@docs/intent.md</code> 是匯入語法：session 開始時就把整份檔案載入，又變回每次都讀。只有確定每次都要整份載入的檔案才用 <code>@</code>，例如本步驟前面給舊版 Claude Code 用的 <code>@AGENTS.md</code>。</p>
             </div>
-            <p><a href="#step-9">第 9 步</a>把 <code>docs/BRAND.md</code> 改成 skill，是同一個做法：context 裡只留 skill 的名稱和一行描述，做 UI 時才載入全文。</p>
+            <p><a href="#step-9">第 9 步</a>把 <code>docs/BRAND.md</code> 改成 skill，是同一個做法：context 裡只留 skill 的名稱和一行描述，做 UI 時才載入全文。三種放法的比較在<a href="#step-9-compare">第 9 步的講師重點</a>。</p>
           </li>
           <li class="tip">
             <div class="tip-head"><span class="tip-no">4</span><div><b>實際測試</b><div class="en">Experiment — Watch what your agent does</div></div></div>
@@ -1214,6 +1221,49 @@ description: Accountable's brand guidelines for fonts, colors, surfaces and tone
       <div class="callout plain">
         <div class="label">白話說明</div>
         <p><code>BRAND.md</code> 是做 UI 時用的品牌規範。改成 skill 之後，Claude 平常只看到一行描述，做 UI 時才載入全文，不做 UI 的時候不佔 context。</p>
+      </div>
+
+      <!-- lecture: AGENTS.md vs skill -->
+      <div class="slide" id="step-9-compare">
+        <div class="slide-head">
+          <div><span class="addon" style="margin-left:0">講師重點</span></div>
+          <h3>寫進 AGENTS.md 和做成 skill 的差別</h3>
+        </div>
+        <p>講師比較的是兩種放法：把 <code>BRAND.md</code> 的全文寫進 <code>AGENTS.md</code>，或做成 skill。這個 repo 在第 2 步時用的是第三種：<code>AGENTS.md</code> 只寫一行路徑。下表把三種並列。表格和下面的說明是依 Claude Code 官方文件和這個 repo 的實測整理的，不是講師的原話。</p>
+        <div class="table-wrap">
+          <table class="compare">
+            <thead><tr><th></th><th>全文寫進 AGENTS.md</th><th>AGENTS.md 只寫路徑（第 2 步）</th><th>brand skill（第 9 步）</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">每個 request 固定帶著</th><td><code>AGENTS.md</code> 全文，至少 1,762 字元（現在的 318 加上 <code>BRAND.md</code> 的 1,444）</td><td><code>AGENTS.md</code> 全文 359 字元，和品牌有關的只有路徑那一行，41 字元</td><td><code>AGENTS.md</code> 318 字元，加上 skill 清單裡的名稱 <code>brand</code> 和 89 字元的 description</td></tr>
+              <tr><th scope="row">品牌規範全文什麼時候進 context</th><td>session 開始時，之後一直都在</td><td>Claude 看到 <code>for UI work</code>，判斷這次要做 UI，自己用 Read 打開 <code>docs/BRAND.md</code></td><td>Claude 拿這次的工作比對 description，判斷相關就載入；你也可以輸入 <code>/brand</code> 直接載入</td></tr>
+              <tr><th scope="row">不做 UI 的 session</th><td>照樣佔 1,444 字元</td><td>不佔</td><td>不佔，只有 description 在</td></tr>
+              <tr><th scope="row">要確保這次一定用到</th><td>不用做什麼</td><td>在提示裡寫 <code>read docs/BRAND.md</code></td><td>輸入 <code>/brand</code>，或在提示裡寫 <code>Use the brand skill</code>。Day 3 的提示就是這樣寫</td></tr>
+              <tr><th scope="row">附帶其他檔案</th><td>可以用 <code>@路徑</code> 匯入，但匯入的檔案也在 session 開始時整份載入</td><td>可以再加路徑，每一行都是每個 request 的固定成本</td><td>放在 skill 資料夾裡，由 <code>SKILL.md</code> 指過去。載入 skill 後，需要時才讀</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fine">字元數是 2026-11-20 用 <code>wc -m</code> 量的。「全文寫進 AGENTS.md」那一欄是相加推算，沒有實際建立這樣的檔案。</p>
+
+        <h4 class="sub-h">官方文件的分法</h4>
+        <p>Claude Code 文件裡有一張 CLAUDE.md 對 skill 的比較表。在這個 repo，<code>AGENTS.md</code> 扮演 <code>CLAUDE.md</code> 的角色。</p>
+        <ul>
+          <li>放 <code>CLAUDE.md</code>：每個 session 都要知道的事，例如程式碼慣例、建置指令、專案結構、「永遠不要做 X」的規則。</li>
+          <li>放 skill：有時才用到的參考資料，例如 API 文件、風格指南；或用 <code>/名稱</code> 觸發的流程，例如部署、發版。</li>
+        </ul>
+        <p>品牌規範是風格指南，只有做 UI 時用得到，所以放 skill。文件也建議 <code>CLAUDE.md</code> 保持在 200 行以內，變長時把參考資料移到 skill。</p>
+
+        <h4 class="sub-h">skill 和「只寫路徑」差在哪</h4>
+        <p>兩種都是需要時才讀全文。以固定成本來看，只寫路徑的 41 字元比 skill 的名稱加 description 少。skill 多的是這幾項：</p>
+        <ul>
+          <li>有固定的指令 <code>/brand</code>，可以直接載入。</li>
+          <li>Claude Code 有專門的 skill 清單。description 寫的就是「什麼時候用」，Claude 拿手上的工作比對它，決定要不要載入。路徑做法裡的 <code>for UI work</code>，只是 <code>AGENTS.md</code> 裡的一段文字。</li>
+          <li><code>/skills</code> 列得出來，看得到目前有哪些 skill。</li>
+          <li>frontmatter 可以控制誰能叫用。例如 <code>disable-model-invocation: true</code>：Claude 不會自己載入，description 也不放進 context，只有你輸入 <code>/名稱</code> 時才載入，適合部署這類有副作用的流程。brand 不需要這樣設。</li>
+        </ul>
+
+        <h4 class="sub-h">侷限</h4>
+        <p>skill 和只寫路徑，都要靠 Claude 自己判斷要不要載入。官方文件寫明：description 寫得模糊，或和其他 skill 重疊時，Claude 可能載錯，或漏掉該用的 skill。第 10 步的 <code>frontend-design</code> 也是做前端時用的 skill，和 brand 的用途重疊，兩個都可能被載入。<code>docs/intent.md</code> 第 36 行寫明，品牌規範優先於一般的設計建議。需要確定用到 brand 時，輸入 <code>/brand</code>，或在提示裡點名。</p>
+        <p class="fine">來源：<a href="https://code.claude.com/docs/en/features-overview">code.claude.com/docs/en/features-overview</a>（Compare similar features、Understand context costs）、<a href="https://code.claude.com/docs/en/skills">code.claude.com/docs/en/skills</a>（Control who invokes a skill、Add supporting files），2026-11-20 查閱。</p>
       </div>
       <div class="callout progress p-done">
         <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>

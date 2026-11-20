@@ -35,6 +35,7 @@
   /* fills that stay the same in both themes */
   --sea: #06D6A0;
   --marigold: #FFC145;
+  --coral: #F78C6B;
   --cerulean-deep: #0B6E8F;
   --raspberry-deep: #C9264F;
   --midnight: #073B4C;
@@ -588,6 +589,42 @@ tbody tr:last-child td { border-bottom: 0; }
 .compare tbody tr:last-child th { border-bottom: 0; }
 .compare code, .slide ul code { background: var(--panel); }
 
+/* ---------- slide: the context window ---------- */
+.ctx-grid { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .ctx-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; } }
+.ctx-stack { background: var(--tint-neutral); border-radius: var(--radius-inner); padding: 10px; display: grid; gap: 6px; }
+.ctx-layer {
+  border-radius: 8px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 2px 10px;
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 15px; font-weight: 700;
+}
+.ctx-layer .zh { font-size: 13px; font-weight: 500; }
+.ctx-layer.l-system { background: var(--cerulean-deep); color: var(--white); min-height: 64px; }
+.ctx-layer.l-agents { background: var(--sea); color: var(--midnight); min-height: 36px; }
+.ctx-layer.l-mcp { background: var(--marigold); color: var(--midnight); min-height: 36px; }
+.ctx-layer.l-skills { background: var(--coral); color: var(--midnight); min-height: 36px; }
+.ctx-layer.l-history { background: var(--raspberry-deep); color: var(--white); min-height: 72px; }
+.ctx-layer.l-free { background: var(--panel); color: var(--ink-soft); min-height: 96px; font-weight: 600; }
+.ctx-steps { list-style: none; padding: 0; display: grid; gap: 14px; }
+.ctx-steps li + li { margin-top: 0; }
+.ctx-steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 2px 12px; align-items: start; }
+.ctx-steps .tip-no { grid-row: span 2; }
+.ctx-steps b { font-size: 16px; line-height: 1.45; padding-top: 2px; }
+.ctx-steps .d { grid-column: 2; color: var(--ink-soft); font-size: 15px; }
+.ctx-now { background: var(--tint-marigold); border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.ctx-now .label { color: var(--ink-marigold); margin-bottom: 0; }
+.ctx-map { min-width: 640px; font-size: 14px; }
+.ctx-map thead th { white-space: normal; }
+.ctx-map tbody th { font-weight: 700; width: 9em; }
+.ctx-map tbody tr:last-child th { border-bottom: 0; }
+.ctx-map td.steps, .ctx-map th.steps { white-space: nowrap; }
+.ctx-map.two { min-width: 0; }
+.ctx-map.two tbody th { width: 16em; }
+@media (max-width: 600px) { .ctx-map.two tbody th { width: 9em; } }
+
 .footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
 @media (min-width: 1100px) { .footer { padding-left: 288px; } }
 </style>
@@ -626,6 +663,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#context-window"><span class="toc-num"></span>投影片：Context window</a></li>
       </ol>
     </nav>
   </aside>
@@ -651,6 +690,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#context-window"><span class="toc-num"></span>投影片：Context window</a></li>
       </ol>
     </details>
 
@@ -689,7 +730,7 @@ tbody tr:last-child td { border-bottom: 0; }
       <ol class="overview">
         <li><span class="num">1</span><a href="#step-1">安裝與登入</a><span class="pill s-done">完成</span><span class="why">Claude Code 2.1.311、已信任資料夾、auto memory 已關閉</span></li>
         <li><span class="num">2</span><a href="#step-2">Markdown 與 AGENTS.md</a><span class="pill s-done">完成</span><span class="why"><code>AGENTS.md</code> 存在、沒有 <code>CLAUDE.md</code>、版本符合；你已讀過 <code>AGENTS.md</code> 和 <code>docs/intent.md</code></span></li>
-        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-done">完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 已建立，2 條 Python 工具的規則，新 session 已載入</span></li>
+        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-done">完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 已建立，3 條規則：2 條 Python 工具、1 條回覆語言，新 session 已載入</span></li>
         <li><span class="num">4</span><a href="#step-4">設定資料夾與範圍</a><span class="pill s-info">說明性質</span><span class="why">專案的 <code>.claude/</code> 已建立，目前有 <code>settings.json</code> 和 <code>settings.local.json</code></span></li>
         <li><span class="num">5</span><a href="#step-5">設定檔</a><span class="pill s-info">說明性質</span><span class="why"><code>.gitignore</code> 已排除 <code>.claude/settings.local.json</code></span></li>
         <li><span class="num">6</span><a href="#step-6">權限</a><span class="pill s-done">完成</span><span class="why">三條規則已寫入 <code>.claude/settings.json</code>，已在 <code>5a988ff</code> commit</span></li>
@@ -710,7 +751,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <div><dt>commit</dt><dd>把目前的變更存成一筆版本紀錄。只存在你的電腦上，執行 <code>git push</code> 之後才會上傳。</dd></div>
         <div><dt><code>~</code>（家目錄）</dt><dd>你帳號的個人資料夾。Mac 上是 <code>/Users/你的帳號名稱</code>，PowerShell 寫成 <code>$HOME</code>。</dd></div>
         <div><dt>session</dt><dd>從啟動 <code>claude</code> 到離開為止的一段對話。</dd></div>
-        <div><dt>context window</dt><dd>Claude 在一段對話中能同時看到的內容量。檔案、對話、工具說明都會佔用它。</dd></div>
+        <div><dt>context window</dt><dd>Claude 在一段對話中能同時看到的內容量。檔案、對話、工具說明都會佔用它。見最後一節的投影片。</dd></div>
+        <div><dt>compact（壓縮）</dt><dd>把到目前為止的對話換成一段摘要，空出 context。Claude Code 在 context 快滿時自動做，也可以手動執行 <code>/compact</code>。</dd></div>
         <div><dt>scope（範圍）</dt><dd>一項設定對誰有效。Claude Code 有 Managed、Local、Project、User 四種，見第 4 步。</dd></div>
         <div><dt><code>settings.json</code> 與 <code>settings.local.json</code></dt><dd>Claude Code 的設定檔。前者 commit 進 repo，所有人共用；後者只給你自己，不進 git。</dd></div>
         <div><dt>permission rule（權限規則）</dt><dd>針對某個動作，規定 Claude 可以直接做（allow）、要先問你（ask），或不准做（deny）。</dd></div>
@@ -992,11 +1034,12 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
       <div class="callout progress p-done">
         <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li><code>~/.claude/CLAUDE.md</code> 已建立（2026-11-19），共 2 行。第 1 行是上面的 uv 範例改得更精確：補上 <code>uv add --dev</code>、<code>uvx</code>，並把 <code>uv pip install</code> 也列為不要用（它不會寫進 <code>pyproject.toml</code> 和 <code>uv.lock</code>）。第 2 行是專案已經用別的 Python 工具時，照專案的做。
+          <li><code>~/.claude/CLAUDE.md</code> 已建立（2026-11-19），目前共 3 行。第 1 行是上面的 uv 範例改得更精確：補上 <code>uv add --dev</code>、<code>uvx</code>，並把 <code>uv pip install</code> 也列為不要用（它不會寫進 <code>pyproject.toml</code> 和 <code>uv.lock</code>）。第 2 行是專案已經用別的 Python 工具時，照專案的做。第 3 行是之後加的回覆語言規則：回覆用繁體中文（台灣用語），寫進 repo 的檔案、程式碼註解、commit message 用英文。
             <div class="code wrap" style="margin-top:8px"><div class="code-head"><span>~/.claude/CLAUDE.md</span><button class="copy" type="button">複製</button></div><pre><code>- Use uv for Python: `uv run` to run code and tools, `uv add` for dependencies (`uv add --dev` for test and lint tools), `uvx` for one-off tools. Never `pip install` or `uv pip install`.
-- If a project already uses a different Python tool (for example Poetry, or pip with requirements.txt), follow the project.</code></pre></div>
+- If a project already uses a different Python tool (for example Poetry, or pip with requirements.txt), follow the project.
+- 回覆用繁體中文（台灣用語）。寫進 repo 的檔案、程式碼註解、commit message 用英文，除非我另外指定。</code></pre></div>
           </li>
-          <li>已確認載入：2026-11-19 重新啟動後的 session，載入的指示檔裡有 <code>~/.claude/CLAUDE.md</code> 的兩行內容。這個檔案只在 session 開始時讀，之後再修改，也要重新啟動 <code>claude</code> 才會生效。</li>
+          <li>已確認載入：2026-11-19 重新啟動後的 session，載入的指示檔裡有 <code>~/.claude/CLAUDE.md</code> 的兩行內容；2026-11-20 的 session 載入的是 3 行的版本。這個檔案只在 session 開始時讀，之後再修改，也要重新啟動 <code>claude</code> 才會生效。</li>
           <li><span class="addon" style="margin-left:0">補充</span> <code>/memory</code> 畫面上的「User instructions」和「Project instructions」是固定的選項，檔案不存在也會顯示，例如 repo 裡沒有 <code>./CLAUDE.md</code>，「Project instructions」那一列照樣出現。要確認有沒有載入，用 <code>/context</code> 看指示檔清單，或請 Claude 原文引用檔案內容。</li>
           <li><span class="addon" style="margin-left:0">補充</span> 這台電腦的終端機目前沒有 <code>code</code> 指令，上面的 <code>code ~/.claude/CLAUDE.md</code> 會顯示 <code>command not found</code>。在 VS Code 按 <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>，執行「Shell Command: Install 'code' command in PATH」，開新的終端機後就能用；或改用 <code>/memory</code> 打開。</li>
           <li><span class="addon" style="margin-left:0">補充</span> <code>~/.claude/rules/</code> 裡已經有 <code>context7.md</code> 和 <code>no-rhetoric.md</code>。它們也是使用者層級的指示，但這一步要建立的是 <code>~/.claude/CLAUDE.md</code>。</li>
@@ -1386,11 +1429,96 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
       </div>
     </section>
 
+    <!-- ===================== slide: the context window ===================== -->
+    <section class="panel" id="context-window">
+      <div class="slide-head">
+        <div><span class="addon" style="margin-left:0">投影片</span></div>
+        <h2>Context window</h2>
+        <div class="en">The context window — AGENTS.md, MCP tools and skills all use context</div>
+      </div>
+      <p>投影片的副標題：<code>AGENTS.md</code>、MCP 工具和 skill 都會佔用 context。左邊是每次送給模型的內容由哪幾塊組成，右邊是 context 快滿時的壓縮（compacting）。</p>
+
+      <div class="ctx-grid">
+        <div class="block">
+          <div class="label">輸入的 context 包含</div>
+          <div class="ctx-stack" role="img" aria-label="context window 由上到下：System prompt、AGENTS.md、MCP tools、Skills、Conversation history，剩下的是 Free space">
+            <div class="ctx-layer l-system"><span>System prompt</span><span class="zh">系統提示</span></div>
+            <div class="ctx-layer l-agents"><span>AGENTS.md</span></div>
+            <div class="ctx-layer l-mcp"><span>MCP tools</span><span class="zh">MCP 工具</span></div>
+            <div class="ctx-layer l-skills"><span>Skills</span></div>
+            <div class="ctx-layer l-history"><span>Conversation history</span><span class="zh">對話紀錄</span></div>
+            <div class="ctx-layer l-free"><span>Free space</span><span class="zh">剩餘空間</span></div>
+          </div>
+          <p class="fine">各塊的高度照投影片示意，不是實際比例。實際比例用 <code>/context</code> 看。</p>
+        </div>
+        <div class="block">
+          <div class="label">壓縮（Compacting）</div>
+          <ol class="ctx-steps">
+            <li><span class="tip-no">1</span><b>摘要對話紀錄</b><span class="d">到目前為止的對話，換成一段簡短的摘要。</span></li>
+            <li><span class="tip-no">2</span><b>確保 AGENTS.md 還在 context 裡</b><span class="d">skill 的定義、MCP server 也一樣。</span></li>
+            <li><span class="tip-no">3</span><b>繼續工作</b><span class="d">session 從摘要接著做，有空間可以繼續。</span></li>
+          </ol>
+          <p><b>自動或手動</b>：context 快滿時 Claude Code 會自動壓縮，你也可以自己執行 <code>/compact</code>。</p>
+        </div>
+      </div>
+
+      <div class="ctx-now">
+        <div class="label">現在就做</div>
+        <p>執行 <code>/context</code>，看你的 context 被哪些東西佔用。</p>
+        <div class="code"><div class="code-head"><span>在 Claude Code 輸入</span><button class="copy" type="button">複製</button></div><pre><code>/context</code></pre></div>
+      </div>
+      <p class="fine">投影片底部列出 Codex、Copilot、Cursor、OpenCode、Pi，每個都打勾，旁邊寫「All six compact the conversation」（六個都會壓縮對話）。各 agent 的指令見<a href="#commands">指令對照表</a>。</p>
+
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>context window 的大小是固定的。system prompt、<code>AGENTS.md</code>、MCP 工具、skill 每次都佔一塊，剩下的給對話。對話越長，剩下的空間越少。快滿時，Claude Code 把舊的對話換成摘要，把 <code>AGENTS.md</code> 這些固定的部分放回去，再接著工作。<a href="#step-2">第 2 步</a>讓 <code>AGENTS.md</code> 保持簡短、<a href="#step-9">第 9 步</a>把品牌規範改成 skill，都是在縮小固定的部分。</p>
+      </div>
+
+      <h4 class="sub-h">對應到你目前的設定 <span class="addon">補充</span></h4>
+      <p><code>/context</code> 依分類列出佔用量，分類和投影片的幾塊大致對得上。下表列出每一塊在你的環境裡實際有什麼，字元數是 2026-11-20 用 <code>wc -m</code> 量的。表格可以左右捲動。</p>
+      <div class="table-wrap">
+        <table class="ctx-map">
+          <thead><tr><th>投影片</th><th><code>/context</code> 的分類</th><th>你的環境裡有什麼</th><th class="steps">相關步驟</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">System prompt</th><td>system prompt、system tools</td><td>Claude Code 內建的指示，以及 Read、Edit、Bash 這些內建工具的定義。投影片沒有把內建工具另外畫出來</td><td>—</td></tr>
+            <tr><th scope="row">AGENTS.md</th><td>memory files</td><td><code>AGENTS.md</code> 318 字元、<code>~/.claude/CLAUDE.md</code> 373 字元（3 行，第 3 步之後多了一行）、<code>~/.claude/rules/</code> 的 <code>context7.md</code> 604 字元和 <code>no-rhetoric.md</code> 578 字元，合計 1,873 字元</td><td class="steps"><a href="#step-2">2</a>、<a href="#step-3">3</a></td></tr>
+            <tr><th scope="row">MCP tools</th><td>MCP tools</td><td>這個專案的 <code>playwright</code>。tool search 預設開啟，啟動時只放工具名稱，用到時才載入完整定義</td><td class="steps"><a href="#step-7">7</a>、<a href="#step-8">8</a></td></tr>
+            <tr><th scope="row">Skills</th><td>skills</td><td><code>brand</code>（描述 89 字元）、<code>frontend-design</code>，加上 <code>~/.claude/skills/</code> 的 43 個 skill 和其他 plugin 帶的 skill。平常只放名稱和描述</td><td class="steps"><a href="#step-9">9</a>、<a href="#step-10">10</a></td></tr>
+            <tr><th scope="row">Conversation history</th><td>messages</td><td>你的訊息、Claude 的回覆、工具的輸入和輸出，例如讀進來的檔案內容、指令輸出、截圖</td><td>—</td></tr>
+            <tr><th scope="row">Free space</th><td>—</td><td>還沒用掉的部分</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine"><code>/context</code> 另外有 custom subagents 一類，目前這個 repo 沒有自訂的 subagent。<code>/skills</code> 不列出 Claude Code 內建的 skill，<code>/context</code> 的 skills 那一類會列出來。</p>
+
+      <h4 class="sub-h">壓縮之後，哪些東西還在 <span class="addon">補充</span></h4>
+      <p>投影片第 2 點的細節。官方文件列出壓縮後各項怎麼處理，和這個 repo 有關的是這幾項：</p>
+      <div class="table-wrap">
+        <table class="ctx-map two">
+          <thead><tr><th>項目</th><th>壓縮之後</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">system prompt</th><td>照常有效</td></tr>
+            <tr><th scope="row">專案根目錄的 <code>CLAUDE.md</code>（這個 repo 是 <code>AGENTS.md</code>）、沒有 <code>paths:</code> 的 rules</th><td>從磁碟重新讀取，再放回 context</td></tr>
+            <tr><th scope="row">skill 的描述</th><td>依目前的 skill 重建後放回。需要 2.1.304 以上，你是 2.1.311</td></tr>
+            <tr><th scope="row">已經載入的 skill 全文</th><td>放回，每個 skill 最多 5,000 tokens，全部合計最多 25,000 tokens，超過時先丟最早載入的。截斷時保留檔案開頭</td></tr>
+            <tr><th scope="row">Claude 讀過或改過的檔案</th><td>重新讀取最多 5 個，最近修改的優先</td></tr>
+            <tr><th scope="row">只在對話裡交代的指示</th><td>跟著對話一起被摘要</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>每次都要遵守的指示，寫進 <code>AGENTS.md</code>，不要只在對話裡說。官方文件對「壓縮後指示不見了」的解釋是：那條指示只在對話裡講過。</li>
+        <li>skill 被截斷時保留開頭，最重要的規則放在 <code>SKILL.md</code> 前面。brand 的 <code>SKILL.md</code> 是 1,569 字元，英文大約每 4 個字元 1 個 token，約 400 tokens，離每個 skill 5,000 tokens 的上限很遠。</li>
+        <li>要關掉自動壓縮，在 settings 設 <code>"autoCompactEnabled": false</code>。手動的 <code>/compact</code> 照樣能用。</li>
+      </ul>
+      <p class="fine">來源：<a href="https://code.claude.com/docs/en/context-window">code.claude.com/docs/en/context-window</a>（What survives compaction）、<a href="https://code.claude.com/docs/en/memory">code.claude.com/docs/en/memory</a>（Instructions seem lost after /compact）、<a href="https://code.claude.com/docs/en/debug-your-config">code.claude.com/docs/en/debug-your-config</a>（See what loaded into context）、<a href="https://code.claude.com/docs/en/settings-reference">code.claude.com/docs/en/settings-reference</a>（autoCompactEnabled），2026-11-20 查閱。</p>
+    </section>
+
   </main>
 </div>
 
 <footer class="footer">
-  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容。進度是 2026-11-20 的檢查結果。
+  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容，第 9 步加上講師對 <code>AGENTS.md</code> 和 skill 的比較，最後一節是課程投影片「The context window」。進度是 2026-11-20 的檢查結果。
 </footer>
 
 <script>

@@ -625,6 +625,74 @@ tbody tr:last-child td { border-bottom: 0; }
 .ctx-map.two tbody th { width: 16em; }
 @media (max-width: 600px) { .ctx-map.two tbody th { width: 9em; } }
 
+/* ---------- handout: one-page reference per agent ---------- */
+/* Block colors follow the PDF: 1 Sea Green, 2 Marigold, 3 Coral, 4 Cerulean, 5 Raspberry, 6 Midnight. */
+.ho { display: grid; gap: 12px; min-width: 0; }
+.ho-card { background: var(--tint-neutral); border-radius: var(--radius-inner); overflow: hidden; min-width: 0; }
+.ho-head { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; padding: 8px 16px; }
+.ho-head .n {
+  width: 24px; height: 24px; flex: none;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight); color: var(--white);
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+}
+.ho-head h3, .ho-head h4 { font-size: 16px; font-weight: 700; line-height: 1.4; margin: 0; }
+.ho-head .en { font-family: var(--font-mono); font-size: 12.5px; margin-left: auto; }
+.ho-1 .ho-head { background: var(--sea); color: var(--midnight); }
+.ho-2 .ho-head { background: var(--marigold); color: var(--midnight); }
+.ho-3 .ho-head { background: var(--coral); color: var(--midnight); }
+.ho-4 .ho-head { background: var(--cerulean-deep); color: var(--white); }
+.ho-5 .ho-head { background: var(--raspberry-deep); color: var(--white); }
+.ho-6 .ho-head { background: var(--midnight); color: var(--white); }
+.ho-4 .ho-head .n, .ho-5 .ho-head .n, .ho-6 .ho-head .n { background: var(--white); color: var(--midnight); }
+.ho-body { padding: 14px 16px 16px; display: grid; gap: 12px; font-size: 15px; min-width: 0; }
+.ho-body .label { margin-bottom: -6px; }
+.ho-body code { background: var(--panel); }
+
+.ho-table { font-size: 14.5px; }
+.ho-table th, .ho-table td { padding: 7px 14px 7px 0; border-bottom-color: var(--neutral-fill); }
+.ho-table th:last-child, .ho-table td:last-child { padding-right: 0; }
+.ho-table td:first-child { white-space: nowrap; }
+.ho-table td.in { padding-left: 18px; }
+.ho-table td.ref { font-size: 13.5px; white-space: nowrap; }
+.ho-table tr.grp th { font-size: 13px; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.04em; padding: 14px 0 4px; border-bottom: 0; }
+.ho-table tr.grp:first-child th { padding-top: 0; }
+/* under 600px each row stacks: name, then description, then the cross-reference */
+@media (max-width: 600px) {
+  .ho-table thead { display: none; }
+  .ho-table, .ho-table tbody, .ho-table tr, .ho-table th, .ho-table td { display: block; }
+  .ho-table tr { padding: 7px 0; border-bottom: 1px solid var(--neutral-fill); }
+  .ho-table tbody tr:last-child, .ho-table tr.grp { border-bottom: 0; }
+  .ho-table td, .ho-table tr.grp th { padding: 0; border-bottom: 0; }
+  .ho-table tr.grp { padding: 10px 0 0; }
+  .ho-table td:first-child, .ho-table td.ref { white-space: normal; }
+  .ho-table td:empty { display: none; }
+  .ho-table td.in, .ho-table td.in ~ td { padding-left: 18px; }
+}
+
+.ho-sum { min-width: 900px; font-size: 14px; }
+.ho-sum thead th { white-space: normal; }
+.ho-sum thead th:nth-child(2), .ho-sum td:nth-child(2) { white-space: nowrap; }
+.ho-sum code { overflow-wrap: normal; white-space: nowrap; }
+.ho-sum tbody th { font-weight: 700; white-space: nowrap; }
+.ho-sum tbody tr:last-child th { border-bottom: 0; }
+
+.ho-agents { display: grid; gap: 10px; min-width: 0; }
+.ho-agent { min-width: 0; }
+.ho-agent > summary {
+  cursor: pointer;
+  background: var(--tint-cerulean);
+  border-radius: var(--radius-inner);
+  padding: 12px 16px;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.ho-agent > summary .pg { font-family: var(--font-mono); font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-left: 10px; }
+.ho-agent-body { display: grid; gap: 12px; padding-top: 12px; min-width: 0; }
+.ho-sub { font-size: 16px; font-weight: 700; line-height: 1.4; margin: 8px 0 0; }
+
 .footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
 @media (min-width: 1100px) { .footer { padding-left: 288px; } }
 </style>
@@ -665,6 +733,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
         <li class="toc-sep" aria-hidden="true"></li>
         <li><a href="#context-window"><span class="toc-num"></span>投影片：Context window</a></li>
+        <li><a href="#handout"><span class="toc-num"></span>速查表：Claude Code</a></li>
+        <li><a href="#handout-others"><span class="toc-num"></span>速查表：其他 agent</a></li>
       </ol>
     </nav>
   </aside>
@@ -692,6 +762,8 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-done" title="完成"></span></a></li>
         <li class="toc-sep" aria-hidden="true"></li>
         <li><a href="#context-window"><span class="toc-num"></span>投影片：Context window</a></li>
+        <li><a href="#handout"><span class="toc-num"></span>速查表：Claude Code</a></li>
+        <li><a href="#handout-others"><span class="toc-num"></span>速查表：其他 agent</a></li>
       </ol>
     </details>
 
@@ -711,7 +783,8 @@ tbody tr:last-child td { border-bottom: 0; }
           <li><b>白話說明</b>：解釋這一步為什麼要這樣做。</li>
           <li><b>你的進度</b>：2026-11-19 檢查你電腦得到的結果，之後的操作不會自動更新到這裡。</li>
           <li>標示 <span class="addon" style="margin-left:0">補充</span> 的內容是講義沒有寫、另外加上的說明。</li>
-          <li>標示 <span class="addon" style="margin-left:0">投影片</span> 的內容來自課程投影片，講義裡沒有。目前在第 2 步。</li>
+          <li>標示 <span class="addon" style="margin-left:0">投影片</span> 的內容來自課程投影片，講義裡沒有。在第 2 步和 Context window 一節。</li>
+          <li>標示 <span class="addon" style="margin-left:0">速查表</span> 的內容來自課程的 PDF「Coding agents handout」，每個 agent 一頁，在最後兩節。</li>
         </ul>
       </div>
     </section>
@@ -751,7 +824,7 @@ tbody tr:last-child td { border-bottom: 0; }
         <div><dt>commit</dt><dd>把目前的變更存成一筆版本紀錄。只存在你的電腦上，執行 <code>git push</code> 之後才會上傳。</dd></div>
         <div><dt><code>~</code>（家目錄）</dt><dd>你帳號的個人資料夾。Mac 上是 <code>/Users/你的帳號名稱</code>，PowerShell 寫成 <code>$HOME</code>。</dd></div>
         <div><dt>session</dt><dd>從啟動 <code>claude</code> 到離開為止的一段對話。</dd></div>
-        <div><dt>context window</dt><dd>Claude 在一段對話中能同時看到的內容量。檔案、對話、工具說明都會佔用它。見最後一節的投影片。</dd></div>
+        <div><dt>context window</dt><dd>Claude 在一段對話中能同時看到的內容量。檔案、對話、工具說明都會佔用它。見 <a href="#context-window">Context window</a> 一節的投影片。</dd></div>
         <div><dt>compact（壓縮）</dt><dd>把到目前為止的對話換成一段摘要，空出 context。Claude Code 在 context 快滿時自動做，也可以手動執行 <code>/compact</code>。</dd></div>
         <div><dt>scope（範圍）</dt><dd>一項設定對誰有效。Claude Code 有 Managed、Local、Project、User 四種，見第 4 步。</dd></div>
         <div><dt><code>settings.json</code> 與 <code>settings.local.json</code></dt><dd>Claude Code 的設定檔。前者 commit 進 repo，所有人共用；後者只給你自己，不進 git。</dd></div>
@@ -770,7 +843,7 @@ tbody tr:last-child td { border-bottom: 0; }
     <!-- ===================== commands ===================== -->
     <section class="panel" id="commands">
       <h2>指令對照表</h2>
-      <p class="section-note">課程中用到的 Claude Code 指令，以及其他 agent 裡最接近的指令。在 agent 的輸入框裡輸入；只有 <code>pi install</code> 是在終端機執行。表格可以左右捲動。</p>
+      <p class="section-note">課程中用到的 Claude Code 指令，以及其他 agent 裡最接近的指令。在 agent 的輸入框裡輸入；只有 <code>pi install</code> 是在終端機執行。表格可以左右捲動。每個 agent 一整頁的指令清單在速查表：<a href="#handout">Claude Code</a>、<a href="#handout-others">其他 agent</a>。</p>
       <div class="table-wrap">
         <table class="cmd-table">
           <thead>
@@ -1514,11 +1587,831 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
       <p class="fine">來源：<a href="https://code.claude.com/docs/en/context-window">code.claude.com/docs/en/context-window</a>（What survives compaction）、<a href="https://code.claude.com/docs/en/memory">code.claude.com/docs/en/memory</a>（Instructions seem lost after /compact）、<a href="https://code.claude.com/docs/en/debug-your-config">code.claude.com/docs/en/debug-your-config</a>（See what loaded into context）、<a href="https://code.claude.com/docs/en/settings-reference">code.claude.com/docs/en/settings-reference</a>（autoCompactEnabled），2026-11-20 查閱。</p>
     </section>
 
+    <!-- ===================== handout: Claude Code one-pager ===================== -->
+    <section class="panel" id="handout">
+      <div class="slide-head">
+        <div><span class="addon" style="margin-left:0">速查表</span></div>
+        <h2>速查表：Claude Code</h2>
+        <div class="en">Coding agents handout — Claude Code, one pager reference guide (page 1 of 7)</div>
+      </div>
+      <p>Day 2 最後的文字課附了一份 PDF <code>AI-SDLC-Coding-Agents-Handout.pdf</code>，共 7 頁，每個 coding agent 一頁。這一節是第 1 頁 Claude Code 的翻譯，六個區塊的編號和標題照原文。其他 agent 在<a href="#handout-others">下一節</a>。</p>
+      <p class="fine">PDF 不在 repo 裡，放在 Ed 的 <a href="https://drive.google.com/drive/folders/1ar40RuSIJxJC5CJavHsEDE8CECqEZrC1?usp=sharing" target="_blank" rel="noopener">Google Drive 資料夾</a>（<code>README.md</code> 第 23 行的連結）。各區塊裡的「筆記裡的位置」是另外加的，指到前面講同一件事的地方。</p>
+
+      <div class="ho">
+        <div class="ho-card ho-1">
+          <div class="ho-head"><span class="n">1</span><h3>開始使用</h3><span class="en">Getting started</span></div>
+          <div class="ho-body">
+            <div class="code"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre></div>
+            <div class="code"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>irm https://claude.ai/install.ps1 | iex</code></pre></div>
+            <p>在專案資料夾執行 <code>claude</code>，從瀏覽器登入。<code>/login</code> 切換帳號。需要 Claude Pro 以上的方案，或 Claude Console 的 API 額度。</p>
+            <p><kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換模式：Manual、Accept edits、Plan、Auto。講師建議用 Auto，它也是啟動時的模式：Claude 不逐一詢問就工作，背景有另一個模型審查它的動作。</p>
+            <p class="fine">筆記裡的位置：<a href="#step-1">第 1 步</a>（安裝、登入）、<a href="#step-6">第 6 步</a>（權限模式）</p>
+          </div>
+        </div>
+
+        <div class="ho-card ho-2">
+          <div class="ho-head"><span class="n">2</span><h3>常用的斜線指令</h3><span class="en">Common slash commands</span></div>
+          <div class="ho-body">
+            <table class="ho-table">
+              <thead><tr><th>指令</th><th>用途</th><th>筆記裡的位置</th></tr></thead>
+              <tbody>
+                <tr><td><code>/model</code></td><td>選模型（左右方向鍵調整 effort）</td><td class="ref"><a href="#commands">指令對照表</a></td></tr>
+                <tr><td><code>/effort</code></td><td>設定推理強度</td><td class="ref"><a href="#commands">指令對照表</a></td></tr>
+                <tr><td><code>/context</code></td><td>查看 context window 被什麼佔用</td><td class="ref"><a href="#context-window">Context window</a></td></tr>
+                <tr><td><code>/compact</code></td><td>摘要對話，釋出 context</td><td class="ref"><a href="#context-window">Context window</a></td></tr>
+                <tr><td><code>/clear</code></td><td>開始新的對話，context 是空的</td><td class="ref"></td></tr>
+                <tr><td><code>/usage</code></td><td>這次 session 的花費，以及方案的用量上限</td><td class="ref"><a href="#commands">指令對照表</a></td></tr>
+                <tr><td><code>/skills</code></td><td>列出你的 skill</td><td class="ref"><a href="#step-9">第 9 步</a></td></tr>
+                <tr><td><code>/mcp</code></td><td>查看 MCP server 的狀態，並登入需要登入的 server</td><td class="ref"><a href="#step-7">第 7 步</a></td></tr>
+                <tr><td><code>/plugin</code></td><td>尋找、安裝、管理 plugin</td><td class="ref"><a href="#step-10">第 10 步</a></td></tr>
+                <tr><td><code>/permissions</code></td><td>工具的 allow、ask、deny 規則</td><td class="ref"><a href="#step-6">第 6 步</a></td></tr>
+                <tr><td><code>/memory</code></td><td>編輯指示檔，關閉 auto memory</td><td class="ref"><a href="#step-1">第 1 步</a>、<a href="#step-3">第 3 步</a></td></tr>
+                <tr><td><code>/rewind</code></td><td>把程式碼、對話，或兩者一起退回先前的狀態</td><td class="ref"></td></tr>
+                <tr><td><code>/help</code></td><td>列出所有指令</td><td class="ref"></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="ho-card ho-3">
+          <div class="ho-head"><span class="n">3</span><h3>檔案與資料夾</h3><span class="en">Files and folders</span></div>
+          <div class="ho-body">
+            <table class="ho-table">
+              <tbody>
+                <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                <tr><td><code>AGENTS.md</code></td><td>專案的指示。沒有 <code>CLAUDE.md</code> 時才讀</td></tr>
+                <tr><td><code>CLAUDE.md</code></td><td>可有可無。寫一行 <code>@AGENTS.md</code>，就會把 <code>AGENTS.md</code> 引進來</td></tr>
+                <tr><td><code>.mcp.json</code></td><td>專案的 MCP server</td></tr>
+                <tr><td><code>.claude/</code></td><td></td></tr>
+                <tr><td class="in"><code>settings.json</code></td><td>共用的權限和 plugin</td></tr>
+                <tr><td class="in"><code>settings.local.json</code></td><td>你自己的設定（不進 git）</td></tr>
+                <tr><td class="in"><code>skills/&lt;name&gt;/SKILL.md</code></td><td>專案的 skill</td></tr>
+                <tr><td class="in"><code>agents/</code></td><td>subagent</td></tr>
+                <tr><td class="in"><code>commands/</code></td><td>你自己的斜線指令</td></tr>
+                <tr><td class="in"><code>rules/</code></td><td>額外的指示，可以只套用在某些路徑</td></tr>
+                <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                <tr><td><code>~/.claude/</code></td><td></td></tr>
+                <tr><td class="in"><code>CLAUDE.md</code></td><td>你給所有專案的指示</td></tr>
+                <tr><td class="in"><code>settings.json</code></td><td>你給所有專案的設定</td></tr>
+                <tr><td class="in"><code>skills/</code> <code>agents/</code></td><td>你自己的 skill 和 subagent</td></tr>
+                <tr><td class="in"><code>plugins/</code></td><td>已安裝的 plugin 和 marketplace</td></tr>
+                <tr><td class="in"><code>projects/</code></td><td>對話紀錄（transcript）和 auto memory</td></tr>
+                <tr><td><code>~/.claude.json</code></td><td>你的帳號、信任過的資料夾、你自己的 MCP server</td></tr>
+              </tbody>
+            </table>
+            <p>Windows 上，<code>~</code> 是你的使用者資料夾，PowerShell 裡寫成 <code>$HOME</code>。</p>
+            <p>兩個檔案設定同一件事時，<code>settings.local.json</code> 優先於專案的 <code>settings.json</code>，專案的又優先於你在 <code>~/.claude</code> 裡的那一份。</p>
+            <p class="fine">筆記裡的位置：<a href="#step-2">第 2 步</a>（<code>AGENTS.md</code> 與 <code>CLAUDE.md</code>）、<a href="#step-4">第 4 步</a>（資料夾與範圍）、<a href="#step-5">第 5 步</a>（設定檔）</p>
+          </div>
+        </div>
+
+        <div class="ho-card ho-4">
+          <div class="ho-head"><span class="n">4</span><h3>MCP server、plugin 與 marketplace</h3><span class="en">MCP servers, plugins and marketplaces</span></div>
+          <div class="ho-body">
+            <div class="label">加入 MCP server（在終端機）</div>
+            <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>claude mcp add -s project playwright -- npx @playwright/mcp@latest
+claude mcp add --transport http &lt;name&gt; &lt;url&gt;</code></pre></div>
+            <p>第一行執行本機的 server，第二行連到遠端的 server。<code>-s</code> 設定範圍：<code>local</code>（預設）是你在這個專案，<code>project</code> 會寫入 <code>.mcp.json</code> 給所有人，<code>user</code> 是你在所有專案。<code>/mcp</code> 顯示每個 server 的狀態。</p>
+            <div class="label">Plugin 與 marketplace（在 Claude Code 裡）</div>
+            <div class="code"><div class="code-head"><span>在 Claude Code 輸入</span><button class="copy" type="button">複製</button></div><pre><code>/plugin
+/plugin marketplace add &lt;owner&gt;/&lt;repo&gt;
+/plugin install &lt;plugin&gt;@&lt;marketplace&gt;</code></pre></div>
+            <p>plugin 把 skill、subagent、hook 和 MCP server 包在一起。marketplace 是放在 GitHub repo 裡的 plugin 目錄，Anthropic 的那一個是內建的。選 project scope，會把 plugin 記錄在 <code>.claude/settings.json</code>，給整個團隊用。</p>
+            <p class="fine">筆記裡的位置：<a href="#step-7">第 7 步</a>（MCP）、<a href="#step-10">第 10 步</a>（plugin）</p>
+          </div>
+        </div>
+
+        <div class="ho-card ho-5">
+          <div class="ho-head"><span class="n">5</span><h3>使用技巧</h3><span class="en">Pro tips</span></div>
+          <div class="ho-body">
+            <ul>
+              <li><code>claude -c</code> 接續你在這個資料夾的上一段對話。<code>/resume</code> 或 <code>claude -r</code> 選更早的一段。</li>
+              <li><code>/remote-control</code>（或 <code>/rc</code>）讓你從手機或 claude.ai/code 接著操作這個 session，session 仍在你的電腦上執行。</li>
+              <li><code>!</code> 在 session 裡執行 shell 指令。<code>@</code> 加入檔案。</li>
+              <li><kbd>Esc</kbd> 停止 Claude。按兩次 <kbd>Esc</kbd> 打開 rewind。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>G</kbd> 用你的文字編輯器打開正在寫的提示。</li>
+              <li><code>/btw</code> 問一個旁支問題，問答不會留在對話裡。</li>
+              <li><code>claude -w &lt;name&gt;</code> 開一個平行的 session，並給它自己的 git worktree。</li>
+              <li><code>claude -p "&lt;prompt&gt;"</code> 執行一次就結束，用在 script 和 CI。</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="ho-card ho-6">
+          <div class="ho-head"><span class="n">6</span><h3>在 VS Code 和桌面 app</h3><span class="en">In VS Code and the desktop app</span></div>
+          <div class="ho-body">
+            <ul>
+              <li>課程用的是 VS Code 終端機裡的 CLI。</li>
+              <li>VS Code 擴充套件多一個面板，和 CLI 共用設定、MCP server、plugin 和歷史紀錄。</li>
+              <li>權限模式在輸入框下方選。Manual 模式下，每次編輯會開成 diff，由你接受或拒絕。</li>
+              <li>有些指令改成按鈕：滑鼠移到訊息上可以 rewind，打開 Session history 可以 resume。</li>
+              <li>Claude Code 也可以從 Claude 桌面 app 的 Code 分頁執行，或在雲端的 claude.ai/code 執行。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout plain">
+        <div class="label">核對 <span class="addon">補充</span></div>
+        <ul>
+          <li>2026-11-20 用這台電腦的 <code>claude --help</code> 和 <code>claude mcp add --help</code>（2.1.311）對照第 4、5 區塊：<code>-c</code>、<code>-r</code>、<code>-w</code>、<code>-p</code> 四個旗標都列在說明裡；<code>claude mcp add</code> 的 <code>-s</code> 接受 <code>local</code>、<code>user</code>、<code>project</code>，預設是 <code>local</code>；<code>--transport</code> 接受 <code>stdio</code>、<code>sse</code>、<code>http</code>。</li>
+          <li>斜線指令（<code>/rewind</code>、<code>/btw</code>、<code>/remote-control</code> 等）、快捷鍵，以及第 6 區塊對 VS Code 和桌面 app 的敘述，這次沒有實際操作核對。</li>
+          <li>前面 11 步沒有出現、只在速查表裡的內容：<code>/clear</code>、<code>/rewind</code>、<code>/help</code>；連遠端 MCP server 的 <code>--transport http</code>；<code>/plugin marketplace add</code> 和 <code>/plugin install</code>；第 5、6 區塊的全部。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== handout: the other six agents ===================== -->
+    <section class="panel" id="handout-others">
+      <div class="slide-head">
+        <div><span class="addon" style="margin-left:0">速查表</span></div>
+        <h2>速查表：其他 agent</h2>
+        <div class="en">Coding agents handout — pages 2 to 7</div>
+      </div>
+      <p>同一份 PDF 的第 2 到 7 頁，每個 agent 一頁，區塊的編號和 Claude Code 那一頁相同。第 7 頁分成 Antigravity CLI（5 個區塊）和 Antigravity IDE（2 個區塊）。點 agent 名稱展開。</p>
+      <p class="fine">每一頁的「檔案與資料夾」都有同一句：Windows 上 <code>~</code> 是你的使用者資料夾，PowerShell 裡寫成 <code>$HOME</code>。下面不重複。</p>
+
+      <div class="callout note">
+        <div class="label">侷限 <span class="addon">補充</span></div>
+        <ul>
+          <li>這六頁是照 PDF 翻譯的，沒有對照各 agent 的官方文件，也沒有實際操作。</li>
+          <li>2026-11-20 這台電腦的 PATH 上有 <code>agent</code>（Cursor CLI，版本 <code>2026.04.17-787b533</code>）和 <code>opencode</code>（版本 <code>1.17.3</code>）。<code>copilot</code>、<code>codex</code>、<code>pi</code>、<code>agy</code>、<code>gemini</code> 都找不到。</li>
+          <li>OpenCode 那一頁寫的是 OpenCode 2，並要你確認 <code>opencode --version</code> 的開頭是 2。這台電腦裝的是 1.17.3，那一頁的指令和路徑不一定適用。</li>
+        </ul>
+      </div>
+
+      <h4 class="sub-h">七個 agent 並列 <span class="addon">補充</span></h4>
+      <p>下表從七頁各取四項整理而成。表格可以左右捲動，點 agent 名稱會跳到那一頁並展開。</p>
+      <div class="table-wrap">
+        <table class="ho-sum">
+          <thead><tr><th>Agent</th><th>啟動指令</th><th>讀不讀 <code>CLAUDE.md</code></th><th>專案的 MCP 設定檔</th><th>專案 skill 的位置</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><a href="#handout">Claude Code</a></th><td><code>claude</code></td><td>讀。有它就不讀 <code>AGENTS.md</code></td><td><code>.mcp.json</code></td><td><code>.claude/skills/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-copilot">Copilot CLI</a></th><td><code>copilot</code></td><td>讀，和其他指示檔合併</td><td><code>.mcp.json</code></td><td><code>.github/skills/</code>，也讀 <code>.agents/skills/</code>、<code>.claude/skills/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-codex">Codex CLI</a></th><td><code>codex</code></td><td>要先加進 <code>config.toml</code> 的 <code>project_doc_fallback_filenames</code></td><td><code>.codex/config.toml</code></td><td><code>.agents/skills/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-cursor">Cursor CLI</a></th><td><code>agent</code></td><td>讀根目錄的</td><td><code>.cursor/mcp.json</code></td><td><code>.cursor/skills/</code>，也讀 <code>.agents/skills/</code>、<code>.claude/</code>、<code>.codex/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-opencode">OpenCode</a></th><td><code>opencode</code></td><td>OpenCode 2 不讀</td><td><code>opencode.json</code>（或 <code>.jsonc</code>）</td><td><code>.opencode/skills/</code>，也讀 <code>.claude/skills/</code>、<code>.agents/skills/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-pi">Pi</a></th><td><code>pi</code></td><td>讀</td><td><code>.pi/mcp.json</code></td><td><code>.pi/skills/</code>，也讀 <code>.agents/skills/</code></td></tr>
+            <tr><th scope="row"><a href="#ho-antigravity">Antigravity CLI</a></th><td><code>agy</code></td><td>速查表沒有寫。寫的是 <code>GEMINI.md</code> 也可以</td><td><code>.agents/mcp_config.json</code></td><td><code>.agents/skills/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>這個 repo 的 brand skill 放在 <code>.claude/skills/</code>（<a href="#step-9">第 9 步</a>），專案的 MCP server 寫在 <code>.mcp.json</code>（<a href="#step-7">第 7 步</a>）。照速查表，Claude Code 以外會讀 <code>.claude/skills/</code> 的是 Copilot CLI、Cursor CLI 和 OpenCode，會讀 <code>.mcp.json</code> 的是 Copilot CLI。</p>
+
+      <div class="ho-agents">
+
+        <!-- page 2: GitHub Copilot CLI -->
+        <details class="ho-agent" id="ho-copilot">
+          <summary>GitHub Copilot CLI<span class="pg">第 2 頁</span></summary>
+          <div class="ho-agent-body">
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>brew install --cask copilot-cli</code></pre></div>
+                  <div class="code"><div class="code-head"><span>Windows（PowerShell 7）</span><button class="copy" type="button">複製</button></div><pre><code>winget install GitHub.Copilot</code></pre></div>
+                  <p>在專案資料夾執行 <code>copilot</code>，信任這個資料夾；還沒登入就執行 <code>/login</code>。每一種 Copilot 方案都包含 CLI，Copilot Free 的用量有限。Windows 上需要 PowerShell 6 以上。</p>
+                  <p><kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換 standard、plan、autopilot 三種模式。<code>/permissions assisted</code> 最接近 Claude Code 的 Auto 模式：由一個模型核准安全的請求，其餘的問你。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/model</code></td><td>選模型和推理強度</td></tr>
+                      <tr><td><code>/usage</code></td><td>這次 session 的 token、credit 和時間長度</td></tr>
+                      <tr><td><code>/context</code></td><td>查看 context window 被什麼佔用</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要歷史紀錄，釋出 context</td></tr>
+                      <tr><td><code>/clear</code></td><td>開始新的對話</td></tr>
+                      <tr><td><code>/resume</code></td><td>切換到先前的 session</td></tr>
+                      <tr><td><code>/undo</code></td><td>退回前幾輪對話，可以選擇連檔案變更一起退回</td></tr>
+                      <tr><td><code>/permissions</code></td><td>切換核准模式</td></tr>
+                      <tr><td><code>/instructions</code></td><td>查看指示檔，並個別開關</td></tr>
+                      <tr><td><code>/skills</code></td><td>列出並管理 skill</td></tr>
+                      <tr><td><code>/mcp</code></td><td>管理 MCP server</td></tr>
+                      <tr><td><code>/plugin</code></td><td>管理 plugin 和 marketplace</td></tr>
+                      <tr><td><code>/help</code></td><td>列出指令和快捷鍵</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示（<code>CLAUDE.md</code> 也可以）</td></tr>
+                      <tr><td><code>.mcp.json</code></td><td>專案的 MCP server</td></tr>
+                      <tr><td><code>.github/</code></td><td></td></tr>
+                      <tr><td class="in"><code>copilot-instructions.md</code></td><td>更多指示</td></tr>
+                      <tr><td class="in"><code>instructions/</code></td><td>套用在符合路徑上的指示</td></tr>
+                      <tr><td class="in"><code>skills/</code></td><td>專案的 skill</td></tr>
+                      <tr><td class="in"><code>agents/</code></td><td>自訂 agent（<code>*.agent.md</code>）</td></tr>
+                      <tr><td class="in"><code>hooks/</code></td><td>hook</td></tr>
+                      <tr><td class="in"><code>copilot/settings.json</code></td><td>repo 共用的設定</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.copilot/</code></td><td></td></tr>
+                      <tr><td class="in"><code>settings.json</code></td><td>你的設定</td></tr>
+                      <tr><td class="in"><code>mcp-config.json</code></td><td>你的 MCP server</td></tr>
+                      <tr><td class="in"><code>copilot-instructions.md</code></td><td>你的指示</td></tr>
+                      <tr><td class="in"><code>skills/</code> <code>agents/</code></td><td>你自己的 skill 和 agent</td></tr>
+                      <tr><td class="in"><code>session-state/</code></td><td>儲存的 session</td></tr>
+                    </tbody>
+                  </table>
+                  <p>Copilot 會把找到的每一份指示檔合併起來，所以內容不要互相矛盾。它也會讀 <code>.agents/skills/</code> 和 <code>.claude/skills/</code> 裡的 skill。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server、plugin 與 marketplace</h4><span class="en">MCP servers, plugins and marketplaces</span></div>
+                <div class="ho-body">
+                  <div class="label">加入 MCP server（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>copilot mcp add playwright -- npx @playwright/mcp@latest
+copilot mcp add --transport http &lt;name&gt; &lt;url&gt;</code></pre></div>
+                  <p>第一行執行本機的 server，第二行連到遠端的 server。兩者都存到 <code>~/.copilot/mcp-config.json</code>，只給你自己用。要給專案用，把 server 寫進 <code>.mcp.json</code>。GitHub MCP server 是內建的，<code>/mcp</code> 會列出全部。</p>
+                  <div class="label">Plugin 與 marketplace（在 Copilot 裡）</div>
+                  <div class="code"><div class="code-head"><span>在 Copilot 輸入</span><button class="copy" type="button">複製</button></div><pre><code>/plugin
+/plugin marketplace add &lt;owner&gt;/&lt;repo&gt;
+/plugin install &lt;plugin&gt;@&lt;marketplace&gt;</code></pre></div>
+                  <p>awesome-copilot marketplace 是內建的，也可以加入 Claude Code 的 marketplace。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li><code>copilot --continue</code> 接續最近的 session。<code>/resume</code> 選其他的。</li>
+                    <li><code>!git status</code> 這種寫法直接執行指令，不經過模型。<code>@</code> 加入檔案，<code>#123</code> 加入 issue 或 PR。</li>
+                    <li><code>/delegate &lt;task&gt;</code> 把工作交給雲端 agent，它會開一個 draft PR。</li>
+                    <li>按兩次 <kbd>Esc</kbd> 中斷正在執行的這一輪。<kbd>Ctrl</kbd>+<kbd>G</kbd> 用文字編輯器打開提示。</li>
+                    <li><code>/fleet &lt;task&gt;</code> 平行執行多個 subagent。<code>copilot -w</code> 在自己的 git worktree 裡工作。</li>
+                    <li><code>/ask</code> 問旁支問題，問答不留在歷史紀錄裡。</li>
+                    <li><code>copilot -p "&lt;prompt&gt;" --allow-all-tools</code> 執行一次，用在 script 和 CI。</li>
+                    <li><code>/share</code> 把 session 存成檔案、網頁或 gist。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="ho-card ho-6">
+                <div class="ho-head"><span class="n">6</span><h4>在 VS Code</h4><span class="en">In VS Code</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>Copilot 內建在 VS Code 裡。沒有方案的帳號登入後是 Copilot Free。</li>
+                    <li>Copilot Chat 讀同一份 <code>AGENTS.md</code> 和 <code>.github</code> 裡的指示檔。</li>
+                    <li>VS Code 的 MCP 設定檔是 <code>.vscode/mcp.json</code>，CLI 不讀這個檔案。</li>
+                    <li>prompt file（<code>.github/prompts/</code>）在 VS Code 有效，在 CLI 無效。</li>
+                    <li><code>/ide</code> 把 CLI 連到 VS Code，CLI 提出的編輯會在 VS Code 開成 diff。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- page 3: Codex CLI -->
+        <details class="ho-agent" id="ho-codex">
+          <summary>Codex CLI<span class="pg">第 3 頁</span></summary>
+          <div class="ho-agent-body">
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code wrap"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://chatgpt.com/codex/install.sh | sh</code></pre></div>
+                  <div class="code wrap"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"</code></pre></div>
+                  <p>在專案資料夾執行 <code>codex</code>，選「Sign in with ChatGPT」。需要 ChatGPT Plus 以上的方案，或 OpenAI API key。Codex 問是否信任資料夾時選「是」，它才會載入 <code>.codex/</code>。</p>
+                  <p><code>/permissions</code> 在 Auto（git repo 裡的預設）和 Read Only 之間切換。Auto 在專案內直接工作，要動到專案外或使用網路前會先問。<code>codex --approve-for-me</code> 由一個審查模型替你核准動作，類似 Claude Code 的 Auto 模式。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/model</code></td><td>選模型和推理強度</td></tr>
+                      <tr><td><code>/permissions</code></td><td>設定 Codex 不用問就能做什麼</td></tr>
+                      <tr><td><code>/status</code></td><td>模型、權限、剩餘的 context</td></tr>
+                      <tr><td><code>/usage</code></td><td>token 用量和方案上限</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要對話，釋出 context</td></tr>
+                      <tr><td><code>/new</code></td><td>開始新的對話</td></tr>
+                      <tr><td><code>/resume</code></td><td>重新打開儲存的對話</td></tr>
+                      <tr><td><code>/init</code></td><td>替這個 repo 建立 <code>AGENTS.md</code></td></tr>
+                      <tr><td><code>/diff</code></td><td>顯示 git diff，包含新檔案</td></tr>
+                      <tr><td><code>/review</code></td><td>審查你的變更，列出發現的問題</td></tr>
+                      <tr><td><code>/skills</code></td><td>瀏覽並使用 skill</td></tr>
+                      <tr><td><code>/mcp</code></td><td>列出 MCP server 和它們的工具</td></tr>
+                      <tr><td><code>/plugins</code></td><td>瀏覽、安裝、啟用 plugin</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示，從 repo 根目錄往下一路讀</td></tr>
+                      <tr><td><code>.codex/</code></td><td></td></tr>
+                      <tr><td class="in"><code>config.toml</code></td><td>專案設定和 MCP server</td></tr>
+                      <tr><td class="in"><code>agents/</code></td><td>subagent，每個一個 <code>.toml</code> 檔</td></tr>
+                      <tr><td class="in"><code>hooks.json</code></td><td>hook</td></tr>
+                      <tr><td><code>.agents/skills/</code></td><td>專案的 skill，用 <code>$name</code> 叫用</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.codex/</code></td><td></td></tr>
+                      <tr><td class="in"><code>config.toml</code></td><td>你的設定和 MCP server</td></tr>
+                      <tr><td class="in"><code>AGENTS.md</code></td><td>你給所有專案的指示</td></tr>
+                      <tr><td class="in"><code>auth.json</code></td><td>你的登入資訊</td></tr>
+                      <tr><td class="in"><code>sessions/</code></td><td>儲存的對話</td></tr>
+                      <tr><td class="in"><code>rules/</code></td><td>你選擇一律允許的指令</td></tr>
+                      <tr><td><code>~/.agents/skills/</code></td><td>你自己的 skill</td></tr>
+                    </tbody>
+                  </table>
+                  <p>要把 <code>CLAUDE.md</code> 加進 <code>config.toml</code> 的 <code>project_doc_fallback_filenames</code>，Codex 才會讀它。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server、plugin 與 marketplace</h4><span class="en">MCP servers, plugins and marketplaces</span></div>
+                <div class="ho-body">
+                  <div class="label">加入 MCP server（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>codex mcp add playwright -- npx @playwright/mcp@latest
+codex mcp add &lt;name&gt; --url &lt;url&gt;</code></pre></div>
+                  <p>兩個指令都存到 <code>~/.codex/config.toml</code>，對你所有的專案有效。要給專案用，自己在 <code>.codex/config.toml</code> 加一個 <code>[mcp_servers.playwright]</code> table。</p>
+                  <div class="label">Plugin 與 marketplace</div>
+                  <div class="code"><div class="code-head"><span>第一行在 Codex 輸入，其餘在終端機</span><button class="copy" type="button">複製</button></div><pre><code>/plugins
+codex plugin add &lt;plugin&gt;@&lt;marketplace&gt;
+codex plugin marketplace add &lt;owner&gt;/&lt;repo&gt;</code></pre></div>
+                  <p>plugin 可以包含 skill、MCP server、app 和 hook。安裝後要開新的 session。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li><code>codex resume --last</code> 接續上一段對話。<code>/resume</code> 選其他的。</li>
+                    <li><code>!</code> 執行 shell 指令。<code>@</code> 加入檔案，<code>$</code> 指名一個 skill。</li>
+                    <li>Codex 工作中，按 <kbd>Enter</kbd> 送出訊息修正它的方向，<kbd>Tab</kbd> 把訊息排進佇列。</li>
+                    <li>按兩次 <kbd>Esc</kbd> 編輯你的上一則訊息，並從那裡分出新的對話。</li>
+                    <li><kbd>Ctrl</kbd>+<kbd>G</kbd> 用文字編輯器打開提示。</li>
+                    <li><code>codex --worktree</code> 開一個平行的對話，並給它自己的 git worktree。</li>
+                    <li><code>codex exec "&lt;task&gt;"</code> 執行一次，用在 script 和 CI。預設唯讀，加上 <code>--sandbox workspace-write</code> 才能寫入。</li>
+                    <li><code>/import</code> 把你在 Claude Code 的指示、skill、MCP server 和 plugin 搬過來。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="ho-card ho-6">
+                <div class="ho-head"><span class="n">6</span><h4>在 IDE 和 ChatGPT app</h4><span class="en">In the IDE and the ChatGPT app</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>IDE 擴充套件（VS Code、Cursor、Windsurf）和 CLI 共用 <code>config.toml</code> 和登入狀態。</li>
+                    <li>權限從輸入框下方的選單設定：Ask for approval、Approve for me、Full access。</li>
+                    <li>擴充套件不支援 plugin。</li>
+                    <li>ChatGPT 桌面 app 的每個 Codex 對話可以在本機、在 worktree 或在雲端執行。<code>codex app</code> 會打開它。</li>
+                    <li>Codex cloud 在它自己的工作區裡處理你的 GitHub repo，需要用 ChatGPT 登入。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- page 4: Cursor CLI -->
+        <details class="ho-agent" id="ho-cursor">
+          <summary>Cursor CLI<span class="pg">第 4 頁</span></summary>
+          <div class="ho-agent-body">
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code wrap"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl https://cursor.com/install -fsS | bash</code></pre></div>
+                  <div class="code wrap"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>irm 'https://cursor.com/install?win32=true' | iex</code></pre></div>
+                  <p>先用 <code>agent login</code> 登入，再到專案資料夾執行 <code>agent</code>。舊名稱 <code>cursor-agent</code> 仍然可用。Plus 方案用的是 Cursor 自己的模型，Claude、GPT、Gemini 要 Premium 以上。</p>
+                  <p><kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換 Agent、Plan、Ask 三種模式。核准方面，<code>/auto-review</code> 最接近 Claude Code 的 Auto 模式：不在 allowlist 上的動作，由一個模型審查。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/model</code></td><td>選模型（Premium 方案用 <kbd>Tab</kbd> 設定 effort）</td></tr>
+                      <tr><td><code>/usage</code></td><td>方案用量、花費和重置日期</td></tr>
+                      <tr><td><code>/context</code></td><td>查看 context window 被什麼佔用</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要對話，釋出 context</td></tr>
+                      <tr><td><code>/clear</code></td><td>開始新的對話</td></tr>
+                      <tr><td><code>/resume</code></td><td>選一段最近的對話接續</td></tr>
+                      <tr><td><code>/skills</code></td><td>瀏覽你的 skill</td></tr>
+                      <tr><td><code>/rules</code></td><td>瀏覽並編輯專案規則</td></tr>
+                      <tr><td><code>/mcp</code></td><td>管理 MCP server 和它們的登入</td></tr>
+                      <tr><td><code>/plugin</code></td><td>管理 plugin 和 marketplace</td></tr>
+                      <tr><td><code>/config</code></td><td>設定，包含核准方式</td></tr>
+                      <tr><td><code>/rewind</code></td><td>把檔案和對話退回先前的某一輪</td></tr>
+                      <tr><td><code>/help</code></td><td>任何指令的說明</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示，根目錄和子資料夾裡的都讀</td></tr>
+                      <tr><td><code>CLAUDE.md</code></td><td>根目錄的也會讀</td></tr>
+                      <tr><td><code>.cursorignore</code></td><td>agent 的檔案工具會略過的檔案</td></tr>
+                      <tr><td><code>.cursor/</code></td><td></td></tr>
+                      <tr><td class="in"><code>rules/*.mdc</code></td><td>專案規則（純 <code>.md</code> 檔會被忽略）</td></tr>
+                      <tr><td class="in"><code>mcp.json</code></td><td>專案的 MCP server</td></tr>
+                      <tr><td class="in"><code>cli.json</code></td><td>專案的 CLI 權限</td></tr>
+                      <tr><td class="in"><code>skills/</code></td><td>專案的 skill</td></tr>
+                      <tr><td class="in"><code>agents/</code></td><td>subagent</td></tr>
+                      <tr><td class="in"><code>hooks.json</code></td><td>hook</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.cursor/</code></td><td></td></tr>
+                      <tr><td class="in"><code>cli-config.json</code></td><td>CLI 設定，包含核准方式</td></tr>
+                      <tr><td class="in"><code>mcp.json</code></td><td>你給所有專案的 MCP server</td></tr>
+                      <tr><td class="in"><code>skills/</code> <code>agents/</code></td><td>你自己的 skill 和 subagent</td></tr>
+                      <tr><td class="in"><code>rules/</code></td><td>你自己的規則檔</td></tr>
+                      <tr><td class="in"><code>worktrees/</code></td><td>用 <code>agent -w</code> 建立的 worktree</td></tr>
+                    </tbody>
+                  </table>
+                  <p>Cursor 也會讀 <code>.agents/skills/</code> 裡的 skill，以及 <code>.claude/</code> 和 <code>.codex/</code> 裡的 skill 和 subagent。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server、plugin 與 marketplace</h4><span class="en">MCP servers, plugins and marketplaces</span></div>
+                <div class="ho-body">
+                  <div class="label">加入 MCP server（編輯 .cursor/mcp.json）</div>
+                  <div class="code"><div class="code-head"><span>.cursor/mcp.json</span><button class="copy" type="button">複製</button></div><pre><code>{ "mcpServers": {
+    "playwright": { "command": "npx",
+                    "args": ["@playwright/mcp@latest"] },
+    "&lt;name&gt;": { "url": "&lt;url&gt;" } } }</code></pre></div>
+                  <p>沒有 add 指令，要自己編輯檔案。<code>~/.cursor/mcp.json</code> 放你給所有專案的 server，編輯器和 CLI 共用這兩個檔案。用 <code>agent mcp enable playwright</code> 核准專案的 server，再用 <code>agent mcp list</code> 檢查。</p>
+                  <div class="label">Plugin 與 marketplace（在 agent 裡）</div>
+                  <div class="code"><div class="code-head"><span>在 agent 輸入</span><button class="copy" type="button">複製</button></div><pre><code>/plugin
+/plugin marketplace add &lt;git-url&gt;</code></pre></div>
+                  <p><code>/plugin</code> 瀏覽 Cursor Marketplace（cursor.com/marketplace），替你或替專案安裝 plugin。plugin 可以包含 skill、指令、subagent 和 MCP server。從 Claude Code 匯入的 plugin 會出現在同一份清單裡。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li><code>agent --continue</code> 接續最近的對話。<code>/resume</code> 列出更早的。</li>
+                    <li>訊息開頭加 <code>&amp;</code>，會交給 Cloud Agent 處理（Premium 以上）。</li>
+                    <li><code>!</code> 切換到 shell 模式，用來執行簡短的指令。<code>@</code> 加入檔案或資料夾。</li>
+                    <li>agent 工作中，按 <kbd>Enter</kbd> 送出訊息修正它的方向。<kbd>Ctrl</kbd>+<kbd>C</kbd> 取消。</li>
+                    <li><kbd>Ctrl</kbd>+<kbd>R</kbd> 檢視變更。<kbd>Ctrl</kbd>+<kbd>G</kbd> 用文字編輯器打開提示。</li>
+                    <li><code>/btw</code> 問旁支問題，問答不留在對話紀錄裡。</li>
+                    <li><code>agent -w &lt;name&gt;</code> 開一個平行的對話，並給它自己的 git worktree。</li>
+                    <li><code>agent -p "&lt;prompt&gt;"</code> 執行一次，用在 script 和 CI（要編輯檔案就加 <code>--force</code>）。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="ho-card ho-6">
+                <div class="ho-head"><span class="n">6</span><h4>在 Cursor 編輯器</h4><span class="en">In the Cursor editor</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>編輯器和 CLI 共用規則、<code>AGENTS.md</code>、MCP server、skill、subagent、hook 和 plugin。</li>
+                    <li>核准設定在 Settings 的 Agents 底下，那裡的預設是 Auto-review。</li>
+                    <li>Plan 模式會打開一份可以編輯的計畫，附一個 Build 按鈕。</li>
+                    <li>對話裡的 Restore Checkpoint 只還原檔案。CLI 的 <code>/rewind</code> 連對話一起還原。</li>
+                    <li>Tab 補全、瀏覽器工具和 Design Mode 只有編輯器有。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- page 5: OpenCode -->
+        <details class="ho-agent" id="ho-opencode">
+          <summary>OpenCode<span class="pg">第 5 頁</span></summary>
+          <div class="ho-agent-body">
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code wrap"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://opencode.ai/v2/install | bash</code></pre></div>
+                  <div class="code wrap"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>npm install -g @opencode/cli</code></pre></div>
+                  <p>在專案資料夾執行 <code>opencode</code>。確認 <code>opencode --version</code> 的開頭是 2：不含 <code>v2</code> 的安裝連結裝的是 OpenCode 1。要用免費模型，在 <code>/models</code> 的 Free 群組裡選一個。</p>
+                  <p><kbd>Shift</kbd>+<kbd>Tab</kbd> 在 build 和 plan 兩個 agent 之間切換。預設情況下，build 執行工具不會問，讀 <code>.env</code> 檔除外。自己的規則加在 <code>opencode.json</code> 的 <code>permissions</code> 底下。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/connect</code></td><td>登入某個 provider 或 OpenCode Go</td></tr>
+                      <tr><td><code>/models</code></td><td>選模型（免費的另外分一組）</td></tr>
+                      <tr><td><code>/variants</code></td><td>設定推理強度</td></tr>
+                      <tr><td><code>/usage</code></td><td>方案的用量上限（token 和花費用 <code>/stats</code>）</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要 session，釋出 context</td></tr>
+                      <tr><td><code>/new</code></td><td>開始新的 session</td></tr>
+                      <tr><td><code>/sessions</code></td><td>切換到先前的 session</td></tr>
+                      <tr><td><code>/skills</code></td><td>選一個 skill</td></tr>
+                      <tr><td><code>/mcps</code></td><td>連接並登入 MCP server</td></tr>
+                      <tr><td><code>/plugins</code></td><td>打開 plugin 管理畫面</td></tr>
+                      <tr><td><code>/undo</code></td><td>復原上一則訊息和它造成的編輯</td></tr>
+                      <tr><td><code>/editor</code></td><td>用文字編輯器寫提示</td></tr>
+                      <tr><td><code>/help</code></td><td>列出指令</td></tr>
+                    </tbody>
+                  </table>
+                  <p>要看 context 用量，按 <kbd>Ctrl</kbd>+<kbd>X</kbd> 再按 <kbd>B</kbd> 打開側邊欄。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示（OpenCode 2 不讀 <code>CLAUDE.md</code>）</td></tr>
+                      <tr><td><code>opencode.json(c)</code></td><td>專案設定：模型、權限、MCP 和 plugin</td></tr>
+                      <tr><td><code>.opencode/</code></td><td></td></tr>
+                      <tr><td class="in"><code>agents/</code></td><td>自訂 agent</td></tr>
+                      <tr><td class="in"><code>commands/</code></td><td>你自己的斜線指令</td></tr>
+                      <tr><td class="in"><code>skills/&lt;id&gt;/SKILL.md</code></td><td>專案的 skill</td></tr>
+                      <tr><td class="in"><code>plugins/</code></td><td>本機的 plugin</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.config/opencode/</code></td><td></td></tr>
+                      <tr><td class="in"><code>opencode.json</code></td><td>你給所有專案的設定</td></tr>
+                      <tr><td class="in"><code>AGENTS.md</code></td><td>你給所有專案的指示</td></tr>
+                      <tr><td class="in"><code>skills/</code> <code>agents/</code></td><td>你自己的 skill 和 agent</td></tr>
+                      <tr><td class="in"><code>cli.json</code></td><td>終端機設定、按鍵和主題</td></tr>
+                      <tr><td><code>~/.local/share/opencode/</code></td><td></td></tr>
+                      <tr><td class="in"><code>opencode.db</code></td><td>登入資訊和 session</td></tr>
+                    </tbody>
+                  </table>
+                  <p>OpenCode 也會讀 <code>.claude/skills/</code> 和 <code>.agents/skills/</code> 裡的 skill。<code>opencode debug paths</code> 會印出所有位置。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server 與 plugin</h4><span class="en">MCP servers and plugins</span></div>
+                <div class="ho-body">
+                  <div class="label">加入 MCP server（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>opencode mcp add playwright -- npx @playwright/mcp@latest
+opencode mcp add &lt;name&gt; --url &lt;url&gt;</code></pre></div>
+                  <p>第一行執行本機的 server，第二行連到遠端的 server。兩者都存到專案的 <code>opencode.json</code>（或 <code>.jsonc</code>）的 <code>mcp.servers</code> 底下。加 <code>--global</code> 則存到你自己的設定。<code>/mcps</code> 連接這些 server 並讓你登入。</p>
+                  <div class="label">Plugin（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>opencode plugin add &lt;npm-package&gt;
+opencode plugin list</code></pre></div>
+                  <p>plugin 是列在 <code>opencode.json</code> 的 <code>plugins</code> 底下的 npm 套件，或 <code>.opencode/plugins/</code> 裡的檔案。為 OpenCode 1 寫的 plugin 在 OpenCode 2 不能執行。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>OpenCode Console（原名 OpenCode Zen）是 OpenCode 的模型閘道，有免費模型，也有用多少付多少的 credit。OpenCode Go 是使用開放模型的月費方案。</li>
+                    <li><code>opencode -c</code> 接續上一個 session。<code>/sessions</code> 列出更早的。</li>
+                    <li><code>!</code> 執行 shell 指令。<code>@</code> 加入檔案、skill 或 agent。</li>
+                    <li>大部分快捷鍵以 <kbd>Ctrl</kbd>+<kbd>X</kbd> 開頭。<kbd>Ctrl</kbd>+<kbd>P</kbd> 打開 command palette。</li>
+                    <li><code>/undo</code> 會把你上一個提示放回輸入框，可以修改後重送。</li>
+                    <li><code>/btw</code> 問旁支問題，問答不留在對話裡。</li>
+                    <li><code>opencode pair</code> 讓你從瀏覽器或手機接著做。</li>
+                    <li><code>opencode run "&lt;prompt&gt;"</code> 執行一次，用在 script 和 CI。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="ho-card ho-6">
+                <div class="ho-head"><span class="n">6</span><h4>桌面、IDE 和 web</h4><span class="en">Desktop, IDE and web</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>終端機、桌面 app、web UI 和手機都連到同一個背景 server，所以共用 session 和設定。</li>
+                    <li>桌面 app（beta）多了 session 分頁、可以逐行留言的 diff 檢視、瀏覽器和 worktree。</li>
+                    <li>VS Code 擴充套件用 <kbd>Cmd</kbd>+<kbd>Esc</kbd>（Windows 是 <kbd>Ctrl</kbd>+<kbd>Esc</kbd>）在分割的終端機裡打開 OpenCode。</li>
+                    <li><code>opencode acp</code> 連接 Zed 和其他支援 ACP 的編輯器。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- page 6: Pi -->
+        <details class="ho-agent" id="ho-pi">
+          <summary>Pi<span class="pg">第 6 頁</span></summary>
+          <div class="ho-agent-body">
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code wrap"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://pi.dev/install.sh | sh</code></pre></div>
+                  <div class="code wrap"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>powershell -c "irm https://pi.dev/install.ps1 | iex"</code></pre></div>
+                  <p>在專案資料夾執行 <code>pi</code>。Pi 本身免費。要用免費模型，用 OpenRouter 的 API key 執行 <code>/login openrouter</code>，再選一個名稱帶 <code>:free</code> 的模型。</p>
+                  <p>Pi 執行工具不會問，沒有 plan 模式，也沒有 sandbox。<kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換 thinking level。Windows 上，Pi 在 Git Bash（Git for Windows 附的）裡執行指令。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/model</code></td><td>選模型</td></tr>
+                      <tr><td><code>/thinking</code></td><td>設定 thinking level</td></tr>
+                      <tr><td><code>/session</code></td><td>已用的 token 和花費（context 顯示在底部列）</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要較舊的歷史紀錄，釋出 context</td></tr>
+                      <tr><td><code>/new</code></td><td>開始新的 session</td></tr>
+                      <tr><td><code>/resume</code></td><td>選一個儲存的 session 接續</td></tr>
+                      <tr><td><code>/tree</code></td><td>回到先前的某則訊息，從那裡分支</td></tr>
+                      <tr><td><code>/skill:name</code></td><td>執行一個 skill（<code>/skill:</code> 列出全部）</td></tr>
+                      <tr><td><code>/mcp</code></td><td>登入、重新連接 MCP server</td></tr>
+                      <tr><td><code>/reload</code></td><td>重新載入 extension、skill 和 context 檔</td></tr>
+                      <tr><td><code>/login</code></td><td>登入某個 provider，或加入 API key</td></tr>
+                      <tr><td><code>/</code></td><td>搜尋所有指令（沒有 <code>/help</code>）</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示，這個資料夾和上層資料夾的都讀</td></tr>
+                      <tr><td><code>.pi/</code></td><td></td></tr>
+                      <tr><td class="in"><code>settings.json</code></td><td>專案設定和 package</td></tr>
+                      <tr><td class="in"><code>mcp.json</code></td><td>專案的 MCP server</td></tr>
+                      <tr><td class="in"><code>skills/</code></td><td>專案的 skill</td></tr>
+                      <tr><td class="in"><code>extensions/</code></td><td>專案的 extension</td></tr>
+                      <tr><td class="in"><code>prompts/</code></td><td>prompt template</td></tr>
+                      <tr><td class="in"><code>SYSTEM.md</code></td><td>取代 system prompt</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.pi/agent/</code></td><td></td></tr>
+                      <tr><td class="in"><code>AGENTS.md</code></td><td>你給所有專案的指示</td></tr>
+                      <tr><td class="in"><code>settings.json</code></td><td>你的設定和已安裝的 package</td></tr>
+                      <tr><td class="in"><code>mcp.json</code></td><td>你的 MCP server</td></tr>
+                      <tr><td class="in"><code>skills/</code> <code>extensions/</code></td><td>你自己的 skill 和 extension</td></tr>
+                      <tr><td class="in"><code>sessions/</code></td><td>儲存的 session，依資料夾分組</td></tr>
+                      <tr><td class="in"><code>auth.json</code></td><td>provider 的登入資訊和 API key</td></tr>
+                    </tbody>
+                  </table>
+                  <p>Pi 也會讀 <code>CLAUDE.md</code>，以及 <code>.agents/skills/</code> 裡的 skill。</p>
+                  <p>Pi 載入 <code>.pi/</code> 或 <code>.agents/skills/</code> 之前，會先問你是否信任這個專案。<code>/trust</code> 會把你的回答存起來。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server 與 package</h4><span class="en">MCP servers and packages</span></div>
+                <div class="ho-body">
+                  <div class="label">加入 MCP server（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>pi mcp add -l playwright -- npx @playwright/mcp@latest
+pi mcp add &lt;name&gt; --url &lt;url&gt;</code></pre></div>
+                  <p>MCP 是內建的。第一行執行本機的 server，第二行連到遠端的 server。<code>-l</code> 把 server 存到專案的 <code>.pi/mcp.json</code>；不加的話，存到 <code>~/.pi/agent/mcp.json</code>，只給你自己用。<code>pi mcp list</code> 列出你的 server。</p>
+                  <div class="label">Package（在終端機）</div>
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>pi install npm:&lt;package&gt;
+pi list
+pi update --extensions</code></pre></div>
+                  <p>package 就是 Pi 的 plugin：來自 npm 或 git 的 extension、skill、prompt template 和主題。加 <code>-l</code> 只安裝到這個專案。<code>pi remove</code> 解除安裝。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>extension 可以在 pi.dev/packages 瀏覽。<code>pi -e npm:&lt;package&gt;</code> 只在這一次執行中試用，不用先安裝。</li>
+                    <li>Oh My Pi（<code>omp</code>）是 Pi 的 fork，替你預先決定的事比較多，內建 subagent、plan 模式、核准模式和更多工具。從 omp.sh 安裝。</li>
+                    <li><code>pi -c</code> 接續你在這個資料夾的上一個 session。<code>pi -r</code> 或 <code>/resume</code> 選更早的。</li>
+                    <li><code>!cmd</code> 執行指令，並把輸出送給模型。<code>!!cmd</code> 不送。</li>
+                    <li>Pi 工作中，按 <kbd>Enter</kbd> 送出訊息修正它的方向，<kbd>Alt</kbd>+<kbd>Enter</kbd> 把後續訊息排進佇列（Windows 是 <kbd>Ctrl</kbd>+<kbd>Q</kbd>）。<kbd>Esc</kbd> 停止。</li>
+                    <li><kbd>Ctrl</kbd>+<kbd>P</kbd> 輪流切換模型。<kbd>Ctrl</kbd>+<kbd>G</kbd> 用文字編輯器打開提示。</li>
+                    <li><code>pi -p "&lt;prompt&gt;"</code> 執行一次就結束，用在 script 和 CI。</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="ho-card ho-6">
+                <div class="ho-head"><span class="n">6</span><h4>IDE 和桌面版</h4><span class="en">IDE and desktop versions</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li>Pi 只在終端機執行。沒有官方的 IDE 擴充套件、桌面 app 或 web 版。</li>
+                    <li>在 VS Code 的終端機裡可以用。VS Code 1.109.5 以上不用設定，較舊的版本要替 <kbd>Shift</kbd>+<kbd>Enter</kbd> 設一個 keybinding。</li>
+                    <li>Windows 上，文件建議用 Windows Terminal。VS Code 的終端機也可以。</li>
+                    <li>Oh My Pi 可以當 ACP server 執行（<code>omp acp</code>），給 Zed 這類編輯器用。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- page 7: Gemini CLI and Antigravity -->
+        <details class="ho-agent" id="ho-antigravity">
+          <summary>Gemini CLI 與 Antigravity<span class="pg">第 7 頁</span></summary>
+          <div class="ho-agent-body">
+            <h4 class="ho-sub">Antigravity CLI</h4>
+            <p>Google 的終端機 agent。2026 年 6 月 18 日起，個人 Google 帳號改用它，取代 Gemini CLI。</p>
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <div class="code wrap"><div class="code-head"><span>Mac（終端機）</span><button class="copy" type="button">複製</button></div><pre><code>curl -fsSL https://antigravity.google/cli/install.sh | bash</code></pre></div>
+                  <div class="code wrap"><div class="code-head"><span>Windows（PowerShell）</span><button class="copy" type="button">複製</button></div><pre><code>irm https://antigravity.google/cli/install.ps1 | iex</code></pre></div>
+                  <p>在專案資料夾執行 <code>agy</code>，從瀏覽器登入。個人 Google 帳號不論哪種方案都能用，包含免費方案；Gemini API key 也可以。</p>
+                  <p><kbd>Shift</kbd>+<kbd>Tab</kbd> 依序切換模式：default、accept-edits、auto、plan。auto 需要終端機 sandbox 和個人帳號。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>常用的斜線指令</h4><span class="en">Common slash commands</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr><td><code>/model</code></td><td>選模型</td></tr>
+                      <tr><td><code>/effort</code></td><td>設定推理強度</td></tr>
+                      <tr><td><code>/usage</code></td><td>你的配額和用量</td></tr>
+                      <tr><td><code>/context</code></td><td>查看 context window 被什麼佔用</td></tr>
+                      <tr><td><code>/compact</code></td><td>摘要，釋出 context</td></tr>
+                      <tr><td><code>/clear</code></td><td>開始新的對話</td></tr>
+                      <tr><td><code>/resume</code></td><td>接續先前的 session</td></tr>
+                      <tr><td><code>/rewind</code></td><td>退回先前的某一輪</td></tr>
+                      <tr><td><code>/skills</code></td><td>列出你的 skill</td></tr>
+                      <tr><td><code>/mcp</code></td><td>管理 MCP server</td></tr>
+                      <tr><td><code>/plugin</code></td><td>管理 plugin</td></tr>
+                      <tr><td><code>/help</code></td><td>列出指令</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="ho-card ho-3">
+                <div class="ho-head"><span class="n">3</span><h4>檔案與資料夾</h4><span class="en">Files and folders</span></div>
+                <div class="ho-body">
+                  <table class="ho-table">
+                    <tbody>
+                      <tr class="grp"><th colspan="2">專案裡 In the repo</th></tr>
+                      <tr><td><code>AGENTS.md</code></td><td>指示（<code>GEMINI.md</code> 也可以）</td></tr>
+                      <tr><td><code>.agents/</code></td><td></td></tr>
+                      <tr><td class="in"><code>rules/</code></td><td>額外的規則，每條有自己的觸發條件</td></tr>
+                      <tr><td class="in"><code>skills/</code></td><td>專案的 skill</td></tr>
+                      <tr><td class="in"><code>mcp_config.json</code></td><td>專案的 MCP server</td></tr>
+                      <tr class="grp"><th colspan="2">家目錄 In your home folder</th></tr>
+                      <tr><td><code>~/.gemini/</code></td><td></td></tr>
+                      <tr><td class="in"><code>AGENTS.md</code></td><td>你給所有專案的指示</td></tr>
+                      <tr><td class="in"><code>config/skills/</code></td><td>你自己的 skill</td></tr>
+                      <tr><td class="in"><code>config/mcp_config.json</code></td><td>你的 MCP server</td></tr>
+                    </tbody>
+                  </table>
+                  <p>CLI 和 IDE 共用這些檔案。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-4">
+                <div class="ho-head"><span class="n">4</span><h4>MCP server 與 plugin</h4><span class="en">MCP servers and plugins</span></div>
+                <div class="ho-body">
+                  <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>agy mcp add playwright npx @playwright/mcp@latest
+agy mcp add &lt;name&gt; &lt;url&gt;</code></pre></div>
+                  <p>兩者都存到 <code>~/.gemini/config/mcp_config.json</code>，只給你自己用。要給專案用，自己把 server 寫進 <code>.agents/mcp_config.json</code>。</p>
+                  <p>plugin 在終端機安裝：</p>
+                  <div class="code wrap"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>agy plugin install &lt;name&gt;@antigravity-plugins-official</code></pre></div>
+                </div>
+              </div>
+              <div class="ho-card ho-5">
+                <div class="ho-head"><span class="n">5</span><h4>使用技巧</h4><span class="en">Pro tips</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li><code>agy -c</code> 接續上一個 session。<code>agy -p "&lt;prompt&gt;"</code> 執行一次，用在 script 和 CI。</li>
+                    <li><code>!</code> 執行 shell 指令，<code>@</code> 加入檔案。<kbd>Ctrl</kbd>+<kbd>R</kbd> 打開 Artifact Review。</li>
+                    <li><code>agy plugin import gemini</code> 轉換 Gemini CLI 的 extension。</li>
+                    <li>Gemini CLI（<code>gemini</code>）現在的對象是使用 Gemini Code Assist Standard 或 Enterprise 的公司，以及付費的 API key。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="ho-sub">Antigravity IDE</h4>
+            <p>Google 的 agentic IDE，有 agent 面板、供你審查的 artifact，以及瀏覽器 agent。</p>
+            <div class="ho">
+              <div class="ho-card ho-1">
+                <div class="ho-head"><span class="n">1</span><h4>開始使用</h4><span class="en">Getting started</span></div>
+                <div class="ho-body">
+                  <p>從 antigravity.google/download 下載 Mac 或 Windows 版的 IDE，用 Google 帳號登入。每種方案都能用，包含免費方案。Pro 和 Ultra 的配額較多，並多了 Gemini 4 Argon，以及 Claude Sonnet 和 Opus 5.5。</p>
+                  <p>模型和 thinking level 在輸入框下方選。IDE 和 CLI 讀同一份 <code>AGENTS.md</code>、規則、skill 和 <code>mcp_config.json</code>。</p>
+                  <p>已經在用 VS Code 或 JetBrains 的話，Antigravity 擴充套件會把同一個 agent 帶進你的編輯器。</p>
+                </div>
+              </div>
+              <div class="ho-card ho-2">
+                <div class="ho-head"><span class="n">2</span><h4>和 agent 一起工作</h4><span class="en">Working with the agent</span></div>
+                <div class="ho-body">
+                  <ul>
+                    <li><kbd>Cmd</kbd>+<kbd>L</kbd>（Windows 是 <kbd>Ctrl</kbd>+<kbd>L</kbd>）打開 agent 面板，並帶入你選取的那幾行。在面板裡，<code>@</code> 指名檔案，<code>/</code> 執行動作。</li>
+                    <li>agent 會寫出供你審查的 artifact：一份工作清單、一份計畫（按 Proceed 之前可以在上面留言）、一份 walkthrough。</li>
+                    <li>用 <kbd>Alt</kbd>+<kbd>Enter</kbd>（Mac 是 <kbd>Option</kbd>+<kbd>Enter</kbd>）接受變更，<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> 拒絕。</li>
+                    <li>終端機指令要不要經你審查，由設定決定：Request Review 或 Always Proceed，另有 allow 和 deny 清單。</li>
+                    <li>MCP server 從 MCP Store 加入，位置在 agent 面板頂端的選單。<code>/browser</code> 讓 agent 操作 Chrome。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
   </main>
 </div>
 
 <footer class="footer">
-  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容，第 9 步加上講師對 <code>AGENTS.md</code> 和 skill 的比較，最後一節是課程投影片「The context window」。進度是 2026-11-20 的檢查結果。
+  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容，第 9 步加上講師對 <code>AGENTS.md</code> 和 skill 的比較，第 11 步之後是課程投影片「The context window」，最後兩節是課程 PDF「Coding agents handout」（7 頁）的翻譯。進度是 2026-11-20 的檢查結果。
 </footer>
 
 <script>
@@ -1586,6 +2479,15 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
     }, { rootMargin: '-20% 0px -70% 0px' });
     document.querySelectorAll('main section[id]').forEach(function (s) { observer.observe(s); });
   }
+
+  // Following a link to a collapsed handout page opens it
+  function openTarget() {
+    var id = location.hash.slice(1);
+    var el = id ? document.getElementById(id) : null;
+    if (el && el.tagName === 'DETAILS') el.open = true;
+  }
+  window.addEventListener('hashchange', openTarget);
+  openTarget();
 })();
 </script>
 </body>

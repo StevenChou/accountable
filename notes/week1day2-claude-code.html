@@ -6,7 +6,7 @@
 <title>Claude Code Day 2 設定</title>
 <style>
 /* Layout: header band, then a sticky step index (left) beside one reading column; one column under 1100px.
-   Palette and surfaces follow docs/BRAND.md (Midnight ink, Sea Green / Marigold / Cerulean / Raspberry). */
+   Palette and surfaces follow .claude/skills/brand/SKILL.md (Midnight ink, Sea Green / Marigold / Cerulean / Raspberry). */
 :root {
   --bg: #F0F4F5;
   --panel: #FFFFFF;
@@ -613,10 +613,10 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
-        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
-        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
-        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
       </ol>
@@ -638,10 +638,10 @@ tbody tr:last-child td { border-bottom: 0; }
         <li><a href="#step-3"><span class="toc-num">3</span>你自己的指示檔<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-4"><span class="toc-num">4</span>設定資料夾與範圍<span class="dot s-info" title="說明性質"></span></a></li>
         <li><a href="#step-5"><span class="toc-num">5</span>設定檔<span class="dot s-info" title="說明性質"></span></a></li>
-        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-todo" title="未完成"></span></a></li>
-        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>權限<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>MCP：Playwright<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-8"><span class="toc-num">8</span>Code Mode<span class="dot s-none" title="不需操作"></span></a></li>
-        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-todo" title="未完成"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>Skill：brand<span class="dot s-done" title="完成"></span></a></li>
         <li><a href="#step-10"><span class="toc-num">10</span>Plugin<span class="dot s-part" title="部分完成"></span></a></li>
         <li><a href="#step-11"><span class="toc-num">11</span>檢查並 commit<span class="dot s-todo" title="未完成"></span></a></li>
       </ol>
@@ -671,28 +671,28 @@ tbody tr:last-child td { border-bottom: 0; }
     <!-- ===================== progress ===================== -->
     <section class="panel" id="progress">
       <h2>進度總覽</h2>
-      <p class="section-note">2026-11-19 的檢查結果，共 11 步。</p>
+      <p class="section-note">2026-11-20 的檢查結果，共 11 步。</p>
       <div class="counts">
-        <span class="pill s-done">完成 3</span>
+        <span class="pill s-done">完成 6</span>
         <span class="pill s-part">部分完成 1</span>
-        <span class="pill s-todo">未完成 4</span>
+        <span class="pill s-todo">未完成 1</span>
         <span class="pill s-info">說明性質 2</span>
         <span class="pill s-none">不需操作 1</span>
       </div>
       <ol class="overview">
         <li><span class="num">1</span><a href="#step-1">安裝與登入</a><span class="pill s-done">完成</span><span class="why">Claude Code 2.1.311、已信任資料夾、auto memory 已關閉</span></li>
         <li><span class="num">2</span><a href="#step-2">Markdown 與 AGENTS.md</a><span class="pill s-done">完成</span><span class="why"><code>AGENTS.md</code> 存在、沒有 <code>CLAUDE.md</code>、版本符合；你已讀過 <code>AGENTS.md</code> 和 <code>docs/intent.md</code></span></li>
-        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-done">完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 已建立，2 條 Python 工具的規則</span></li>
-        <li><span class="num">4</span><a href="#step-4">設定資料夾與範圍</a><span class="pill s-info">說明性質</span><span class="why">專案的 <code>.claude/</code> 會在第 6、9、10 步產生</span></li>
+        <li><span class="num">3</span><a href="#step-3">你自己的指示檔</a><span class="pill s-done">完成</span><span class="why"><code>~/.claude/CLAUDE.md</code> 已建立，2 條 Python 工具的規則，新 session 已載入</span></li>
+        <li><span class="num">4</span><a href="#step-4">設定資料夾與範圍</a><span class="pill s-info">說明性質</span><span class="why">專案的 <code>.claude/</code> 已建立，目前有 <code>settings.json</code> 和 <code>settings.local.json</code></span></li>
         <li><span class="num">5</span><a href="#step-5">設定檔</a><span class="pill s-info">說明性質</span><span class="why"><code>.gitignore</code> 已排除 <code>.claude/settings.local.json</code></span></li>
-        <li><span class="num">6</span><a href="#step-6">權限</a><span class="pill s-todo">未完成</span><span class="why"><code>.claude/settings.json</code> 不存在</span></li>
-        <li><span class="num">7</span><a href="#step-7">MCP：Playwright</a><span class="pill s-todo">未完成</span><span class="why"><code>.mcp.json</code> 不存在</span></li>
+        <li><span class="num">6</span><a href="#step-6">權限</a><span class="pill s-done">完成</span><span class="why">三條規則已寫入 <code>.claude/settings.json</code>，已在 <code>5a988ff</code> commit</span></li>
+        <li><span class="num">7</span><a href="#step-7">MCP：Playwright</a><span class="pill s-done">完成</span><span class="why"><code>.mcp.json</code> 已建立，專案的 <code>playwright</code> 已連線，plugin 那一份已在這個專案停用</span></li>
         <li><span class="num">8</span><a href="#step-8">Code Mode</a><span class="pill s-none">不需操作</span><span class="why">Claude Code 沒有這個功能</span></li>
-        <li><span class="num">9</span><a href="#step-9">Skill：brand</a><span class="pill s-todo">未完成</span><span class="why"><code>docs/BRAND.md</code> 還沒搬成 skill</span></li>
+        <li><span class="num">9</span><a href="#step-9">Skill：brand</a><span class="pill s-done">完成</span><span class="why"><code>.claude/skills/brand/SKILL.md</code> 已建立，<code>docs/BRAND.md</code> 已刪除，<code>AGENTS.md</code> 已移除那一行，已在 <code>5a988ff</code> commit</span></li>
         <li><span class="num">10</span><a href="#step-10">Plugin</a><span class="pill s-part">部分完成</span><span class="why">已裝在使用者層級，還沒裝在專案層級</span></li>
         <li><span class="num">11</span><a href="#step-11">檢查並 commit</a><span class="pill s-todo">未完成</span><span class="why">前面的步驟做完後進行</span></li>
       </ol>
-      <p class="next">還沒做的步驟依序是 6、7、9、10、11。</p>
+      <p class="next">還沒做的步驟依序是 10、11。</p>
     </section>
 
     <!-- ===================== glossary ===================== -->
@@ -861,7 +861,7 @@ tbody tr:last-child td { border-bottom: 0; }
                 <tbody>
                   <tr><td><code>docs/intent.md</code></td><td>要知道這個產品要做什麼</td><td class="n">7,335</td></tr>
                   <tr><td><code>docs/TECH_STACK.md</code></td><td>寫程式、選套件、跑測試</td><td class="n">1,660</td></tr>
-                  <tr><td><code>docs/BRAND.md</code></td><td>做 UI（第 9 步會改成 skill）</td><td class="n">1,444</td></tr>
+                  <tr><td><code>docs/BRAND.md</code></td><td>做 UI（第 9 步已改成 skill）</td><td class="n">1,444</td></tr>
                   <tr><td><code>docs/STATUS.md</code></td><td>要知道做到哪裡；做完一段工作後更新</td><td class="n">32</td></tr>
                   <tr><td><code>course/for_agents/</code>（4 個檔案）</td><td>學生需要課程上的協助</td><td class="n">67,199</td></tr>
                 </tbody>
@@ -875,7 +875,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
         <h4 class="sub-h">二、AGENTS.md 是純 Markdown</h4>
         <p>Markdown 是一般的文字檔，用幾個符號標出結構：<code>#</code> 是標題、<code>##</code> 是下一層標題、行首的 <code>-</code> 是清單的一項、反引號 <code>`</code> 包住的是程式碼或路徑。不需要特殊工具，任何編輯器都能改，各家 coding agent 都讀得懂。</p>
-        <p>這是 repo 裡 <code>AGENTS.md</code> 的全文：</p>
+        <p>這是第 2 步時 <code>AGENTS.md</code> 的全文。<a href="#step-9">第 9 步</a>刪掉了第 9 行的 <code>docs/BRAND.md</code>，下面的行號和字元數都是刪除前的：</p>
         <div class="code wrap"><div class="code-head"><span>AGENTS.md</span><button class="copy" type="button">複製</button></div><pre><code># Accountable
 
 SIDENOTE: this repo is part of a course by Ed Donner. If the student needs help, read `course/for_agents/`
@@ -903,9 +903,9 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
             <p>agent 每個 session 都讀整份檔案。多寫一行，每個 session 的 context 就多佔一行；寫得模糊的句子，agent 每次都得自己猜意思。</p>
             <div class="ex">
               <div class="ex-row before"><span class="ex-tag">改寫前</span><span>Please try to keep the project docs up to date where appropriate.</span><span class="gloss">請在適當的時候盡量更新專案文件。沒說什麼時候、哪一份。</span></div>
-              <div class="ex-row after"><span class="ex-tag">改寫後</span><span><code>Update docs/STATUS.md when you finish a piece of work</code></span><span class="gloss">寫明時機（完成一段工作）和檔案（<code>docs/STATUS.md</code>）。這是 <code>AGENTS.md</code> 的第 12 行。</span></div>
+              <div class="ex-row after"><span class="ex-tag">改寫後</span><span><code>Update docs/STATUS.md when you finish a piece of work</code></span><span class="gloss">寫明時機（完成一段工作）和檔案（<code>docs/STATUS.md</code>）。這是 <code>AGENTS.md</code> 的最後一行。</span></div>
             </div>
-            <p class="fine"><span class="addon" style="margin-left:0">補充</span> Claude Code 文件建議每份 <code>CLAUDE.md</code> 在 200 行以內：超過會佔更多 context，Claude 照著做的程度也會下降，啟動時和 <code>/status</code> 會顯示警告。<code>AGENTS.md</code> 在這個 repo 扮演同樣的角色，目前是 12 行。</p>
+            <p class="fine"><span class="addon" style="margin-left:0">補充</span> Claude Code 文件建議每份 <code>CLAUDE.md</code> 在 200 行以內：超過會佔更多 context，Claude 照著做的程度也會下降，啟動時和 <code>/status</code> 會顯示警告。<code>AGENTS.md</code> 在這個 repo 扮演同樣的角色，第 9 步之後是 11 行、318 字元。</p>
           </li>
           <li class="tip">
             <div class="tip-head"><span class="tip-no">2</span><div><b>多寫「要做什麼」，少寫「不要做什麼」</b><div class="en">Favor positives over negatives — Say what to do</div></div></div>
@@ -989,7 +989,8 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
             <div class="code wrap" style="margin-top:8px"><div class="code-head"><span>~/.claude/CLAUDE.md</span><button class="copy" type="button">複製</button></div><pre><code>- Use uv for Python: `uv run` to run code and tools, `uv add` for dependencies (`uv add --dev` for test and lint tools), `uvx` for one-off tools. Never `pip install` or `uv pip install`.
 - If a project already uses a different Python tool (for example Poetry, or pip with requirements.txt), follow the project.</code></pre></div>
           </li>
-          <li>這個檔案在 session 開始時載入，要重新啟動 <code>claude</code> 才會生效。開新 session 後執行 <code>/memory</code>，清單裡應該會出現它的路徑。</li>
+          <li>已確認載入：2026-11-19 重新啟動後的 session，載入的指示檔裡有 <code>~/.claude/CLAUDE.md</code> 的兩行內容。這個檔案只在 session 開始時讀，之後再修改，也要重新啟動 <code>claude</code> 才會生效。</li>
+          <li><span class="addon" style="margin-left:0">補充</span> <code>/memory</code> 畫面上的「User instructions」和「Project instructions」是固定的選項，檔案不存在也會顯示，例如 repo 裡沒有 <code>./CLAUDE.md</code>，「Project instructions」那一列照樣出現。要確認有沒有載入，用 <code>/context</code> 看指示檔清單，或請 Claude 原文引用檔案內容。</li>
           <li><span class="addon" style="margin-left:0">補充</span> 這台電腦的終端機目前沒有 <code>code</code> 指令，上面的 <code>code ~/.claude/CLAUDE.md</code> 會顯示 <code>command not found</code>。在 VS Code 按 <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>，執行「Shell Command: Install 'code' command in PATH」，開新的終端機後就能用；或改用 <code>/memory</code> 打開。</li>
           <li><span class="addon" style="margin-left:0">補充</span> <code>~/.claude/rules/</code> 裡已經有 <code>context7.md</code> 和 <code>no-rhetoric.md</code>。它們也是使用者層級的指示，但這一步要建立的是 <code>~/.claude/CLAUDE.md</code>。</li>
         </ul>
@@ -1045,7 +1046,8 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
       <div class="callout progress p-info">
         <div class="row"><span class="label">你的進度</span><span class="pill s-info">說明性質</span></div>
         <ul>
-          <li>專案的 <code>.claude/</code> 還不存在，第 6、9、10 步會產生</li>
+          <li>專案的 <code>.claude/</code> 已在第 6 步建立，目前有 <code>settings.json</code>（第 6 步）、<code>settings.local.json</code>（第 7 步，git 忽略）和 <code>skills/brand/SKILL.md</code>（第 9 步）</li>
+          <li>第 10 步會在 <code>settings.json</code> 加上 plugin 的紀錄</li>
         </ul>
       </div>
     </section>
@@ -1075,6 +1077,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
         <div class="row"><span class="label">你的進度</span><span class="pill s-info">說明性質</span></div>
         <ul>
           <li><code>.gitignore</code> 第 59 行已排除 <code>.claude/settings.local.json</code></li>
+          <li><code>.claude/settings.local.json</code> 已在第 7 步建立，內容是 <code>"enabledMcpjsonServers": ["playwright"]</code>，也就是你對專案 MCP server 的選擇。<code>git check-ignore</code> 確認它被第 59 行排除。</li>
         </ul>
       </div>
     </section>
@@ -1084,7 +1087,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
       <div class="step-head">
         <span class="step-no">6</span>
         <div class="step-titles"><h2>權限</h2><div class="en">Permissions</div></div>
-        <span class="pill s-todo">未完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -1118,10 +1121,11 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
         <p><code>npm run</code> 後面可以接任何 script，允許它等於允許執行任意程式，所以 Auto 模式不採用這種規則。<code>npm test</code> 只會執行固定的測試指令，範圍明確。</p>
         <p>三條規則存到 project settings，commit 之後，repo 裡的每個人都套用同樣的限制。</p>
       </div>
-      <div class="callout progress p-todo">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li><code>.claude/settings.json</code> 不存在</li>
+          <li><code>.claude/settings.json</code> 已建立，三條規則都在：allow <code>Bash(npm test)</code>、ask <code>Bash(git push *)</code>、deny <code>Read(./.env)</code>，內容和上面的範例相同</li>
+          <li>已在 <code>5a988ff</code>（Day 2 setup: permissions, Playwright MCP and brand skill）commit</li>
           <li>目前的權限模式是 Auto（<code>~/.claude/settings.json</code> 沒有另外設定預設模式）</li>
         </ul>
       </div>
@@ -1132,7 +1136,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
       <div class="step-head">
         <span class="step-no">7</span>
         <div class="step-titles"><h2>MCP：Playwright server</h2><div class="en">MCP: the Playwright server</div></div>
-        <span class="pill s-todo">未完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -1152,10 +1156,15 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
         <div class="label">注意 <span class="addon">補充</span></div>
         <p>你已經在使用者層級啟用了 <code>playwright</code> plugin，它附帶自己的 playwright server（<code>/plugin</code> 畫面上 playwright 底下那一列）。做完這一步後會有兩個：<code>plugin:playwright:playwright</code> 和專案的 <code>playwright</code>。課程需要的是專案這一份。如果不想重複，可以比照 context7 的做法，在 <code>/mcp</code> 停用 plugin 那一份，只影響這個專案。</p>
       </div>
-      <div class="callout progress p-todo">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li><code>.mcp.json</code> 不存在</li>
+          <li><code>.mcp.json</code> 已建立，<code>playwright</code> 的指令是 <code>npx @playwright/mcp@latest</code></li>
+          <li><code>claude mcp get playwright</code> 顯示 <code>Scope: Project config (shared via .mcp.json)</code>、<code>Status: ✔ Connected</code></li>
+          <li>第一次重新啟動時選到「Continue without using this MCP server」，<code>settings.local.json</code> 存成 <code>"disabledMcpjsonServers": ["playwright"]</code>。重新選擇後改成 <code>"enabledMcpjsonServers": ["playwright"]</code></li>
+          <li>plugin 那一份 <code>plugin:playwright:playwright</code> 已在這個專案停用。它和 <code>plugin:context7:context7</code> 一起記在 <code>~/.claude.json</code> 這個專案的 <code>disabledMcpServers</code>，不在 repo 裡，其他專案不受影響</li>
+          <li>改設定之前就開著的 session 還在用舊的工具清單（<code>mcp__plugin_playwright_playwright__*</code>），開新 session 才會換成 <code>mcp__playwright__*</code></li>
+          <li><code>.mcp.json</code> 已在 <code>5a988ff</code> commit</li>
         </ul>
       </div>
     </section>
@@ -1185,7 +1194,7 @@ Update `docs/STATUS.md` when you finish a piece of work</code></pre></div>
       <div class="step-head">
         <span class="step-no">9</span>
         <div class="step-titles"><h2>Skill：brand skill</h2><div class="en">A skill: the brand skill</div></div>
-        <span class="pill s-todo">未完成</span>
+        <span class="pill s-done">完成</span>
       </div>
       <div class="block">
         <div class="label">要做什麼</div>
@@ -1206,12 +1215,16 @@ description: Accountable's brand guidelines for fonts, colors, surfaces and tone
         <div class="label">白話說明</div>
         <p><code>BRAND.md</code> 是做 UI 時用的品牌規範。改成 skill 之後，Claude 平常只看到一行描述，做 UI 時才載入全文，不做 UI 的時候不佔 context。</p>
       </div>
-      <div class="callout progress p-todo">
-        <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li><code>docs/BRAND.md</code> 還在</li>
-          <li><code>AGENTS.md</code> 第 9 行還列著 <code>docs/BRAND.md</code></li>
-          <li><code>.claude/skills/brand/</code> 不存在</li>
+          <li><code>.claude/skills/brand/SKILL.md</code> 已建立（2026-11-20），45 行、1,569 字元。frontmatter 和上面的範例相同，下面是 <code>docs/BRAND.md</code> 的全文：Fonts、Colors、Surfaces、Avoid、Tone 五段，用 <code>diff</code> 比對過內容沒有改動</li>
+          <li><code>docs/BRAND.md</code> 已用 <code>git rm</code> 刪除，刪除已經 staged</li>
+          <li><code>AGENTS.md</code> 已移除 <code>- `docs/BRAND.md`: the look, for UI work</code> 這一行，從 12 行變成 11 行</li>
+          <li>平常放在 context 裡的是 <code>name</code> 和 <code>description</code>，description 是 89 字元。全文 1,569 字元，做 UI 時才載入</li>
+          <li>這個 session 的 skill 清單已經出現 <code>brand</code>。第 11 步的檢查清單要你自己執行 <code>/skills</code> 再確認一次</li>
+          <li>repo 裡還提到 <code>docs/BRAND.md</code> 的只有 <code>course/</code> 的課程文件，以及這份筆記頁裡描述第 2 步當時狀態的段落。<code>docs/intent.md</code> 只寫 "brand guidelines"，沒有寫路徑</li>
+          <li>已在 <code>5a988ff</code> commit。git 把它記成 <code>docs/BRAND.md</code> 改名為 <code>.claude/skills/brand/SKILL.md</code>，所以 <code>git log --follow</code> 查得到原檔的歷史</li>
         </ul>
       </div>
     </section>
@@ -1298,7 +1311,9 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
       <div class="callout progress p-todo">
         <div class="row"><span class="label">你的進度</span><span class="pill s-todo">未完成</span></div>
         <ul>
-          <li>目前在 <code>main</code>，快照當時沒有未 commit 的變更</li>
+          <li>目前在 <code>main</code>。第 6、7、9 步的設定已在 <code>5a988ff</code>（Day 2 setup: permissions, Playwright MCP and brand skill）commit，筆記頁在下一個 commit，兩個都推到 <code>fork</code> 的 <code>main</code></li>
+          <li><code>.claude/settings.local.json</code> 被 git 忽略，沒有 commit</li>
+          <li>還沒做的是第 10 步的 plugin，以及上面的逐項檢查。第 10 步會改 <code>.claude/settings.json</code>，做完要再 commit 一次</li>
         </ul>
       </div>
     </section>
@@ -1307,7 +1322,7 @@ git commit -m "Notes: Day 2 Claude Code guide in Traditional Chinese"</code></pr
 </div>
 
 <footer class="footer">
-  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容。進度是 2026-11-19 的檢查結果。
+  依據 <code>course/coding_agents/claude_code.md</code> 翻譯整理，第 2 步另外加上課程投影片「Markdown and progressive disclosure」的內容。進度是 2026-11-20 的檢查結果。
 </footer>
 
 <script>

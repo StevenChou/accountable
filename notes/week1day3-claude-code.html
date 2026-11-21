@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Code Day 3 MVP</title>
+<style>
+/* Same layout and palette as notes/week1day2-claude-code.html: header band, sticky step index beside one reading column.
+   Palette and surfaces follow .claude/skills/brand/SKILL.md. Stage colors follow the brand order:
+   Plan Sea Green, Design Marigold, Build Coral, Test Cerulean, Deploy Raspberry, Maintain Midnight. */
+:root {
+  --bg: #F0F4F5;
+  --panel: #FFFFFF;
+  --ink: #073B4C;
+  --ink-soft: #46656F;
+  --line: #D6E1E4;
+  --link: #0B6E8F;
+  --code-bg: #073B4C;
+  --code-fg: #E4EDEF;
+  --code-muted: #8FB0B8;
+  --code-btn: #0E4B5F;
+  --code-btn-hover: #145C73;
+  --tint-green: #DDF5EE;
+  --tint-marigold: #FFF2D6;
+  --tint-cerulean: #E0EFF5;
+  --tint-raspberry: #FCE4EA;
+  --tint-coral: #FDEBE4;
+  --tint-neutral: #E4EBED;
+  --ink-green: #036B53;
+  --ink-marigold: #7A5200;
+  --ink-cerulean: #0B5C78;
+  --ink-raspberry: #A11E43;
+  --ink-coral: #9A3E22;
+  --neutral-fill: #D3DEE1;
+  /* fills that stay the same in both themes */
+  --sea: #06D6A0;
+  --marigold: #FFC145;
+  --coral: #F78C6B;
+  --cerulean-deep: #0B6E8F;
+  --raspberry-deep: #C9264F;
+  --midnight: #073B4C;
+  --white: #FFFFFF;
+
+  --font-body: "Instrument Sans", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --radius-panel: 16px;
+  --radius-inner: 12px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #04232E;
+    --panel: #000000;
+    --ink: #CDD8DB;
+    --ink-soft: #93AAB1;
+    --line: #17404C;
+    --link: #62C6E8;
+    --code-bg: #0B2F3B;
+    --code-fg: #DCE6E8;
+    --code-muted: #7F9CA4;
+    --code-btn: #164454;
+    --code-btn-hover: #1D5466;
+    --tint-green: #0A3A31;
+    --tint-marigold: #3A2F14;
+    --tint-cerulean: #0B3142;
+    --tint-raspberry: #3E1622;
+    --tint-coral: #3D2219;
+    --tint-neutral: #122F38;
+    --ink-green: #5BE7C0;
+    --ink-marigold: #FFD47A;
+    --ink-cerulean: #7FD0EC;
+    --ink-raspberry: #FF8FA9;
+    --ink-coral: #FFAD93;
+    --neutral-fill: #24434D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #04232E;
+  --panel: #000000;
+  --ink: #CDD8DB;
+  --ink-soft: #93AAB1;
+  --line: #17404C;
+  --link: #62C6E8;
+  --code-bg: #0B2F3B;
+  --code-fg: #DCE6E8;
+  --code-muted: #7F9CA4;
+  --code-btn: #164454;
+  --code-btn-hover: #1D5466;
+  --tint-green: #0A3A31;
+  --tint-marigold: #3A2F14;
+  --tint-cerulean: #0B3142;
+  --tint-raspberry: #3E1622;
+  --tint-coral: #3D2219;
+  --tint-neutral: #122F38;
+  --ink-green: #5BE7C0;
+  --ink-marigold: #FFD47A;
+  --ink-cerulean: #7FD0EC;
+  --ink-raspberry: #FF8FA9;
+  --ink-coral: #FFAD93;
+  --neutral-fill: #24434D;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+code, kbd, pre { font-family: var(--font-mono); }
+:not(pre) > code {
+  font-size: 0.86em;
+  background: var(--tint-neutral);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3em; }
+li + li { margin-top: 4px; }
+
+/* ---------- header ---------- */
+.masthead {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-block: 48px 32px;
+  display: grid;
+  gap: 14px;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-green);
+}
+.masthead h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+.lede { font-size: 17px; color: var(--ink-soft); max-width: 46em; }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.meta span { display: inline-flex; gap: 6px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.meta b { font-weight: 600; color: var(--ink); }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+.toc-side { display: none; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 232px minmax(0, 1fr); gap: 56px; }
+  .toc-side { display: block; }
+  .toc-mobile { display: none; }
+}
+.content { display: grid; gap: 28px; min-width: 0; max-width: 800px; }
+
+/* ---------- table of contents ---------- */
+.toc-side nav {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.toc-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 10px; }
+.toc-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+.toc-list li + li { margin-top: 0; }
+.toc-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.toc-list a:hover { background: var(--panel); }
+.toc-list a[aria-current="true"] { background: var(--panel); font-weight: 600; }
+.toc-sep { height: 1px; background: var(--line); margin: 8px 10px; }
+.toc-group {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 10px 10px 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toc-group .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-width: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-left: auto; }
+.toc-mobile {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 4px 18px;
+}
+.toc-mobile summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.toc-mobile .toc-list { padding-bottom: 12px; }
+
+/* ---------- status ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.s-done { background: var(--sea); color: var(--midnight); }
+.s-next { background: var(--marigold); color: var(--midnight); }
+.s-none { background: var(--neutral-fill); color: var(--ink); }
+
+/* ---------- stage tags ---------- */
+.stage-line { margin-bottom: 4px; }
+.stage-tag {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+.st-prep, .st-share { background: var(--neutral-fill); color: var(--ink); }
+.st-1 { background: var(--sea); color: var(--midnight); }
+.st-2 { background: var(--marigold); color: var(--midnight); }
+.st-3 { background: var(--coral); color: var(--midnight); }
+.st-4 { background: var(--cerulean-deep); color: var(--white); }
+.st-5 { background: var(--raspberry-deep); color: var(--white); }
+.st-6 { background: var(--midnight); color: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.swatch.st-6 { box-shadow: inset 0 0 0 1px var(--line); }
+
+/* ---------- panels & sections ---------- */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+@media (max-width: 600px) { .panel { padding: 20px 18px; } }
+.panel > h2 { font-size: 24px; font-weight: 700; }
+.section-note { color: var(--ink-soft); font-size: 15px; }
+.prose { display: grid; gap: 12px; }
+.sub-h { font-size: 16.5px; font-weight: 700; margin: 10px 0 0; line-height: 1.4; }
+.fine { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+
+/* ---------- overview ---------- */
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.counts .pill { font-variant-numeric: tabular-nums; gap: 6px; }
+.overview { list-style: none; padding: 0; display: grid; gap: 0; }
+.overview li + li { margin-top: 0; }
+.overview li {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.overview li:last-child { border-bottom: 0; }
+.overview .num { font-family: var(--font-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.overview a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.overview a:hover { text-decoration: underline; }
+.overview .why { grid-column: 2 / 4; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.next { background: var(--tint-neutral); border-radius: var(--radius-inner); padding: 14px 16px; font-size: 15px; }
+
+/* ---------- glossary ---------- */
+.glossary { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
+@media (min-width: 720px) { .glossary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; } }
+.glossary div { padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.glossary dt { font-weight: 700; margin-bottom: 2px; }
+.glossary dd { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-inner); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font-size: 13px; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stage-table { min-width: 700px; font-size: 14px; }
+.stage-table td:nth-child(1), .stage-table td:nth-child(2) { white-space: nowrap; }
+.stage-table td:nth-child(3) { min-width: 11em; }
+.stage-table code { overflow-wrap: normal; white-space: nowrap; }
+.stage-table td:nth-child(3) code { white-space: normal; }
+.stage-table .chg { display: block; font-size: 13px; color: var(--ink-soft); line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cmd-table { min-width: 620px; }
+.cmd-table td:nth-child(2) code { white-space: nowrap; }
+.cmd-table .what b { display: block; }
+.cmd-table .what span { display: block; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+.compare { min-width: 640px; font-size: 14px; }
+.compare thead th { white-space: normal; }
+.compare tbody th { font-weight: 700; width: 8em; }
+.muted { color: var(--ink-soft); }
+
+/* ---------- steps ---------- */
+.step-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.step-no {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight);
+  color: var(--sea);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  flex: none;
+}
+.step-titles { flex: 1 1 220px; min-width: 0; }
+.step-titles h2 { font-size: 22px; font-weight: 700; }
+.step-titles .en { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); }
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.block { display: grid; gap: 12px; min-width: 0; }
+.callout { border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.callout .label { margin-bottom: 0; }
+.plain { background: var(--tint-cerulean); }
+.plain .label { color: var(--ink-cerulean); }
+.note { background: var(--tint-coral); }
+.note .label { color: var(--ink-coral); }
+.guide { background: var(--tint-neutral); }
+.ed { background: var(--tint-marigold); }
+.ed .label { color: var(--ink-marigold); }
+.addon {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  background: var(--panel);
+  color: var(--ink-soft);
+  vertical-align: 1px;
+}
+.progress { display: grid; gap: 10px; }
+.progress .row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.progress .label { margin-bottom: 0; }
+.progress ul { font-size: 15px; }
+.p-done { background: var(--tint-green); }
+.p-done .label { color: var(--ink-green); }
+.p-next { background: var(--tint-marigold); }
+.p-next .label { color: var(--ink-marigold); }
+.p-none { background: var(--tint-neutral); }
+
+/* ---------- code ---------- */
+.code { background: var(--code-bg); border-radius: var(--radius-inner); min-width: 0; overflow: hidden; }
+.code-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 0 16px;
+  font-size: 12.5px;
+  color: var(--code-muted);
+  font-family: var(--font-mono);
+}
+.copy {
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--code-fg);
+  background: var(--code-btn);
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+.copy:hover { background: var(--code-btn-hover); }
+.code pre {
+  margin: 0;
+  padding: 10px 16px 16px;
+  overflow-x: auto;
+  color: var(--code-fg);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.code.wrap pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.code pre code { background: transparent; padding: 0; font-size: inherit; }
+/* inline code on tinted areas sits on the panel color so the chip stays visible in both themes */
+.callout code, .checklist code, .next code, .policy code { background: var(--panel); }
+.translation { font-size: 15px; color: var(--ink-soft); }
+
+/* ---------- review policy, translated ---------- */
+.policy { display: grid; gap: 8px; }
+.policy-row {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr);
+  gap: 2px 14px;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.policy-row b { font-size: 14px; }
+.policy-row .en { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); display: block; font-weight: 500; }
+@media (max-width: 600px) { .policy-row { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- checklist ---------- */
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist li + li { margin-top: 0; }
+.checklist label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.checklist input { width: 18px; height: 18px; margin: 3px 0 0; flex: none; accent-color: var(--ink-green); }
+.checklist input:checked + span { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+.checklist .no { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); margin-right: 6px; }
+.check-count { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; font-weight: 500; letter-spacing: 0; }
+
+.footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
+@media (min-width: 1100px) { .footer { padding-left: 288px; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Accountable 課程筆記 · Week 1 Day 3</div>
+  <h1>Claude Code 的 Day 3：用六個階段做出 MVP</h1>
+  <p class="lede">把 <code>course/instructions/week1day3.md</code> 翻成中文，每一步附上白話說明，並標出你目前做到哪裡。</p>
+  <div class="meta">
+    <span><b>原文</b><a href="../course/instructions/week1day3.md"><code>course/instructions/week1day3.md</code></a></span>
+    <span><b>進度快照</b>2026-11-21</span>
+    <span><b>Claude Code 版本</b>2.1.311</span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc-side" aria-label="目錄">
+    <nav>
+      <div class="toc-title">目錄</div>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#stages"><span class="toc-num"></span>六個階段與 commit</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+        <li class="toc-group"><span class="swatch st-prep"></span>準備</li>
+        <li><a href="#step-1"><span class="toc-num">1</span>Fork repo<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>建立 mvp 分支<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-group"><span class="swatch st-1"></span>階段 1 · Plan</li>
+        <li><a href="#step-3"><span class="toc-num">3</span>訪談並更新 intent<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-group"><span class="swatch st-2"></span>階段 2 · Design</li>
+        <li><a href="#step-4"><span class="toc-num">4</span>寫 spec<span class="dot s-next" title="下一步"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>選外觀：三份設計稿<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-3"></span>階段 3 · Build</li>
+        <li><a href="#step-6"><span class="toc-num">6</span>寫 plan<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>建置 MVP<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-4"></span>階段 4 · Test</li>
+        <li><a href="#step-8"><span class="toc-num">8</span>一個指令跑所有測試<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>對照設計稿<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>自己檢查<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-5"></span>階段 5 · Deploy</li>
+        <li><a href="#step-11"><span class="toc-num">11</span>寫審查政策<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-12"><span class="toc-num">12</span>審查分支<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-13"><span class="toc-num">13</span>merge 回 main<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-6"></span>階段 6 · Maintain</li>
+        <li><a href="#step-14"><span class="toc-num">14</span>記下之後的想法<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-share"></span>分享</li>
+        <li><a href="#step-15"><span class="toc-num">15</span>用 PR 分享文件<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+        <li><a href="#agent-commits"><span class="toc-num"></span>agent 自己 commit 時</a></li>
+        <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <details class="toc-mobile">
+      <summary>目錄</summary>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#stages"><span class="toc-num"></span>六個階段與 commit</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+        <li class="toc-group"><span class="swatch st-prep"></span>準備</li>
+        <li><a href="#step-1"><span class="toc-num">1</span>Fork repo<span class="dot s-done" title="完成"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>建立 mvp 分支<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-group"><span class="swatch st-1"></span>階段 1 · Plan</li>
+        <li><a href="#step-3"><span class="toc-num">3</span>訪談並更新 intent<span class="dot s-done" title="完成"></span></a></li>
+        <li class="toc-group"><span class="swatch st-2"></span>階段 2 · Design</li>
+        <li><a href="#step-4"><span class="toc-num">4</span>寫 spec<span class="dot s-next" title="下一步"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>選外觀：三份設計稿<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-3"></span>階段 3 · Build</li>
+        <li><a href="#step-6"><span class="toc-num">6</span>寫 plan<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>建置 MVP<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-4"></span>階段 4 · Test</li>
+        <li><a href="#step-8"><span class="toc-num">8</span>一個指令跑所有測試<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>對照設計稿<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>自己檢查<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-5"></span>階段 5 · Deploy</li>
+        <li><a href="#step-11"><span class="toc-num">11</span>寫審查政策<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-12"><span class="toc-num">12</span>審查分支<span class="dot s-none" title="未開始"></span></a></li>
+        <li><a href="#step-13"><span class="toc-num">13</span>merge 回 main<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-6"></span>階段 6 · Maintain</li>
+        <li><a href="#step-14"><span class="toc-num">14</span>記下之後的想法<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-group"><span class="swatch st-share"></span>分享</li>
+        <li><a href="#step-15"><span class="toc-num">15</span>用 PR 分享文件<span class="dot s-none" title="未開始"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+        <li><a href="#agent-commits"><span class="toc-num"></span>agent 自己 commit 時</a></li>
+        <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+      </ol>
+    </details>
+
+    <!-- ===================== intro ===================== -->
+    <section class="panel" id="intro">
+      <h2>這一天在做什麼</h2>
+      <div class="prose">
+        <p>Day 3 的課名是「Anthropic AI-SDLC」。你要從 <code>docs/intent.md</code> 這份商業層級的描述出發，做出 Accountable 的 MVP：一個給一個人、在自己電腦上用的業務 CRM。過程照 Anthropic 的 AI-native SDLC 分成六個階段：Plan、Design、Build、Test、Deploy、Maintain，全部在一個叫 <code>mvp</code> 的分支上進行，每個階段結束時由你 commit 一次。</p>
+        <p>開始前先 fork 這個 repo，因為今天最後要用 pull request 把你寫的文件分享出去。</p>
+        <p>做完之後，<code>docs/</code> 會多出 <code>spec.md</code>、<code>mockups/</code>、<code>plan.md</code>、<code>REVIEW.md</code>，<code>intent.md</code>、<code>STATUS.md</code>、<code>AGENTS.md</code> 會修改。程式碼依 <code>docs/TECH_STACK.md</code> 放在 <code>frontend/</code>（React、Vite）、<code>backend/</code>（FastAPI、SQLite）、<code>e2e/</code>（Playwright Test），根目錄會有 <code>package.json</code>、<code>pyproject.toml</code>、<code>uv.lock</code>。</p>
+        <p>給 Claude 的指示照原文貼英文，下面附中文意思。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">怎麼讀這份頁面</div>
+        <ul>
+          <li><b>要做什麼</b>：講義原文的翻譯。指令、檔名、commit 訊息保留英文。</li>
+          <li><b>白話說明</b>：解釋這一步為什麼要這樣做。</li>
+          <li><b>你的進度</b>記錄截至 2026-11-21 的工作狀態，後續進度由人工更新。</li>
+          <li>標示 <span class="addon" style="margin-left:0">課程指南</span> 的內容來自 <code>course/for_agents/</code> 裡給 agent 讀的指南，講義裡沒有。</li>
+          <li>標示 <span class="addon" style="margin-left:0">Ed 的版本</span> 的數字取自 Ed 的分支 <code>origin/week1day3-end</code>，是他做完這一天的結果，你的數字會不同。</li>
+          <li>標示 <span class="addon" style="margin-left:0">補充</span> 的內容是上面兩者都沒有寫、另外加上的說明。</li>
+        </ul>
+      </div>
+      <div class="callout note">
+        <div class="label">這份頁面沒有的內容</div>
+        <p>Day 3 的投影片在 Ed 的 Google Drive 資料夾，不在 repo 裡，這份頁面沒有用到投影片。講義說每個階段的 commit 訊息「照投影片上的寫」，這些訊息講義裡也都有，下面照抄。</p>
+      </div>
+    </section>
+
+    <!-- ===================== progress ===================== -->
+    <section class="panel" id="progress">
+      <h2>進度總覽</h2>
+      <p class="section-note">截至 2026-11-21，共 15 步。</p>
+      <div class="counts">
+        <span class="pill s-done">完成 3</span>
+        <span class="pill s-next">下一步 1</span>
+        <span class="pill s-none">未開始 11</span>
+      </div>
+      <ol class="overview">
+        <li><span class="num">1</span><a href="#step-1">Fork repo</a><span class="pill s-done">完成</span><span class="why"><code>fork</code> remote 已加入，GitHub 上標示為 <code>ed-donner/accountable</code> 的 fork；<code>origin</code> 仍是 Ed 的 repo</span></li>
+        <li><span class="num">2</span><a href="#step-2">建立 mvp 分支</a><span class="pill s-done">完成</span><span class="why">目前在 <code>mvp</code>，從你自己的 <code>main</code> 開出，兩者都在 <code>a034f6e</code>；這份筆記頁還沒 commit</span></li>
+        <li><span class="num">3</span><a href="#step-3">訪談並更新 intent</a><span class="pill s-done">完成</span><span class="why">訪談完成，繁中 <code>docs/intent.md</code> 與 <code>docs/STATUS.md</code> 已更新，待檢閱與 commit</span></li>
+        <li><span class="num">4</span><a href="#step-4">寫 spec</a><span class="pill s-next">下一步</span><span class="why">依更新後的 intent 撰寫 <code>docs/spec.md</code></span></li>
+        <li><span class="num">5</span><a href="#step-5">選外觀：三份設計稿</a><span class="pill s-none">未開始</span><span class="why"><code>docs/mockups/</code> 不存在</span></li>
+        <li><span class="num">6</span><a href="#step-6">寫 plan</a><span class="pill s-none">未開始</span><span class="why"><code>docs/plan.md</code> 不存在</span></li>
+        <li><span class="num">7</span><a href="#step-7">建置 MVP</a><span class="pill s-none">未開始</span><span class="why">沒有 <code>frontend/</code>、<code>backend/</code>、<code>e2e/</code></span></li>
+        <li><span class="num">8</span><a href="#step-8">一個指令跑所有測試</a><span class="pill s-none">未開始</span><span class="why">沒有 <code>package.json</code></span></li>
+        <li><span class="num">9</span><a href="#step-9">對照設計稿</a><span class="pill s-none">未開始</span><span class="why">要等第 5、7 步</span></li>
+        <li><span class="num">10</span><a href="#step-10">自己檢查</a><span class="pill s-none">未開始</span><span class="why">要等第 7 步</span></li>
+        <li><span class="num">11</span><a href="#step-11">寫審查政策</a><span class="pill s-none">未開始</span><span class="why"><code>docs/REVIEW.md</code> 不存在</span></li>
+        <li><span class="num">12</span><a href="#step-12">審查分支</a><span class="pill s-none">未開始</span><span class="why">要等第 11 步的 <code>REVIEW.md</code></span></li>
+        <li><span class="num">13</span><a href="#step-13">merge 回 main</a><span class="pill s-none">未開始</span><span class="why">要等第 12 步</span></li>
+        <li><span class="num">14</span><a href="#step-14">記下之後的想法</a><span class="pill s-none">未開始</span><span class="why"><code>docs/STATUS.md</code> 已有規劃紀錄，使用心得待 MVP 完成後補上</span></li>
+        <li><span class="num">15</span><a href="#step-15">用 PR 分享文件</a><span class="pill s-none">未開始</span><span class="why"><code>community_contributions/</code> 裡還沒有你的資料夾</span></li>
+      </ol>
+      <p class="next">檢閱並提交 Plan 的文件後，進入<a href="#step-4">第 4 步「寫 spec」</a>。</p>
+    </section>
+
+    <!-- ===================== stages ===================== -->
+    <section class="panel" id="stages">
+      <h2>六個階段與 commit</h2>
+      <p class="section-note">每個階段做完，用 <code>git add .</code> 和 <code>git commit -m</code> 存一次，訊息照下表。最後 <code>git log --oneline</code> 會看到每個階段一個 commit。右欄是 Ed 對應的 commit，下面兩行是改了幾個檔案、新增和刪除幾行。</p>
+      <div class="table-wrap">
+        <table class="stage-table">
+          <thead>
+            <tr><th>階段</th><th>步驟</th><th>產出</th><th>commit 訊息</th><th>Ed 的 commit</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="stage-tag st-prep">準備</span></td><td>1–2</td><td><code>fork</code> remote、<code>mvp</code> 分支</td><td class="muted">不 commit</td><td class="muted">—</td></tr>
+            <tr><td><span class="stage-tag st-1">1 Plan</span></td><td>3</td><td>更新的 <code>docs/intent.md</code></td><td><code>Plan: intent.md agreed</code></td><td><code>8690dec</code><span class="chg">2 個檔案<br>+36 / −12</span></td></tr>
+            <tr><td><span class="stage-tag st-2">2 Design</span></td><td>4</td><td><code>docs/spec.md</code></td><td><code>Design: spec.md</code></td><td><code>e64d6b4</code><span class="chg">3 個檔案<br>+649 / −4</span></td></tr>
+            <tr><td><span class="stage-tag st-2">2 Design</span></td><td>5</td><td><code>docs/mockups/</code>，選擇寫進 spec</td><td><code>Design: chosen mockup</code></td><td><code>ca3d93f</code><span class="chg">22 個檔案<br>+1,899 / −51</span></td></tr>
+            <tr><td><span class="stage-tag st-3">3 Build</span></td><td>6</td><td><code>docs/plan.md</code></td><td><code>Build: plan.md</code></td><td><code>f098346</code><span class="chg">2 個檔案<br>+382 / −1</span></td></tr>
+            <tr><td><span class="stage-tag st-3">3 Build</span></td><td>7</td><td>程式碼和測試</td><td><code>Build: the MVP</code></td><td><code>18f80ee</code><span class="chg">125 個檔案<br>+19,954 / −33</span></td></tr>
+            <tr><td><span class="stage-tag st-4">4 Test</span></td><td>8–10</td><td><code>npm test</code>、<code>AGENTS.md</code> 的測試說明、外觀修正</td><td><code>Test: check command</code></td><td><code>e110120</code><span class="chg">36 個檔案<br>+993 / −199</span></td></tr>
+            <tr><td><span class="stage-tag st-5">5 Deploy</span></td><td>11–13</td><td><code>docs/REVIEW.md</code>、審查後的修正</td><td><code>Deploy: review fixes</code></td><td><code>27c1570</code><span class="chg">77 個檔案<br>+4,381 / −316</span></td></tr>
+            <tr><td><span class="stage-tag st-6">6 Maintain</span></td><td>14</td><td><code>docs/STATUS.md</code> 的想法清單</td><td><code>Maintain: ideas for later</code></td><td><code>9cc3dd4</code><span class="chg">1 個檔案<br>+1 / −1</span></td></tr>
+            <tr><td><span class="stage-tag st-share">分享</span></td><td>15</td><td>PR 到 <code>community_contributions/</code></td><td class="muted">自訂</td><td class="muted">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">Ed 的數字來自 <code>git show --stat</code>。除了這 8 個 commit，<code>week1day3-end</code> 還有 15 個 merge commit（第一個在 Deploy 和 Maintain 之間），是 Ed 把 <code>main</code> 的更新併進這個分支，不屬於任何階段。想直接看 Ed 這一天的結果：先 commit 你自己的變更，再執行 <code>git checkout week1day3-end</code>（<code>README.md</code> 的 Switching to my version）。</p>
+    </section>
+
+    <!-- ===================== glossary ===================== -->
+    <section class="panel" id="glossary">
+      <h2>名詞解釋</h2>
+      <dl class="glossary">
+        <div><dt>SDLC</dt><dd>Software Development Life Cycle，軟體從規劃到維護的流程。今天用 Anthropic 版本的六個階段：Plan、Design、Build、Test、Deploy、Maintain。</dd></div>
+        <div><dt>MVP</dt><dd>Minimum Viable Product，第一個可以實際使用的版本。範圍和「不做什麼」寫在 <code>docs/intent.md</code>。</dd></div>
+        <div><dt>intent（<code>docs/intent.md</code>）</dt><dd>要解決的問題、預期成果、限制、成功標準。說「要什麼、為什麼」，不說怎麼做。</dd></div>
+        <div><dt>spec（<code>docs/spec.md</code>）</dt><dd>把 intent 轉成需求和設計。第 4 步由 agent 寫，你回答它列出的疑慮。</dd></div>
+        <div><dt>mockup（設計稿）</dt><dd>不接資料的靜態 HTML 畫面，只用來看外觀和版面。第 5 步做三份，你選一份。</dd></div>
+        <div><dt>plan（<code>docs/plan.md</code>）</dt><dd>怎麼做：會變動的檔案、分階段的工作順序、風險、用哪些測試證明完成。</dd></div>
+        <div><dt>fork</dt><dd>在你的 GitHub 帳號下複製一份別人的 repo。你不能直接推到 Ed 的 repo，所以先推到自己的 fork，再從 fork 發 PR。</dd></div>
+        <div><dt>remote：<code>origin</code> 與 <code>fork</code></dt><dd>本機 repo 記錄的遠端位址名稱。<code>origin</code> 是你 clone 的來源，也就是 Ed 的 repo；<code>fork</code> 是第 1 步加的、你自己的那份。</dd></div>
+        <div><dt>branch（分支）</dt><dd>從某個 commit 分出去的一條工作線。在 <code>mvp</code> 上做 MVP，<code>main</code> 不動，到第 13 步才合回去。</dd></div>
+        <div><dt>merge</dt><dd>把一個分支的 commit 合進另一個分支。第 13 步把 <code>mvp</code> 合進 <code>main</code>。</dd></div>
+        <div><dt>pull request（PR）</dt><dd>請 repo 的擁有者把你分支上的變更合進他的 repo。第 15 步從你的 fork 發給 <code>ed-donner/accountable</code>。</dd></div>
+        <div><dt>unit test 與 end-to-end test</dt><dd>unit test 單獨測一個函式或元件；end-to-end test 啟動整個 app，在瀏覽器裡像使用者一樣操作。</dd></div>
+        <div><dt>Playwright MCP 與 Playwright Test <span class="addon">補充</span></dt><dd>今天兩個都會用到。Playwright MCP 是 Day 2 第 7 步加的，讓 Claude 操作瀏覽器、截圖（第 5、9 步）。Playwright Test（<code>@playwright/test</code>）是寫 end-to-end test 的框架，<code>docs/TECH_STACK.md</code> 指定用它。</dd></div>
+        <div><dt><code>npm test</code></dt><dd>一個指令跑完所有 unit test 和 end-to-end test，有任何一個失敗就回報失敗。第 8 步建立。</dd></div>
+        <div><dt>review policy（審查政策）</dt><dd><code>docs/REVIEW.md</code>：審查時要看哪些面向、什麼算必須修正。第 11 步由你自己寫。</dd></div>
+        <div><dt>Important 與 nit</dt><dd>審查的兩種發現。Important 必須在 merge 前修正；nit 是風格、命名這類小問題，不擋 merge，每次最多回報五個。</dd></div>
+        <div><dt>fresh session（新 session）</dt><dd>清空 context、重新開始的對話。Claude Code 用 <code>/clear</code>。新 session 不記得前面的對話，只能讀 repo 裡的檔案。</dd></div>
+        <div><dt>usage limit（用量上限）</dt><dd>訂閱方案有 5 小時和每週兩種上限。到了上限 agent 會停下來，說明何時重置。見<a href="#usage">用量上限與 session</a>。</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===================== commands ===================== -->
+    <section class="panel" id="commands">
+      <h2>今天用到的指令</h2>
+      <h3 class="sub-h">Claude Code</h3>
+      <div class="table-wrap">
+        <table class="cmd-table">
+          <thead><tr><th>用途</th><th>指令</th><th>用在哪裡</th></tr></thead>
+          <tbody>
+            <tr><td class="what"><b>開新 session、清空 context</b><span>前面的對話不再佔用 context</span></td><td><code>/clear</code></td><td>第 7、12 步</td></tr>
+            <tr><td class="what"><b>換模型</b><span>Claude Pro 方案建議用 Sonnet</span></td><td><code>/model</code></td><td><a href="#usage">用量上限</a></td></tr>
+            <tr><td class="what"><b>查看方案剩餘用量</b><span>5 小時與每週上限各用了多少</span></td><td><code>/usage</code></td><td><a href="#usage">用量上限</a></td></tr>
+            <tr><td class="what"><b>重新打開上一個 session</b><span>關掉終端機後接著做；在終端機執行</span></td><td><code>claude --continue</code></td><td><a href="#usage">用量上限</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="sub-h">git</h3>
+      <div class="table-wrap">
+        <table class="cmd-table">
+          <thead><tr><th>用途</th><th>指令</th><th>用在哪裡</th></tr></thead>
+          <tbody>
+            <tr><td class="what"><b>加入你的 fork 當第二個 remote</b></td><td><code>git remote add fork https://github.com/&lt;username&gt;/accountable.git</code></td><td>第 1 步</td></tr>
+            <tr><td class="what"><b>列出 remote</b></td><td><code>git remote -v</code></td><td>第 1 步</td></tr>
+            <tr><td class="what"><b>從 main 開新分支並切過去</b></td><td><code>git checkout -b mvp</code></td><td>第 2 步</td></tr>
+            <tr><td class="what"><b>看目前在哪個分支</b><span>前面有 <code>*</code> 的是目前的分支</span></td><td><code>git branch</code></td><td>第 7 步</td></tr>
+            <tr><td class="what"><b>存一個階段</b></td><td><code>git add .</code><br><code>git commit -m "…"</code></td><td>每個階段</td></tr>
+            <tr><td class="what"><b>看 commit 紀錄</b><span>一行一個，最新的在上</span></td><td><code>git log --oneline</code></td><td>第 13 步</td></tr>
+            <tr><td class="what"><b>合回 main 並刪除分支</b></td><td><code>git checkout main</code><br><code>git merge mvp</code><br><code>git branch -d mvp</code></td><td>第 13 步</td></tr>
+            <tr><td class="what"><b>把 main 推到你的 fork</b></td><td><code>git push -u fork main</code></td><td>第 15 步</td></tr>
+            <tr><td class="what"><b>檢查 PR 包含哪些檔案</b><span>每個檔案的新增和刪除行數</span></td><td><code>git diff --numstat origin/main...HEAD</code></td><td>第 15 步</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">課程一律用 <code>git checkout</code> 切換分支，不用 <code>git switch</code>（<code>course/for_agents/AGENT_GIT_GUIDE.md</code>）。</p>
+    </section>
+
+    <!-- ===================== step 1 ===================== -->
+    <section class="panel" id="step-1">
+      <div class="step-head">
+        <span class="step-no">1</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-prep">準備</span></div><h2>Fork repo</h2><div class="en">Fork the repo</div></div>
+        <span class="pill s-done">完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>今天結束時要用 pull request 分享文件，這需要你自己的 fork：</p>
+        <ol>
+          <li>打開 <a href="https://github.com/ed-donner/accountable" target="_blank" rel="noopener">github.com/ed-donner/accountable</a>，按 <b>Fork</b>，再按 <b>Create fork</b>。</li>
+          <li>把你的 fork 加成第二個 remote，<code>&lt;username&gt;</code> 換成你的 GitHub 帳號：</li>
+        </ol>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git remote add fork https://github.com/&lt;username&gt;/accountable.git</code></pre></div>
+        <p>每一步都可以請 coding agent 解釋。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>你對 Ed 的 repo 沒有寫入權限。fork 是在你的帳號下複製一份，你可以推到那裡，再從那裡發 PR 請 Ed 合併。</p>
+        <p><code>origin</code> 保持指向 Ed 的 repo，因為課程用 <code>origin/&lt;分支&gt;</code> 讀 Ed 每天的分支，例如 <code>origin/week1day2-end</code>。你的 fork 用另一個名字 <code>fork</code>。</p>
+      </div>
+      <div class="callout guide">
+        <div class="label">課程指南 <span class="addon">AGENT_GIT_GUIDE.md</span></div>
+        <ul>
+          <li>Fork 時保留勾選 <b>Copy the main branch only</b>。</li>
+          <li>用 <code>git remote -v</code> 確認：<code>origin</code> 是 <code>ed-donner/accountable</code>，<code>fork</code> 是你的。</li>
+          <li>remote 位址打錯時：<code>git remote set-url fork https://github.com/&lt;username&gt;/accountable.git</code>。</li>
+          <li>如果你當初 clone 的是自己的 fork，<code>origin</code> 就是你的 fork。這時改加 Ed 的 repo：<code>git remote add upstream https://github.com/ed-donner/accountable.git</code>，之後指南裡的 <code>origin</code> 讀成 <code>upstream</code>、<code>fork</code> 讀成 <code>origin</code>。</li>
+          <li>第一次 push 時 GitHub 密碼不能用。VS Code 的終端機會提供用瀏覽器登入；或在 GitHub 建立 personal access token，git 問密碼時自己貼上，不要放進檔案或對話。</li>
+        </ul>
+      </div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
+        <ul>
+          <li><code>git remote -v</code>：<code>origin</code> 是 <code>ed-donner/accountable</code>，<code>fork</code> 是你帳號下的 <code>accountable</code></li>
+          <li><code>gh repo view</code> 顯示你的 repo 是 fork，parent 是 <code>ed-donner/accountable</code>；遠端只有 <code>main</code> 一個分支</li>
+          <li>本機 <code>main</code> 的 upstream 是 <code>fork/main</code>，兩邊都在 <code>a034f6e</code></li>
+          <li><code>gh</code> 已登入 GitHub，第 15 步可以用 <code>gh pr create</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 2 ===================== -->
+    <section class="panel" id="step-2">
+      <div class="step-head">
+        <span class="step-no">2</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-prep">準備</span></div><h2>建立 mvp 分支</h2><div class="en">Start the branch</div></div>
+        <span class="pill s-done">完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>從你自己的 <code>main</code> 開始，昨天的設定要先 commit：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git checkout main
+git checkout -b mvp</code></pre></div>
+        <p>或者從 Ed 的 Day 2 設定開始。這會把你自己的成果留在一個叫 <code>my-day2</code> 的分支，再把你的 <code>main</code> 移到 Ed 的分支：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git branch my-day2
+git checkout --no-track -B main origin/week1day2-end
+git checkout -b mvp</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>git checkout -b mvp</code> 從目前的 commit 開一條叫 <code>mvp</code> 的分支並切過去。今天所有工作都在 <code>mvp</code> 上，<code>main</code> 保持 Day 2 的狀態，審查通過後才在第 13 步合回去。</p>
+        <p>第二種做法 <span class="addon">補充</span>：<code>git branch my-day2</code> 把目前的 <code>main</code> 存一個名字；<code>-B main origin/week1day2-end</code> 把 <code>main</code> 重設到 Ed 的 Day 2 結束點；<code>--no-track</code> 表示不把 Ed 的分支設成 <code>main</code> 的 upstream。你的 Day 2 已經做完，用第一種就好。</p>
+      </div>
+      <div class="callout note">
+        <div class="label">注意 <span class="addon">補充</span></div>
+        <p>這份頁面 <code>notes/week1day3-claude-code.html</code> 仍是工作區的未追蹤檔案。準備 Plan 的 commit 時，可依第 3 步的補充指定文件路徑。</p>
+        <p>目前 <code>mvp</code> 和 <code>main</code> 指向同一個 commit。如果想把筆記單獨提交到 <code>main</code>，可以用以下方式讓 <code>mvp</code> 跟上。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git checkout main
+git add notes/week1day3-claude-code.html
+git commit -m "Notes: Day 3 guide in Traditional Chinese"
+git checkout mvp
+git merge main</code></pre></div>
+        <p>最後的 <code>git merge main</code> 是 fast-forward：<code>mvp</code> 直接移到 <code>main</code> 的新 commit，不產生 merge commit。放在 <code>main</code> 而不是 <code>mvp</code>，第 12 步審查「這個分支相對於 <code>main</code> 的變更」時，就不會把這份約 1,400 行的頁面算進去。</p>
+        <p>這個做法只在 <code>mvp</code> 還沒有任何 commit 時適用。之後如果在 <code>mvp</code> 上更新這份頁面，用 <code>git add notes/…</code> 單獨 commit，訊息以 <code>Notes:</code> 開頭，不要混進階段的 commit。</p>
+      </div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
+        <ul>
+          <li>目前在 <code>mvp</code>（<code>git branch</code> 顯示 <code>* mvp</code>）</li>
+          <li>用的是第一種做法：<code>mvp</code> 和你自己的 <code>main</code> 都在 <code>a034f6e</code>，<code>mvp</code> 還沒有自己的 commit；沒有 <code>my-day2</code> 分支</li>
+          <li>工作區已有第 3 步的文件變更，這份筆記頁仍未追蹤</li>
+          <li>Day 2 設定已 commit：<code>5a988ff</code>、<code>4bb50e6</code></li>
+          <li>建置要用的工具 <span class="addon">補充</span>：Node v26.13.1（<code>TECH_STACK.md</code> 要求 24 以上）、uv 0.13.9、Google Chrome 已安裝（end-to-end test 用它）。系統的 <code>python3</code> 是 3.15.2，<code>TECH_STACK.md</code> 指定 3.12；uv 預設會在需要時下載專案指定的 Python 版本</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 3 ===================== -->
+    <section class="panel" id="step-3">
+      <div class="step-head">
+        <span class="step-no">3</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-1">階段 1 · Plan</span></div><h2>訪談並更新 intent</h2><div class="en">Stage 1: Plan</div></div>
+        <span class="pill s-done">完成</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>對 Claude 輸入：</p>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Read docs/intent.md and interview me about anything unclear or missing: scope, users, constraints and what success looks like. Then update intent.md with my answers.</code></pre></div>
+        <p class="translation">中文意思：讀 <code>docs/intent.md</code>，針對不清楚或缺漏的地方訪談我：範圍、使用者、限制，以及成功是什麼樣子。然後把我的回答寫進 <code>intent.md</code>。</p>
+        <p>回答它的問題。Claude Code 會用選擇題問你，你也可以自己輸入答案。</p>
+        <p>在 VS Code 的 Source Control 檢視讀過變更，修正 agent 寫錯的地方。然後 commit：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Plan: intent.md agreed"</code></pre></div>
+        <p><span class="addon">補充</span> 這次可用 <code>git add docs/intent.md docs/STATUS.md</code> 暫存兩份規劃文件，再執行上方的 commit 指令。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>intent 是你的文件：要解決什麼問題、做到什麼算成功，由你決定。agent 的工作是找出寫得不清楚或沒寫到的地方，問你，再把答案寫回去。之後的 spec、plan、程式碼都從這份檔案出發，所以這裡的答案會一路影響到最後。</p>
+        <p>Source Control 檢視在 VS Code 左側的活動列，會逐行顯示檔案改了什麼：綠色是新增，紅色是刪除。</p>
+        <p>目前的 <a href="../docs/intent.md"><code>docs/intent.md</code></a> 使用繁體中文，記錄第一版的問題、範圍與八條成功標準。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">8690dec</span></div>
+        <p><code>intent.md</code> 從 65 行變成 89 行（10,055 字元），另外改了 <code>STATUS.md</code> 一行。</p>
+      </div>
+      <div class="callout progress p-done">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
+        <ul>
+          <li>第一版供小型企業的老闆兼業務使用，打開儀表板先回顧近期客戶往來與跟進事項。</li>
+          <li>保留儀表板、公司、聯絡人、商機與商機看板。介面採繁體中文，金額一律使用新臺幣（TWD）。</li>
+          <li>備妥工具與套件後，在自己的 Mac 上實測離線啟動與操作，並保留 Linux 和 Windows 的相容目標。</li>
+          <li><a href="../docs/intent.md"><code>docs/intent.md</code></a> 和 <a href="../docs/STATUS.md"><code>docs/STATUS.md</code></a> 已在 <code>mvp</code> 工作區更新，待檢閱與 commit。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 4 ===================== -->
+    <section class="panel" id="step-4">
+      <div class="step-head">
+        <span class="step-no">4</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-2">階段 2 · Design</span></div><h2>寫 spec</h2><div class="en">Stage 2: Design — The spec</div></div>
+        <span class="pill s-next">下一步</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Read docs/intent.md and write docs/spec.md with the requirements and the design for the MVP. Use the brand skill. List any concerns at the top.</code></pre></div>
+        <p class="translation">中文意思：讀 <code>docs/intent.md</code>，寫出 <code>docs/spec.md</code>，內容是 MVP 的需求和設計。使用 brand skill。把任何疑慮列在最上面。</p>
+        <p>逐一回答每個疑慮，請 agent 更新 <code>docs/spec.md</code>。再用 <code>docs/intent.md</code> 的「要解決的問題」、「成功標準」和「後續待議」檢查 spec。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Design: spec.md"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>intent 說要什麼、為什麼；spec 把它拆成一條條需求，加上設計：畫面怎麼排、資料怎麼存、規則怎麼算。「把疑慮列在最上面」是讓 agent 把它不能自己決定的事交給你，而不是自己猜。</p>
+        <p>brand skill 是 Day 2 第 9 步從 <code>docs/BRAND.md</code> 搬過去的，spec 的設計部分要照它的字型和顏色。</p>
+        <p>對照 intent 檢查，是確認 spec 解決的是原本的問題，也沒有把未決問題（登入、多人共用、對外部署）偷偷放進 MVP。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">e64d6b4</span></div>
+        <p><code>spec.md</code> 在這個 commit 新增 649 行。分支最後的 <code>spec.md</code> 是 711 行、52,511 字元，開頭的 Concerns 一節分成三組：Decided（已決定，7 項）、Worth knowing（值得知道，3 項）、Calls made where the intent was silent（intent 沒寫、由 agent 做的決定）。Decided 的例子：品牌只有五個顏色但 pipeline 有六個 stage、MVP 沒有備份和匯出、Windows 和 Linux 暫時沒有測試。</p>
+      </div>
+      <div class="callout progress p-next">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-next">下一步</span></div>
+        <ul><li><code>docs/spec.md</code> 待撰寫。可從更新後的 <code>docs/intent.md</code> 與 Day 2 建立的品牌規範 <code>.claude/skills/brand/SKILL.md</code> 開始。</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 5 ===================== -->
+    <section class="panel" id="step-5">
+      <div class="step-head">
+        <span class="step-no">5</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-2">階段 2 · Design</span></div><h2>選外觀：三份設計稿</h2><div class="en">Stage 2: Design — Choose the look</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Make three different mockups of the MVP's dashboard and pipeline as HTML files in docs/mockups/, following spec.md and the brand skill. Take a screenshot of each with Playwright and save it beside the HTML.</code></pre></div>
+        <p class="translation">中文意思：依照 <code>spec.md</code> 和 brand skill，為 MVP 的 dashboard 和 pipeline 做三份不同的設計稿，存成 <code>docs/mockups/</code> 裡的 HTML 檔。用 Playwright 為每一份截圖，存在 HTML 旁邊。</p>
+        <p>在 VS Code 打開截圖，選你最喜歡的一份。然後請 agent 把你的選擇和理由記進 <code>docs/spec.md</code>。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Design: chosen mockup"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>設計稿是靜態畫面，不接資料庫，做起來比整個 app 快，適合在寫程式前比較幾種方向。選哪一份是你的判斷。</p>
+        <p>截圖用的是 Day 2 第 7 步加的 Playwright MCP。</p>
+        <p>選擇和理由要寫進 <code>spec.md</code>，因為第 7 步會開新 session 建置，新 session 不記得這段對話，只讀得到檔案。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">ca3d93f</span></div>
+        <p><code>docs/mockups/</code> 有三份設計稿：<code>1-color-band</code>、<code>2-work-desk</code>、<code>3-deal-wall</code>，每份有 dashboard 和 pipeline 兩張截圖；另外有 <code>4-chosen-design</code>，以及共用的 <code>shared.css</code>、<code>shared.js</code> 和字型。<code>spec.md</code> 開頭改成指向 <code>4-chosen-design.html</code>，需求 N1 從側邊欄改成頂部列。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li><code>docs/mockups/</code> 不存在；專案的 <code>.mcp.json</code> 有 <code>playwright</code>（Day 2 第 7 步）</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 6 ===================== -->
+    <section class="panel" id="step-6">
+      <div class="step-head">
+        <span class="step-no">6</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-3">階段 3 · Build</span></div><h2>寫 plan</h2><div class="en">Stage 3: Build — Write the plan</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Read docs/intent.md and docs/spec.md and write docs/plan.md with four sections: Files that change, Order of work, Risks and Proof. Order the work in phases. Proof lists the unit and end-to-end tests. Don't write any code yet.</code></pre></div>
+        <p class="translation">中文意思：讀 <code>docs/intent.md</code> 和 <code>docs/spec.md</code>，寫出 <code>docs/plan.md</code>，分四節：Files that change（會變動的檔案）、Order of work（工作順序）、Risks（風險）、Proof（證明）。工作順序分成幾個階段（phase）。Proof 列出 unit test 和 end-to-end test。先不要寫任何程式碼。</p>
+        <p>然後質問這份計畫，例如：</p>
+        <ul>
+          <li>What could this break?（這會弄壞什麼？）</li>
+          <li>Which step is riskiest?（哪一步風險最高？）</li>
+          <li>What did you decide against?（你考慮過但沒採用的是什麼？）</li>
+        </ul>
+        <p>持續修改，直到另一位工程師只看 <code>docs/plan.md</code> 就能做出來。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Build: plan.md"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>spec 說做出來要是什麼樣子，plan 說怎麼一步步做到。「先不要寫程式碼」讓你在 agent 花將近兩小時建置之前，先檢查它打算怎麼做。在文件裡改方向，比在寫好的程式碼裡改便宜。</p>
+        <p>「另一位工程師只看 plan 就能做出來」也是下一步的條件：第 7 步的新 session 只有這份 plan 和 spec 可以依據。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">f098346</span></div>
+        <p><code>plan.md</code> 381 行、34,976 字元。Ed 的 <code>STATUS.md</code> 記錄建置分 8 個 phase：</p>
+        <ol>
+          <li>能跑起來的外殼（a shell that runs）</li>
+          <li>資料庫、規則與範例資料</li>
+          <li>API</li>
+          <li>表格與表單</li>
+          <li>紀錄頁與時間軸</li>
+          <li>Pipeline</li>
+          <li>Dashboard</li>
+          <li>收尾（finish the build）</li>
+        </ol>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li><code>docs/plan.md</code> 不存在</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 7 ===================== -->
+    <section class="panel" id="step-7">
+      <div class="step-head">
+        <span class="step-no">7</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-3">階段 3 · Build</span></div><h2>建置 MVP</h2><div class="en">Stage 3: Build — Build the MVP</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>確認你在分支上：<code>git branch</code> 顯示 <code>* mvp</code>。然後開一個新 session、清空 context（Claude Code 用 <code>/clear</code>），再輸入：</p>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Implement docs/plan.md, following its order of work. Write the tests in its Proof section and run them as you go. Leave the commits to me.</code></pre></div>
+        <p class="translation">中文意思：依照 <code>docs/plan.md</code> 的工作順序實作。寫出 Proof 一節列的測試，邊做邊跑。commit 留給我。</p>
+        <p>這是今天最長的一步。如果用量上限中斷了建置，等上限重置後，在同一個 session 繼續。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Build: the MVP"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>/clear</code> 把前面訪談、寫 spec、選設計稿的對話清掉。好處有兩個：建置有完整的 context 可用；而且這個 session 只能依據 repo 裡的檔案工作，如果 plan 有漏寫的地方，會在這裡顯現。</p>
+        <p>「Leave the commits to me」是課程的做法：每個階段由你決定何時存成一筆紀錄。</p>
+      </div>
+      <div class="callout guide">
+        <div class="label">課程指南 <span class="addon">AGENT_COURSE_GUIDE.md、AGENT_GUIDE_WEEK1.md</span></div>
+        <ul>
+          <li>Day 3 是 Week 1 用量最大的一天：agent 總共工作約四小時，其中將近兩小時是這一步。</li>
+          <li>Ed 用 Opus 做 Day 3，約用掉 Claude Pro 方案一週額度的三分之一；Sonnet 用得比較少。</li>
+          <li>agent 可能自己 commit，例如 <code>plan.md</code> 把每個 phase 寫成一個 commit 點時。這沒關係，做法見 <a href="#agent-commits">agent 自己 commit 時</a>。</li>
+        </ul>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">18f80ee</span></div>
+        <p>125 個檔案，新增 19,954 行、刪除 33 行。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li>沒有 <code>frontend/</code>、<code>backend/</code>、<code>e2e/</code></li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 8 ===================== -->
+    <section class="panel" id="step-8">
+      <div class="step-head">
+        <span class="step-no">8</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-4">階段 4 · Test</span></div><h2>一個指令跑所有測試</h2><div class="en">Stage 4: Test — One command runs all the tests</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Make sure npm test runs all the unit and end-to-end tests and fails if any fail. Add it to AGENTS.md, run it, fix failures until it passes, and show me the output.</code></pre></div>
+        <p class="translation">中文意思：確認 <code>npm test</code> 會跑所有 unit test 和 end-to-end test，任何一個失敗就回報失敗。把它寫進 <code>AGENTS.md</code>，執行它，修正失敗直到通過，並給我看輸出。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>測試分散在 pytest、Vitest、Playwright 三套工具裡。合成一個指令之後，你和之後每個 session 都用同一個方法確認 app 沒壞。寫進 <code>AGENTS.md</code>，是讓每個新 session 一開始就知道要跑它。</p>
+        <p>Day 2 第 6 步允許了 <code>Bash(npm test)</code> <span class="addon">補充</span>，所以 Claude 執行這個指令時不會停下來問你。</p>
+      </div>
+      <div class="callout guide">
+        <div class="label">課程指南 <span class="addon">AGENT_GUIDE_WEEK1.md</span></div>
+        <p><code>npm test</code> 可以跑之後，Ed 建議一個選做步驟：請 agent 盡量讓測試平行執行，加快速度。做法是每個 end-to-end worker 有自己的伺服器和資料庫，worker 數依電腦的核心數和記憶體決定，像 Ed 分支上的 <code>scripts/test-plan.mjs</code> 和 <code>scripts/test-servers.mjs</code>。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">e110120</span></div>
+        <p><code>AGENTS.md</code> 多了 Testing 一節，從 11 行變成 19 行：<code>npm test</code> 跑 type check、pytest、Vitest、Playwright，最後印出摘要，有失敗就以錯誤結束；在 10 核心的電腦約兩分鐘；<code>ACCOUNTABLE_TEST_WORKERS=2 npm test</code> 可以手動指定 worker 數。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li>沒有 <code>package.json</code>；<code>.claude/settings.json</code> 已允許 <code>Bash(npm test)</code></li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 9 ===================== -->
+    <section class="panel" id="step-9">
+      <div class="step-head">
+        <span class="step-no">9</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-4">階段 4 · Test</span></div><h2>對照設計稿</h2><div class="en">Stage 4: Test — Check the look</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Start the app, use Playwright to compare it with the chosen mockup, and fix what differs. Show me the screenshots.</code></pre></div>
+        <p class="translation">中文意思：啟動 app，用 Playwright 和選定的設計稿比對，修正不同的地方。給我看截圖。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>測試檢查的是功能對不對，不會檢查畫面和你選的設計稿像不像。這一步讓 Claude 打開真的 app 截圖，和第 5 步選定的設計稿並排比較。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">STATUS.md</span></div>
+        <p>在 1440×900 和 1280×720 兩種尺寸比對，範例資料以設計稿的日期 2026-10-31 產生。Pipeline 和設計稿一致；Dashboard 的版面、數字、圖表差距在 1 像素內，Recent activity 的項目不同，因為設計稿裡是示意。Organizations、Contacts、Deals 不在設計稿裡，沿用同樣的外殼、顏色和字型。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li>要等第 5 步的設計稿和第 7 步的 app</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 10 ===================== -->
+    <section class="panel" id="step-10">
+      <div class="step-head">
+        <span class="step-no">10</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-4">階段 4 · Test</span></div><h2>自己檢查</h2><div class="en">Stage 4: Test — Check it yourself</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>自己執行一次 <code>npm test</code>。然後照 <code>docs/STATUS.md</code> 寫的方式啟動 app，在瀏覽器打開，檢查 <code>docs/intent.md</code> 裡的成功標準。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Test: check command"</code></pre></div>
+        <div class="label" style="margin-top:8px">成功標準 <span class="check-count" data-count-for="criteria"></span></div>
+        <p class="fine">清單對應訪談後的 <a href="../docs/intent.md"><code>docs/intent.md</code></a>。勾選紀錄儲存在目前的瀏覽器。</p>
+        <ul class="checklist" data-list="criteria">
+          <li><label><input type="checkbox" id="crit-1"><span><span class="no">1</span>非技術使用者備妥必要工具與相依套件後，能在自己的 Mac 上離線依文件用一個指令啟動，在瀏覽器開啟後抵達儀表板，並在各畫面看到範例資料。</span></label></li>
+          <li><label><input type="checkbox" id="crit-2"><span><span class="no">2</span>使用者能從各自的表格新增、搜尋、排序、編輯及刪除公司、聯絡人和商機。刪除前會要求確認並說明對關聯紀錄的影響。重新整理或重新啟動後仍保留變更，重設指令會恢復範例資料。</span></label></li>
+          <li><label><input type="checkbox" id="crit-3"><span><span class="no">3</span>聯絡人可依狀態篩選，各類紀錄的詳情頁會顯示相關紀錄。</span></label></li>
+          <li><label><input type="checkbox" id="crit-4"><span><span class="no">4</span>跨欄拖放商機卡片會更新階段與成交機率，商機列表會顯示新值。卡片可在欄內任意位置排序，重新整理後位置不變。看板與各欄的合計金額和預期營收在拖放後立即更新。從欄內新增的商機會套用該欄階段，逾期商機在列表和卡片上都有明顯標示。</span></label></li>
+          <li><label><input type="checkbox" id="crit-5"><span><span class="no">5</span>聯絡人和商機的活動時間軸依時間由新到舊呈現活動及跟進事項，商機時間軸也會自動記錄每次階段變更。儀表板會呈現即將到期或逾期的跟進，標記完成後即移出待辦清單。</span></label></li>
+          <li><label><input type="checkbox" id="crit-6"><span><span class="no">6</span>使用者可從儀表板回顧近期活動與待跟進事項，查閱對應的聯絡人或商機時間軸，並記錄下一個跟進事項。儀表板統計與資料相符，商機標為成交或新增跟進時會反映變更。</span></label></li>
+          <li><label><input type="checkbox" id="crit-7"><span><span class="no">7</span>所有畫面使用繁體中文，金額一律以新臺幣顯示，外觀符合品牌規範，呈現俐落、現代、專業的風格。儀表板應有出色的視覺呈現，並包含折線圖、長條圖及商機階段視覺化。</span></label></li>
+          <li><label><input type="checkbox" id="crit-8"><span><span class="no">8</span>自動測試通過後，由驗收者在 Mac 上用真實瀏覽器，依照老闆兼業務的日常工作流程操作每個功能區塊與上述操作，逐一目視檢查畫面，且瀏覽器主控台無錯誤。</span></label></li>
+        </ul>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>前兩步是 agent 檢查自己的成果，這一步換你。第 8 條成功標準寫明，測試通過不等於完成，要有人實際用過。</p>
+        <p><code>docs/TECH_STACK.md</code> 規定的三個指令 <span class="addon">補充</span>：<code>npm run dev</code> 同時啟動前後端，<code>npm test</code> 跑所有測試，<code>npm run seed</code> 把資料庫重設成範例資料。實際的啟動方式以 agent 寫進 <code>docs/STATUS.md</code> 的為準。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">STATUS.md</span></div>
+        <p><code>npm run dev</code> 印出 <code>Accountable is running at http://localhost:5173</code>，用 Chrome 打開。第一次執行要下載套件，需要網路、要幾分鐘。另有 <code>npm run empty</code> 清空所有資料，和 <code>seed</code> 一樣要輸入 <code>yes</code> 才執行。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li>要等第 7 步的 app；勾選框要你自己勾</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 11 ===================== -->
+    <section class="panel" id="step-11">
+      <div class="step-head">
+        <span class="step-no">11</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-5">階段 5 · Deploy</span></div><h2>寫審查政策</h2><div class="en">Stage 5: Deploy — Write the review policy</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>審查政策是你對這個專案「什麼重要」的判斷，所以這個檔案你自己寫。新增 <code>docs/REVIEW.md</code>，內容如下。你判斷不同的地方就改。</p>
+        <div class="code wrap"><div class="code-head"><span>docs/REVIEW.md</span><button class="copy" type="button">複製</button></div><pre><code># Review policy
+
+Every change is reviewed against this policy before it merges. The reviewer reports its findings and doesn't change any code.
+
+## Passes
+
+Make a separate pass over every change for each of these:
+
+- **Bugs:** the code does what it's meant to, including when something goes wrong.
+- **Security:** no secrets or personal data are exposed, and nobody can do what they shouldn't.
+- **Matches spec.md and plan.md:** the change does what those documents say, with nothing missing and nothing extra.
+
+## Important
+
+An Important finding must be fixed before the change merges. A finding is Important if the change breaks behavior that should work, leaks data or breaks a rule in AGENTS.md.
+
+## Nits
+
+A nit is a small point, such as style or naming, that doesn't block the merge. Report at most five per review.</code></pre></div>
+        <div class="label" style="margin-top:8px">中文意思</div>
+        <div class="policy">
+          <div class="policy-row"><b>開頭<span class="en">Review policy</span></b><span>每個變更在 merge 前都依這份政策審查。審查者只回報發現，不改任何程式碼。</span></div>
+          <div class="policy-row"><b>Bugs<span class="en">Passes</span></b><span>程式做到它該做的事，包括出錯的時候。</span></div>
+          <div class="policy-row"><b>Security<span class="en">Passes</span></b><span>沒有洩漏 secret 或個人資料，也沒有人能做不該做的事。</span></div>
+          <div class="policy-row"><b>符合 spec 和 plan<span class="en">Passes</span></b><span>變更做到 <code>spec.md</code> 和 <code>plan.md</code> 說的，沒有缺漏，也沒有多做。</span></div>
+          <div class="policy-row"><b>Important<span class="en">Important</span></b><span>merge 前必須修正。符合任一項就算：弄壞了應該正常運作的行為、洩漏資料、違反 <code>AGENTS.md</code> 的規則。</span></div>
+          <div class="policy-row"><b>Nits<span class="en">Nits</span></b><span>風格、命名這類小問題，不擋 merge。每次審查最多回報五個。</span></div>
+        </div>
+        <p>三個 pass 的意思是：每個面向各看一遍，不是一次看完全部。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>第 12 步的審查會照這份檔案進行。什麼算「必須修」、什麼可以先放著，是專案擁有者的判斷，所以講義要你自己建立這個檔案，而不是請 agent 寫。</p>
+        <p>nit 限五個，是避免審查結果被大量小問題淹沒，讓 Important 的項目容易看到。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本</div>
+        <p>Ed 分支上的 <code>docs/REVIEW.md</code> 和上面的內容逐字相同：19 行、820 字元。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li><code>docs/REVIEW.md</code> 不存在</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 12 ===================== -->
+    <section class="panel" id="step-12">
+      <div class="step-head">
+        <span class="step-no">12</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-5">階段 5 · Deploy</span></div><h2>審查分支</h2><div class="en">Stage 5: Deploy — Review the branch</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>開一個新 session（Claude Code 用 <code>/clear</code>），然後：</p>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Review this branch against main with docs/REVIEW.md. Report only, skip style.</code></pre></div>
+        <p class="translation">中文意思：依 <code>docs/REVIEW.md</code> 審查這個分支相對於 <code>main</code> 的變更。只回報，略過風格問題。</p>
+        <p>請 agent 修正 Important 的發現，再用你的判斷抽查這些修正。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Deploy: review fixes"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>開新 session 是為了讓審查者不帶著寫程式時的 context：它沒有參與建置，只能從程式碼和文件判斷，比較容易看出寫的人自己沒發現的問題。</p>
+        <p>「against main」是比較 <code>mvp</code> 和 <code>main</code> 的差異，也就是今天所有的變更。「Report only」讓審查和修正分開，你先看過發現，再決定修哪些。</p>
+      </div>
+      <div class="callout guide">
+        <div class="label">課程指南 <span class="addon">AGENT_GUIDE_WEEK1.md</span></div>
+        <p>審查可能找到所有測試都沒抓到的 Important bug。這就是這個階段的用途，不代表建置失敗。agent 在 merge 前修正它們。</p>
+      </div>
+      <div class="callout ed">
+        <div class="label">Ed 的版本 <span class="addon">27c1570、STATUS.md</span></div>
+        <p>Ed 審查了三次，每次都在 <code>npm test</code> 全部通過的情況下找到問題：</p>
+        <div class="table-wrap">
+          <table class="compare">
+            <thead><tr><th>審查</th><th class="n">Important</th><th class="n">Nits</th><th class="n">審查時的測試數</th><th class="n">修正後的測試數</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">第 1 次</th><td class="n">6</td><td class="n">5</td><td class="n">657</td><td class="n">1,291</td></tr>
+              <tr><th scope="row">第 2 次</th><td class="n">4</td><td class="n">5</td><td class="n">1,291</td><td class="n">1,352</td></tr>
+              <tr><th scope="row">第 3 次</th><td class="n">2</td><td class="n">2</td><td class="n">1,352</td><td class="n">1,368</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>第 1 次的 Important 例子：Vite 預設的 CORS 設定讓本機其他 port 的網頁可以讀寫所有資料、下載資料庫檔；timeline 到 500 筆時按 Show more 會整個清空。第 2 次另外修了 3 個較小的點。第 3 次的 2 個 nit 在 <code>STATUS.md</code> 裡標為仍未處理。</p>
+        <p>這個 commit 改了 77 個檔案，新增 4,381 行、刪除 316 行。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li><code>mvp</code> 分支已建立；要等第 11 步的 <code>REVIEW.md</code></li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 13 ===================== -->
+    <section class="panel" id="step-13">
+      <div class="step-head">
+        <span class="step-no">13</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-5">階段 5 · Deploy</span></div><h2>merge 回 main</h2><div class="en">Stage 5: Deploy — Merge it</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>執行 <code>npm test</code>，確認修正後仍然通過。然後把分支合進你的 <code>main</code>，並刪除分支：</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git checkout main
+git merge mvp
+git branch -d mvp</code></pre></div>
+        <p>現在 <code>git log --oneline</code> 會列出你從 Plan 到 Deploy 的 commit，最新的在最上面。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p><code>git merge mvp</code> 把 <code>mvp</code> 上的 commit 帶進 <code>main</code>。<code>git branch -d</code> 只會刪除已經合併過的分支，還沒合併時會拒絕，所以不會弄丟東西。</p>
+        <p>如果開分支之後 <code>main</code> 沒有新的 commit <span class="addon">補充</span>，git 會直接把 <code>main</code> 往前移到 <code>mvp</code> 的位置（fast-forward），不產生額外的 merge commit。</p>
+      </div>
+      <div class="callout note">
+        <div class="label">注意 <span class="addon">Ed 的版本</span></div>
+        <p>Ed 第 3 次審查的第 2 個 Important 是：前兩次審查的修正還沒 commit，照 commit 的內容 merge 會把那些問題帶回來。merge 只會帶進已經 commit 的變更。merge 前先在 <code>mvp</code> 上執行 <code>git status</code>，確認沒有未 commit 的修改。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li>要等第 12 步</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 14 ===================== -->
+    <section class="panel" id="step-14">
+      <div class="step-head">
+        <span class="step-no">14</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-6">階段 6 · Maintain</span></div><h2>記下之後的想法</h2><div class="en">Stage 6: Maintain</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <p>照 <code>docs/STATUS.md</code> 啟動 Accountable，像業務一樣使用它：新增一個 deal、在 pipeline 上把它往後移、記錄一個 follow-up。記下缺少或不對的地方，然後：</p>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Here's what I noticed using the app: [your notes]. Add these to docs/STATUS.md under Ideas for later, one line each.</code></pre></div>
+        <p class="translation">中文意思：這是我使用 app 時注意到的：[你的筆記]。把它們加到 <code>docs/STATUS.md</code> 的 Ideas for later 底下，每項一行。<code>[your notes]</code> 換成你的筆記。</p>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
+git commit -m "Maintain: ideas for later"</code></pre></div>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>做完不是結束：實際使用會發現規劃時沒想到的事。把它們寫進 <code>STATUS.md</code>，之後的工作（Week 1 Day 4 起）就有一份待辦可以參考，而且是存在 repo 裡、每個 agent 都讀得到的地方。</p>
+        <p>這一步在第 13 步 merge 之後，所以 commit 會直接落在 <code>main</code> 上 <span class="addon">補充</span>。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul><li><code>docs/STATUS.md</code> 已記錄第 3 步的規劃結果。等 MVP 可用後，再把實際使用的觀察加進去。</li></ul>
+      </div>
+    </section>
+
+    <!-- ===================== step 15 ===================== -->
+    <section class="panel" id="step-15">
+      <div class="step-head">
+        <span class="step-no">15</span>
+        <div class="step-titles"><div class="stage-line"><span class="stage-tag st-share">分享</span></div><h2>用 PR 分享文件</h2><div class="en">Share your documents</div></div>
+        <span class="pill s-none">未開始</span>
+      </div>
+      <div class="block">
+        <div class="label">要做什麼</div>
+        <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Share today's documents in a pull request to community_contributions, following course/for_agents/AGENT_GIT_GUIDE.md.</code></pre></div>
+        <p class="translation">中文意思：依照 <code>course/for_agents/AGENT_GIT_GUIDE.md</code>，用 pull request 把今天的文件分享到 <code>community_contributions</code>。</p>
+        <p>agent 要求 push 時核准。然後到 GitHub 檢查這個 PR：Files changed 分頁列出 5 個檔案，都在 <code>community_contributions/&lt;你的資料夾&gt;/</code> 裡：<code>intent.md</code>、<code>spec.md</code>、<code>plan.md</code>、<code>REVIEW.md</code>、<code>README.md</code>。</p>
+      </div>
+      <div class="callout plain">
+        <div class="label">白話說明</div>
+        <p>分享的是文件，不是程式碼：其他學生看你怎麼寫 intent、spec、plan 和審查政策，比較同一個 MVP 的不同做法。程式碼留在你的 fork，<code>README.md</code> 附上連結。</p>
+        <p>agent 會停下來問你是否 push <span class="addon">補充</span>，是因為 Day 2 第 6 步把 <code>Bash(git push *)</code> 設成 ask。</p>
+      </div>
+      <div class="callout guide">
+        <div class="label">課程指南 <span class="addon">AGENT_GIT_GUIDE.md</span></div>
+        <p>agent 會照這個流程做，你可以對照：</p>
+        <ol>
+          <li>先把你的 <code>main</code> 推到 fork，README 裡的連結 <code>https://github.com/&lt;username&gt;/accountable</code> 才看得到你的 build：<code>git push -u fork main</code>。</li>
+          <li>把四份文件複製到 <code>community_contributions/&lt;資料夾&gt;/</code>，資料夾名稱自訂，再加一份簡短的 <code>README.md</code>：做了什麼、你 fork 的連結。</li>
+          <li>其他變更先 commit 或 stash，讓 <code>git status</code> 只顯示這個新資料夾。</li>
+          <li>從 Ed 最新的 <code>main</code> 開分支，PR 才不會帶進你 build 的其他內容：</li>
+        </ol>
+        <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git fetch origin
+git checkout --no-track -b share-day3 origin/main
+git add community_contributions/&lt;folder&gt;
+git commit -m "Add &lt;name&gt;'s Week 1 Day 3 documents"
+git diff --numstat origin/main...HEAD
+git push -u fork share-day3</code></pre></div>
+        <p>在 fork 的頁面按 <b>Compare &amp; pull request</b>，base repository 是 <code>ed-donner/accountable</code>、base branch 是 <code>main</code>。或用 <code>gh pr create --repo ed-donner/accountable --base main --head &lt;username&gt;:share-day3</code>。做完後 <code>git checkout main</code> 回到你自己的分支，有 stash 的話 <code>git stash pop</code>。</p>
+        <p class="fine">commit 訊息的格式取自 repo 裡已合併的例子，例如 <code>Add sarvjot23's Week 1 Day 3 documents</code>。指南沒有規定格式。</p>
+      </div>
+      <div class="block">
+        <div class="label">送出前檢查 <span class="check-count" data-count-for="pr"></span></div>
+        <p class="fine">取自 <code>AGENT_GIT_GUIDE.md</code> 的檢查項目，用 <code>git diff --numstat</code> 的輸出對照。</p>
+        <ul class="checklist" data-list="pr">
+          <li><label><input type="checkbox" id="pr-files"><span>不超過 5 個檔案</span></label></li>
+          <li><label><input type="checkbox" id="pr-outside"><span>沒有改到 <code>community_contributions/</code> 以外的檔案</span></label></li>
+          <li><label><input type="checkbox" id="pr-deleted"><span>沒有刪除任何一行（<code>--numstat</code> 第二欄都是 0）</span></label></li>
+          <li><label><input type="checkbox" id="pr-secrets"><span>沒有 API key 或 <code>.env</code> 的內容</span></label></li>
+          <li><label><input type="checkbox" id="pr-lines"><span>總共少於 2,000 行變更；當天的文件不受這個上限限制</span></label></li>
+          <li><label><input type="checkbox" id="pr-readme"><span><code>README.md</code> 簡短，沒有 emoji 或其他 LLM 痕跡</span></label></li>
+        </ul>
+        <p class="fine">repo 裡已經有 3 個學生的資料夾。<code>community_contributions/sarvjot23/README.md</code> 是 7 行、487 字元：一段說明做了什麼，一行列出四份文件，一行 fork 的連結。</p>
+      </div>
+      <div class="callout progress p-none">
+        <div class="row"><span class="label">你的進度</span><span class="pill s-none">未開始</span></div>
+        <ul>
+          <li><code>community_contributions/</code> 裡有 <code>SabiMantock</code>、<code>sarvjot23</code>、<code>verbodh-pte</code>，還沒有你的資料夾</li>
+          <li><code>main</code> 的 upstream 已經是 <code>fork/main</code>。筆記頁 <code>notes/</code> 會跟著 <code>main</code> 推到你的 fork，但不會進 PR，因為 PR 分支從 <code>origin/main</code> 開始</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== usage ===================== -->
+    <section class="panel" id="usage">
+      <h2>用量上限與 session</h2>
+      <p class="section-note">內容來自 <code>course/for_agents/AGENT_COURSE_GUIDE.md</code> 的 Models and usage limits <span class="addon">課程指南</span>。</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>項目</th><th>內容</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Day 3 的用量</th><td>agent 總共工作約四小時，建置（第 7 步）將近兩小時。Ed 用 Opus，約用掉 Claude Pro 一週額度的三分之一。</td></tr>
+            <tr><th scope="row">模型</th><td>Ed 在較大的方案上用 Opus 錄影。Claude Pro 這類較小的方案建議用 Sonnet，用 <code>/model</code> 切換。Sonnet 做得完課程的建置，也比較不會碰到上限。</td></tr>
+            <tr><th scope="row">5 小時上限</th><td>長時間的建置可能碰到。agent 會停下來，說明何時重置。不會遺失任何東西：重置後在同一個 session 請它繼續。</td></tr>
+            <tr><th scope="row">關掉終端機後</th><td>在終端機執行 <code>claude --continue</code>，重新打開上一個 session。</td></tr>
+            <tr><th scope="row">查看剩餘用量</th><td><code>/usage</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout note">
+        <div class="label">你的設定 <span class="addon">補充</span></div>
+        <ul>
+          <li>這份頁面是在 Claude Opus 5.5 的對話裡產生的。今天要在哪個模型上建置，開始前用 <code>/model</code> 確認。</li>
+          <li><code>~/.claude/settings.json</code> 裡 <code>effortLevel</code> 是 <code>xhigh</code>。effort 越高，模型回答前思考越多，用掉的額度也越多。方案較小時，可以用 <code>/effort</code> 或 <code>/model</code> 選單調低。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== agent commits ===================== -->
+    <section class="panel" id="agent-commits">
+      <h2>agent 自己 commit 時</h2>
+      <p class="section-note">內容來自 <code>course/for_agents/AGENT_GIT_GUIDE.md</code> 的 If the agent has committed <span class="addon">課程指南</span>。課程把 commit 留給你，但 agent 有時還是會邊做邊 commit，例如每個 phase 做完時。這不會遺失任何東西。</p>
+      <ol>
+        <li><code>git commit</code> 顯示「nothing to commit, working tree clean」，表示 agent 已經全部 commit 了。<code>git log --oneline</code> 會列出它的 commit，最新的在上。</li>
+        <li><code>git branch</code> 用 <code>*</code> 標出目前的分支。確認是 <code>mvp</code>，不是 <code>main</code>。</li>
+        <li>保留這些 commit 繼續做。如果 <code>git status</code> 還有變更，用該階段的訊息 commit。</li>
+      </ol>
+      <h3 class="sub-h">想要每個階段只有一個 commit</h3>
+      <p>merge 前把 agent 的 commit 合成一個。在 <code>git log --oneline</code> 找到這個階段開始前的最後一個 commit，用它的 hash：</p>
+      <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git reset --soft &lt;hash&gt;
+git add .
+git commit -m "Build: the MVP"</code></pre></div>
+      <p><code>--soft</code> 保留所有變更，只替換 commit。只能用在還沒 push 的 commit 上。</p>
+      <h3 class="sub-h">commit 落在 main 上（忘了先開分支）</h3>
+      <p>在 <code>git status</code> 乾淨的狀態下，<code>&lt;hash&gt;</code> 是這個階段開始前的最後一個 commit：</p>
+      <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git branch mvp
+git reset --hard &lt;hash&gt;
+git checkout mvp</code></pre></div>
+      <p><code>git branch mvp</code> 讓 agent 的 commit 留在 <code>mvp</code> 上，<code>git reset --hard</code> 把 <code>main</code> 移回這個階段開始前的位置。</p>
+    </section>
+
+    <!-- ===================== cheap route ===================== -->
+    <section class="panel" id="cheap">
+      <h2>便宜模型路線的差異</h2>
+      <p class="section-note">用免費或便宜模型（OpenCode 免費模型、Pi 加 OpenRouter、Antigravity CLI 免費帳號）的學生改看 <a href="../course/cheap_llm_instructions/week1day3.md"><code>course/cheap_llm_instructions/week1day3.md</code></a>。六個階段相同，建置範圍小很多。你用 Claude Code 付費方案，照上面的主線做。</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>項目</th><th>主線（這份頁面）</th><th>便宜模型路線</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">MVP 範圍</th><td>五個區塊、四種紀錄，有編輯、刪除、搜尋、紀錄頁、pipeline 看板、活動</td><td>四個頁面、三種紀錄（organizations、contacts、deals）。dashboard 有三個數字和兩張長條圖，每種紀錄一個表格加新增表單；沒有編輯、刪除、搜尋、紀錄頁、pipeline 看板、活動</td></tr>
+            <tr><th scope="row">intent</th><td>訪談後更新 <code>docs/intent.md</code></td><td>Plan 開始時換成那份檔案裡較小的 intent</td></tr>
+            <tr><th scope="row">設計稿</th><td>dashboard 和 pipeline 三份，Playwright 截圖</td><td>dashboard 一份，用眼睛看，不截圖</td></tr>
+            <tr><th scope="row">建置</th><td>新 session 一次做完 plan</td><td>每個 phase 開一個新 session，每個 phase 做完 commit 一次（「Build: phase 1」等）</td></tr>
+            <tr><th scope="row">測試</th><td>Proof 列出的全部</td><td>每一層幾個就夠</td></tr>
+            <tr><th scope="row">對照設計稿</th><td>agent 用 Playwright 比對</td><td>你自己比對</td></tr>
+            <tr><th scope="row">Ed 的分支</th><td>可以用 <code>week1day3-end</code> 追進度</td><td>不建議，Ed 的 build 比這條路線大很多</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">來源：<code>course/cheap_llm_instructions/week1day3.md</code> 開頭的 What's different from the main instructions，以及 <code>course/for_agents/AGENT_COURSE_GUIDE.md</code> 的 The route for cheap or free models。</p>
+    </section>
+
+  </main>
+</div>
+
+<footer class="footer">
+  依據 <code>course/instructions/week1day3.md</code> 翻譯整理。標示「課程指南」的內容取自 <code>course/for_agents/AGENT_GUIDE_WEEK1.md</code>、<code>AGENT_COURSE_GUIDE.md</code>、<code>AGENT_GIT_GUIDE.md</code>；便宜模型路線一節取自 <code>course/cheap_llm_instructions/week1day3.md</code>；標示「Ed 的版本」的數字取自 <code>origin/week1day3-end</code> 的 commit 和 <code>docs/STATUS.md</code>。沒有使用 Day 3 的投影片。進度更新至 2026-11-21。
+</footer>
+
+<script>
+(function () {
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = block.querySelector('.copy');
+    var code = block.querySelector('pre code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function () {
+      var text = code.textContent;
+      function done(ok) {
+        btn.textContent = ok ? '已複製' : '請手動選取';
+        setTimeout(function () { btn.textContent = '複製'; }, 1600);
+      }
+      function fallback() {
+        try {
+          var range = document.createRange();
+          range.selectNodeContents(code);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          var ok = document.execCommand('copy');
+          if (ok) sel.removeAllRanges();
+          done(ok);
+        } catch (e) { done(false); }
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  // Checklists, remembered in this browser only
+  var KEY = 'w1d3-claude-code-checklist';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  document.querySelectorAll('.checklist[data-list]').forEach(function (list) {
+    var name = list.getAttribute('data-list');
+    var counter = document.querySelector('[data-count-for="' + name + '"]');
+    var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+    function updateCount() {
+      if (!counter) return;
+      var n = boxes.filter(function (b) { return b.checked; }).length;
+      counter.textContent = n + ' / ' + boxes.length;
+    }
+    boxes.forEach(function (box) {
+      box.checked = saved[box.id] === true;
+      box.addEventListener('change', function () {
+        saved[box.id] = box.checked;
+        try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+        updateCount();
+      });
+    });
+    updateCount();
+  });
+
+  // Highlight the current section in the side index
+  if ('IntersectionObserver' in window) {
+    var links = {};
+    document.querySelectorAll('.toc-side a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && links[entry.target.id]) {
+          Object.keys(links).forEach(function (k) { links[k].removeAttribute('aria-current'); });
+          links[entry.target.id].setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { observer.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,65 +1,64 @@
-# Intent: the Accountable MVP
+# Accountable MVP 產品意圖
 
-## Problem
+## 要解決的問題
 
-A small business keeps track of its customers and sales in spreadsheets, inboxes and people's heads. Nobody can see at a glance which companies we deal with, who our contacts are, what's in the sales pipeline, what happened last with a customer or what needs doing next.
+小型企業的客戶資訊和業務進度分散在試算表、電子郵件和同事的記憶裡。兼任業務的老闆很難一眼看出有哪些往來公司、該找哪位聯絡人、商機進行到哪個階段、上次和客戶談了什麼，以及接下來要做哪些跟進。
 
-## Proposed outcome
+## 預期成果
 
-Accountable is a business management system: a sales CRM that will grow into a full Business OS, including ERP. This first version, the MVP, is a complete sales CRM for one person, running on their own computer. Think of it as a private Salesforce that does the everyday CRM essentials really well. It should feel sharp, modern and professional, and be a pleasure to use.
+Accountable 是企業管理系統，從業務用的客戶關係管理系統（CRM）起步，未來將擴充成涵蓋企業資源規劃（ERP）的企業營運平台。第一版（MVP）是一套讓老闆兼業務在自己的電腦上日常使用的單人 CRM。使用者每天打開 Accountable 時，可以先在儀表板回顧近期客戶往來及待跟進事項，再查閱聯絡人或商機的時間軸，掌握下一步。介面應俐落、現代、專業，日常操作順手。
 
-### Five sections
+### 五個功能區塊
 
-- **Dashboard**, the landing page: how sales are going at a glance. Deals won and revenue won month by month, the open pipeline and its expected revenue (each deal's value times its probability of close), a sales funnel showing how much value reaches each stage, recent activity, and the follow-ups that are coming up or overdue. It should be visually stunning, with at least a line chart, a bar chart and a visual of the pipeline. Which figures each one shows, and how, is the designer's call.
-- **Organizations**: the companies we do business with. Open one to see its contacts and deals.
-- **Contacts**: the people we deal with, including leads and customers, with a filter by status. Open one to see their organization and a timeline of everything that has happened with them.
-- **Deals**: the potential sales, with each one's stage, value and close date. Open one to see its details and its timeline. A deal still open after its expected close date stands out, in the table and on its pipeline card.
-- **Pipeline**: the deals as cards on a board, one column per stage. Drag a card to another column to change the deal's stage, or within a column to change its place; a card can be dropped anywhere in a column, and it stays where it was dropped. A new deal can be added straight into a column, at that stage. The board shows the total value and expected revenue of the deals still open, each column shows its own, and the figures change as soon as a card moves.
+- **儀表板**是首頁，集中呈現每月成交筆數與成交金額、進行中商機及其預期營收、各階段的商機金額漏斗、近期活動，以及即將到期或已逾期的跟進事項。預期營收是將每筆進行中商機的金額乘以成交機率，再加總。儀表板至少要有折線圖、長條圖和商機階段視覺化，圖表各自呈現哪些指標及如何呈現，由設計階段決定。
+- **公司**列出有業務往來的公司，詳情頁顯示所屬聯絡人與商機。
+- **聯絡人**列出往來對象，包含潛在客戶及既有客戶，可依狀態篩選。詳情頁顯示所屬公司及互動時間軸。
+- **商機**列出潛在交易及其階段、金額、成交機率和結案日期。詳情頁顯示商機資料與活動時間軸。過了預計結案日仍未結案的商機，在列表和看板卡片上都要醒目標示。
+- **商機看板**每個階段各有一欄，欄內顯示該階段的商機卡片。可把卡片拖到另一欄來變更階段，也可在同一欄調整順序。卡片可以放在欄內任意位置，並保留拖放後的順序。可直接在指定欄新增商機。看板和各欄均顯示未結案商機的合計金額與預期營收，拖放後立即更新。
 
-Every table has a search box, columns you can sort by clicking their headings, a way to add a new record, and edit and delete on each row. That's how we add a new deal, a new lead or a new customer. Deleting asks first, and says what will happen to the records linked to the one being deleted.
+每個資料表格都提供搜尋框、可點按欄名排序、可新增紀錄，且每列都能編輯和刪除。刪除前要取得使用者確認，並說明對關聯紀錄的影響。
 
-From any contact or deal you can log an activity (a note, call or email) and give it a follow-up date. A follow-up shows on the dashboard as a task until it's marked done. Activities can be edited and deleted too. When a deal moves to another stage, including Won or Lost, an entry such as "Moved from Proposal to Negotiation" appears in its timeline and in the dashboard's recent activity by itself.
+使用者可從聯絡人或商機的詳情頁新增、編輯及刪除活動。活動可加上跟進日期，並在儀表板列為待辦事項，直到標記完成。每次商機變更階段（含成交與失單），系統會自動新增一筆活動，例如「從提案移至議價」，顯示在該商機的時間軸和儀表板的近期活動。
 
-### Four kinds of record
+### 四種紀錄
 
-- **Organization**: a company we do business with. Name, website, industry and notes. An organization has many contacts and many deals.
-- **Contact**: a person we deal with. Name, email, phone, job title, the organization they belong to, and a status (lead, qualified or customer). A lead is a contact with the lead status, so there's no separate list of leads.
-- **Deal**: a potential sale. Name, the organization and the main contact it is with, its stage (New, Qualified, Proposal, Negotiation, Won or Lost), its value in US dollars, its probability of close, and its expected or actual close date. Each stage has a usual probability of close, and a deal takes its new stage's probability when it moves; a probability set by hand is kept until the stage changes.
-- **Activity**: something that happened, or needs to happen, with a contact or deal. Type (note, call or email), the contact or deal it relates to, a description and when it happened, and optionally a follow-up date and whether it's done.
+- **公司**包含名稱、網站、產業與備註，可關聯多位聯絡人與多筆商機。
+- **聯絡人**包含姓名、電子郵件、電話、職稱、所屬公司與狀態。狀態分為潛在客戶（Lead）、已確認（Qualified）及既有客戶（Customer）。潛在客戶與其他聯絡人共用同一份名單。
+- **商機**包含名稱、所屬公司、主要聯絡人、階段、以新臺幣（TWD）計價的金額、成交機率，以及預計或實際結案日期。階段分為新商機（New）、已確認（Qualified）、提案（Proposal）、議價（Negotiation）、成交（Won）及失單（Lost）。切換階段時套用新階段的預設成交機率。手動設定的機率會保留到下一次階段變更。
+- **活動**包含關聯的聯絡人或商機、內容與發生時間，也可記錄跟進日期及完成狀態。手動新增的活動可選擇備註、通話或電子郵件。
 
-### Sample data
+### 範例資料
 
-Accountable comes with realistic sample data, so every screen looks alive the first time it starts: organizations across several industries, contacts at every status, deals at every stage (including deals won and lost over the past months, deals expected to close in the months ahead and a few running late), and activities with some follow-ups due soon and some overdue.
+第一次啟動時，各畫面都有可供操作的擬真範例資料。公司涵蓋多個產業，聯絡人涵蓋所有狀態，商機涵蓋所有階段，包含過去幾個月的成交與失單、未來幾個月預計結案的商機，以及部分逾期商機。活動包含即將到期及已逾期的跟進事項。
 
-### Look and feel
+### 介面與品牌
 
-The look follows Accountable's brand guidelines, which take priority over any general design guidance. The MVP is light mode, designed for a laptop or desktop screen.
+介面以 Accountable 品牌規範為準，採用淺色設計，適用於筆記型電腦及桌上型電腦。導覽、表單、提示與圖表等介面文字使用繁體中文。商機金額、預期營收及成交金額等金額一律以新臺幣顯示。
 
-## Affected users and systems
+## 使用者與相關系統
 
-- One salesperson, using Accountable on their own computer every day. The rest of the sales team joins later.
-- No other systems are involved yet.
+第一版供一位兼任業務的小型企業老闆在自己的電腦上日常使用。其他團隊成員日後加入。第一版可獨立使用。
 
-## Constraints
+## 限制與範圍
 
-- The technology in `docs/TECH_STACK.md`.
-- It runs locally with one documented command that works on Mac, Linux and Windows, and needs no internet connection to use.
-- Every change is kept: it's still there after a browser refresh, and every time the app starts it shows every change made before.
-- One documented command resets the data to the sample data, to start again from scratch.
-- Not in the MVP: sign-in, user accounts or several users; a dark mode or a layout for phones; AI features; email, calendar or phone integrations; currencies other than US dollars; reports beyond the dashboard; tags or custom fields; changing the pipeline stages; importing or exporting data.
+- 技術選型依 [技術堆疊](TECH_STACK.md)。
+- 備妥必要工具與相依套件後，可依文件用同一個指令在本機啟動，啟動與日常操作皆可離線進行。MVP 在使用者的 Mac 上實測，並保留 Mac、Linux 與 Windows 的相容目標。
+- 所有變更都必須儲存，重新整理瀏覽器或重新啟動應用程式後仍可查到。
+- 提供一個有文件說明的指令，可將本機資料重設為初始範例資料。
+- 延後項目包括登入、帳號、多人共用、深色模式、手機版面、AI 功能、電子郵件／行事曆／電話整合、多幣別、儀表板以外的報表、標籤、自訂欄位、自訂商機階段，以及資料匯入與匯出。
 
-## Success criteria
+## 成功標準
 
-1. Someone non-technical can start Accountable with the one documented command, open it in a browser and land on the dashboard, with sample data on every screen.
-2. Organizations, contacts (leads, qualified contacts and customers) and deals can each be added, found by searching, sorted, edited and deleted from their tables, and every change is still there after a refresh and after a restart. Deleting asks first. The reset command brings back the sample data.
-3. Contacts can be filtered by status, and each record's page shows the records it's linked to.
-4. Dragging a deal to another column on the pipeline changes its stage and its probability of close, and the deals list shows both. A card dropped anywhere in a column, including higher or lower in its own column, stays there after a refresh. The board's and the columns' totals and expected revenue change as soon as the card moves. A deal added in a column starts at that stage, and late deals stand out.
-5. An activity or follow-up logged on a contact or deal appears in its timeline, newest first, and so does an entry for each change of stage. Follow-ups show on the dashboard as upcoming or overdue until they're marked done.
-6. The dashboard's figures match the data, and they reflect a deal marked won or a new follow-up.
-7. Every screen is sharp, modern and professional, and follows the brand. The dashboard is visually stunning, with a line chart, a bar chart and a visual of the pipeline.
-8. Before it's called done, someone has used it end to end in a real browser, the way a salesperson would: every section and every action above, each screen checked by eye, with no errors in the browser's console. Passing tests is necessary, but it isn't enough.
+1. 非技術使用者備妥必要工具與相依套件後，能在自己的 Mac 上離線依文件用一個指令啟動，在瀏覽器開啟後抵達儀表板，並在各畫面看到範例資料。
+2. 使用者能從各自的表格新增、搜尋、排序、編輯及刪除公司、聯絡人和商機。刪除前會要求確認並說明對關聯紀錄的影響。重新整理或重新啟動後仍保留變更，重設指令會恢復範例資料。
+3. 聯絡人可依狀態篩選，各類紀錄的詳情頁會顯示相關紀錄。
+4. 跨欄拖放商機卡片會更新階段與成交機率，商機列表會顯示新值。卡片可在欄內任意位置排序，重新整理後位置不變。看板與各欄的合計金額和預期營收在拖放後立即更新。從欄內新增的商機會套用該欄階段，逾期商機在列表和卡片上都有明顯標示。
+5. 聯絡人和商機的活動時間軸依時間由新到舊呈現活動及跟進事項，商機時間軸也會自動記錄每次階段變更。儀表板會呈現即將到期或逾期的跟進，標記完成後即移出待辦清單。
+6. 使用者可從儀表板回顧近期活動與待跟進事項，查閱對應的聯絡人或商機時間軸，並記錄下一個跟進事項。儀表板統計與資料相符，商機標為成交或新增跟進時會反映變更。
+7. 所有畫面使用繁體中文，金額一律以新臺幣顯示，外觀符合品牌規範，呈現俐落、現代、專業的風格。儀表板應有出色的視覺呈現，並包含折線圖、長條圖及商機階段視覺化。
+8. 自動測試通過後，由驗收者在 Mac 上用真實瀏覽器，依照老闆兼業務的日常工作流程操作每個功能區塊與上述操作，逐一目視檢查畫面，且瀏覽器主控台無錯誤。
 
-## Open questions
+## 後續待議
 
-- Sign-in, several people sharing the same data, and a record of who did what are for a later intent.
-- Making Accountable available to people beyond the computer it runs on is for later too.
+- 登入、多人共用資料，以及記錄每筆變更由誰操作的需求留待下一份產品意圖決定。
+- 日後再決定如何讓使用者從執行 Accountable 的電腦以外的地方存取系統。

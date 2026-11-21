@@ -1,1 +1,8 @@
-The project has not yet started.
+# 專案進度
+
+## 2026-11-21｜MVP 規劃
+
+- 已完成使用者訪談並更新 [產品意圖](intent.md)。確認第一版給小型企業的老闆兼業務使用，保留五個功能區塊，介面採繁體中文，金額採新臺幣。
+- 本機啟動與離線操作將在使用者的 Mac 上驗收，並保留 Mac、Linux 與 Windows 的相容目標。
+- [Day 3 課程筆記](../notes/week1day3-claude-code.html) 已標記第 3 步完成，並同步更新驗收清單。
+- 應用程式尚未開始實作。下一步是依產品意圖撰寫設計規格（`docs/spec.md`）。

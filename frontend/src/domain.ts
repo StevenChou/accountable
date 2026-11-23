@@ -1,0 +1,90 @@
+export const stages = {
+  new: { label: '新商機', probability: 10, color: '#06d6a0' },
+  qualified: { label: '已確認', probability: 25, color: '#ffc145' },
+  proposal: { label: '提案', probability: 50, color: '#f78c6b' },
+  negotiation: { label: '議價', probability: 75, color: '#118ab2' },
+  won: { label: '成交', probability: 100, color: '#073b4c' },
+  lost: { label: '失單', probability: 0, color: '#ef476f' },
+} as const
+
+export const statuses = { lead: '潛在客戶', qualified: '已確認', customer: '既有客戶' } as const
+export const activityKinds = { note: '備註', call: '通話', email: '電子郵件', stage: '階段變更' } as const
+export const followUpGroups = { late: '逾期', today: '今天', soon: '七天內', later: '稍後' } as const
+export const resourceNames = { companies: '公司', contacts: '聯絡人', deals: '商機' } as const
+
+export type Stage = keyof typeof stages
+export type Status = keyof typeof statuses
+export type Resource = keyof typeof resourceNames
+export type Named = { id: number; name: string }
+export type Company = Named & { website: string | null; industry: string | null; notes: string | null }
+export type Contact = Named & {
+  company_id: number | null; company_name: string | null; title: string | null
+  email: string | null; phone: string | null; status: Status
+}
+export type Deal = Named & {
+  company_id: number | null; company_name: string | null
+  contact_id: number | null; contact_name: string | null
+  stage: Stage; amount_cents: number; probability: number; overdue: boolean
+  expected_close: string | null; actual_close: string | null; close_date: string | null
+}
+export type Rows = { companies: Company; contacts: Contact; deals: Deal }
+export type Activity = {
+  id: number; kind: keyof typeof activityKinds; content: string; occurred_at: string
+  follow_up: string | null; completed: boolean
+  owner_id: number; owner_name: string; owner_type: 'contacts' | 'deals'
+}
+export type Totals = { count: number; amount_cents: number; expected_cents: number }
+export type Lane = { stage: Stage; cards: Deal[]; count: number; totals: Totals }
+export type Pipeline = { lanes: Lane[]; totals: Totals }
+type Monthly = { month: string; count: number; amount_cents: number }
+export type Dashboard = {
+  today: string; won: Monthly; open: Totals; months: Monthly[]
+  stage_amounts: { stage: Stage; amount_cents: number }[]
+  recent: Activity[]
+  follow_ups: (Activity & { group: keyof typeof followUpGroups })[]
+}
+
+export function isClosed(stage: Stage) {
+  return stage === 'won' || stage === 'lost'
+}
+
+const currency = new Intl.NumberFormat('zh-TW')
+const dateTime = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'short', timeStyle: 'short' })
+
+export function money(cents: number) {
+  return `NT$${formatCents(cents, true)}`
+}
+
+export function formatCents(cents: number, group = false) {
+  const magnitude = Math.abs(cents)
+  const whole = Math.floor(magnitude / 100)
+  const decimal = String(magnitude % 100).padStart(2, '0').replace(/0+$/, '')
+  return `${cents < 0 ? '-' : ''}${group ? currency.format(whole) : whole}${decimal ? `.${decimal}` : ''}`
+}
+
+export function parseMoney(value: string): number | null {
+  const trimmed = value.trim()
+  if (!/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})$/.test(trimmed)) return null
+  const [whole, fraction = ''] = trimmed.split('.')
+  const cents = Number(whole + fraction.padEnd(2, '0'))
+  return Number.isSafeInteger(cents) ? cents : null
+}
+
+export function localDate(value = new Date()) {
+  const fields = [value.getFullYear(), value.getMonth() + 1, value.getDate()]
+  return fields.map(field => String(field).padStart(2, '0')).join('-')
+}
+
+export function localDateTime(value: Date) {
+  const time = [value.getHours(), value.getMinutes()].map(field => String(field).padStart(2, '0')).join(':')
+  return `${localDate(value)}T${time}`
+}
+
+export function displayTime(value: string) {
+  return dateTime.format(new Date(value))
+}
+
+export function matchesSearch(query: string, values: (string | null)[]) {
+  const term = query.trim().toLowerCase()
+  return !term || values.some(value => value?.toLowerCase().includes(term))
+}

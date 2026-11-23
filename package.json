@@ -1,0 +1,22 @@
+{
+  "name": "accountable",
+  "private": true,
+  "workspaces": ["frontend"],
+  "engines": {"node": ">=24"},
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently --kill-others --success first npm:dev:api npm:dev:web",
+    "dev:api": "uv run --no-sync python -m backend.main",
+    "dev:web": "npm run dev --workspace frontend",
+    "seed": "uv run --no-sync python -m backend.seed",
+    "test": "npm run test:frontend && npm run test:backend && npm run test:e2e",
+    "test:frontend": "npm test --workspace frontend",
+    "test:backend": "uv run --no-sync pytest",
+    "test:e2e": "node e2e/run.mjs",
+    "build": "npm run build --workspace frontend"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "concurrently": "^9.2.0"
+  }
+}

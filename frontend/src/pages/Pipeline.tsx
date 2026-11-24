@@ -6,9 +6,9 @@ import {
 } from '@dnd-kit/core'
 import { Link } from 'react-router'
 import { ApiError, errorMessage, useResource, write } from '../api'
-import { Loading, Notice, Overdue, PageHeading } from '../components/Common'
+import { CalendarDay, Loading, Notice, Overdue, PageHeading } from '../components/Common'
 import { RecordForm } from '../components/RecordForm'
-import { money, stages, type Deal, type Lane, type Pipeline, type Stage } from '../domain'
+import { isClosed, localDate, money, stages, type Deal, type Lane, type Pipeline, type Stage } from '../domain'
 
 type Position = { stage: Stage; before_id: number | null }
 
@@ -33,11 +33,21 @@ function DropSlot({ stage, before, empty = false }: { stage: Stage; before?: Dea
 }
 
 function CardContent({ card }: { card: Deal }) {
+  const close = card.close_date
+  const closeLabel = isClosed(card.stage) ? '實際結案日' : '預計結案日'
+  const displayDate = close?.startsWith(localDate().slice(0, 4))
+    ? close.slice(5).replace('-', '/')
+    : close
   return <>
     <Link className="record-link" to={`/deals/${card.id}`}>{card.name}</Link>
     <p className="card-company">{card.company_name ?? '未指定公司'}</p>
-    <div className="card-values num"><strong>{money(card.amount_cents)}</strong><span>{card.probability}%</span></div>
-    <div className="date-cell"><time className="num">{card.close_date ?? '未填結案日'}</time> <Overdue overdue={card.overdue} /></div>
+    <p className="card-amount num">{money(card.amount_cents)}</p>
+    <div className="card-meta">
+      <span className="num" title="成交機率">{card.probability}%</span>
+      {close && <time className="num" dateTime={close} title={`${closeLabel} ${close}`}>{displayDate}</time>}
+      {!close && <span>未填結案日</span>}
+      <Overdue overdue={card.overdue} />
+    </div>
   </>
 }
 
@@ -52,7 +62,7 @@ function Card({ card, disabled }: { card: Deal; disabled: boolean }) {
 
 function Column({ lane, disabled, onAdd }: { lane: Lane; disabled: boolean; onAdd: () => void }) {
   const stage = stages[lane.stage]
-  return <section className="lane" aria-label={stage.label} style={{ '--stage-color': stage.color } as CSSProperties}>
+  return <section className="lane" data-stage={lane.stage} aria-label={stage.label} style={{ '--stage-color': stage.color } as CSSProperties}>
     <header className="lane-header">
       <div className="lane-title">
         <i aria-hidden="true" /><h2>{stage.label}</h2><span className="lane-count num">{lane.count}</span>
@@ -114,7 +124,7 @@ export function PipelinePage() {
 
   const data = query.data
   return <>
-    <PageHeading title="商機看板" />
+    <PageHeading title="商機看板"><CalendarDay date={localDate()} /></PageHeading>
     <Loading {...query} />
     {message && <Notice>{message}</Notice>}
     {moving && <p className="loading" role="status">更新看板中…</p>}
@@ -138,8 +148,10 @@ export function PipelinePage() {
         onDragCancel={() => setActive(undefined)}
         onDragEnd={event => void drop(event)}
       >
-        <div className="board-columns">
-          {data.lanes.map(lane => <Column key={lane.stage} lane={lane} disabled={moving} onAdd={() => setSelected(lane.stage)} />)}
+        <div className="board-scroll" role="region" tabIndex={0} aria-label="六個商機階段，可水平捲動">
+          <div className="board-columns">
+            {data.lanes.map(lane => <Column key={lane.stage} lane={lane} disabled={moving} onAdd={() => setSelected(lane.stage)} />)}
+          </div>
         </div>
         <DragOverlay dropAnimation={null}>{active && <article className="deal-card drag-overlay"><CardContent card={active} /></article>}</DragOverlay>
       </DndContext>

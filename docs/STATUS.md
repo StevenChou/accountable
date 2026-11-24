@@ -1,5 +1,31 @@
 # 專案進度
 
+## 2026-11-24｜第 10 步「自己檢查」完成
+
+- Codex 在 Mac 執行 `UV_NO_CACHE=1 npm test`，Vitest 6 項、pytest 21 項、Chrome Playwright 9 項全數通過，共 36 項。
+- 用獨立的暫存 SQLite 啟動 MVP，在 Chrome 操作五個功能區塊並檢視截圖。確認刪除提示符合實際的關聯變更、重新整理及重啟後保留看板順序、`npm run seed` 恢復範例資料。畫面顯示繁體中文、新臺幣、折線圖、長條圖及六階段統計，1024 px 視窗可在看板區內水平捲動。
+- 驗證跟進在今天、第七天和第八天正確分組，完成後移出待辦並保留於時間軸。`NT$100,000` 的商機從提案的 40% 拖到議價後採用 75%，預期營收增加 `NT$35,000`。標為成交後，本月成交金額增加 `NT$100,000`。
+- 驗證時以離線模式執行 npm 和 uv，並在 Chrome 封鎖本機服務以外的請求。瀏覽器外部請求及主控台錯誤皆為 0。[驗收條件](spec.md#驗收條件)
+- 使用者已看過並確認，第 10 步完成。下一步是建立 `docs/REVIEW.md`。[Day 3 第 11 步](../notes/week1day3-claude-code.html#step-11)
+
+## 2026-11-23｜MVP 與設計稿比對
+
+- 已用 Playwright 在 Chrome 比對「A · 跟進工作台」與 MVP。兩邊都採設計稿的 2026-11-23 和同一組商機、活動及跟進資料，MVP 使用獨立的暫存 SQLite。
+- 已對齊儀表板的摘要數字、月份範圍、折線底色及長條標籤。看板已對齊欄距、卡片尺寸與內容排列。1024 px 視窗仍可在看板區內橫向捲動，Chrome 主控台無錯誤。
+- 修正後 `npm run build` 通過，`npm test` 仍通過全部 36 項測試。下一步是親自操作 MVP 並對照成功標準。[Day 3 第 10 步](../notes/week1day3-claude-code.html#step-10)
+
+| 視窗尺寸 | 儀表板 | 商機看板 |
+| --- | --- | --- |
+| 1440 × 900 | [並排截圖](screenshots/day3/dashboard-1440x900.png) | [並排截圖](screenshots/day3/pipeline-1440x900.png) |
+| 1280 × 720 | [並排截圖](screenshots/day3/dashboard-1280x720.png) | [並排截圖](screenshots/day3/pipeline-1280x720.png) |
+
+## 2026-11-23｜測試指令驗證
+
+- 已在 [AGENTS.md](../AGENTS.md#testing) 記錄從 repo 根目錄執行 `npm test`、測試順序與暫存資料庫的設定。
+- 在 Mac 上重新執行 `npm test`，結果為 Vitest 6 項、pytest 21 項、Chrome Playwright 9 項，共 36 項通過，結束碼為 0。
+- 在暫存副本逐一模擬三套測試失敗。每次都確認 `npm test` 傳回非零結束碼，並在失敗的階段停止。
+- 第 8 步已完成。[Day 3 第 8 步](../notes/week1day3-claude-code.html#step-8)
+
 ## 2026-11-23｜MVP 建置
 
 - 已依「A · 跟進工作台」建置儀表板、公司、聯絡人、商機與商機看板。商機拖放、結案、活動時間軸與待跟進由本機 SQLite 保存。首次啟動自動建立範例資料。

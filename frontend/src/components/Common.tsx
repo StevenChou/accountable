@@ -5,6 +5,15 @@ export function PageHeading({ title, children }: { title: string; children?: Rea
   return <div className="page-heading"><h1>{title}</h1>{children}</div>
 }
 
+const weekday = new Intl.DateTimeFormat('zh-TW', { weekday: 'short' })
+
+export function CalendarDay({ date }: { date: string }) {
+  const [year, month, day] = date.split('-').map(Number)
+  return <time dateTime={date}>
+    {year} 年 {month} 月 {day} 日　{weekday.format(new Date(year, month - 1, day))}
+  </time>
+}
+
 export function Notice({ children }: { children: ReactNode }) {
   return <p className="notice" role="alert">{children}</p>
 }

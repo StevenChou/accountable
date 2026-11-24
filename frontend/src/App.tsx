@@ -8,11 +8,11 @@ const DashboardPage = lazy(() => import('./pages/Dashboard').then(module => ({ d
 const PipelinePage = lazy(() => import('./pages/Pipeline').then(module => ({ default: module.PipelinePage })))
 
 const navigation = [
-  { path: '/', label: '儀表板', icon: '▥' },
-  { path: '/companies', label: '公司', icon: '▤' },
+  { path: '/', label: '儀表板', icon: '▦' },
+  { path: '/companies', label: '公司', icon: '◇' },
   { path: '/contacts', label: '聯絡人', icon: '◎' },
-  { path: '/deals', label: '商機', icon: '◇' },
-  { path: '/pipeline', label: '商機看板', icon: '▦' },
+  { path: '/deals', label: '商機', icon: '▤' },
+  { path: '/pipeline', label: '商機看板', icon: '▥' },
 ]
 
 export default function App() {

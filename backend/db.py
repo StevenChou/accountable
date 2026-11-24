@@ -6,7 +6,9 @@ from sqlalchemy.engine import Engine
 
 from backend.schema import activities, companies, contacts, deals, initialized, metadata
 
-DEFAULT_DB = Path(__file__).resolve().parent.parent / "data" / "accountable.sqlite3"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_DB = PROJECT_ROOT / "data" / "accountable.sqlite3"
+WEB_ROOTS = (PROJECT_ROOT / "frontend", PROJECT_ROOT / "node_modules")
 
 
 def database_path() -> Path:
@@ -21,8 +23,11 @@ def database_path() -> Path:
             raise RuntimeError("測試資料庫須位於本次測試的暫存目錄。")
         if path == DEFAULT_DB.resolve():
             raise RuntimeError("測試不可使用日常資料庫。")
-        return path
-    return Path(supplied or DEFAULT_DB).resolve()
+    else:
+        path = Path(supplied or DEFAULT_DB).resolve()
+    if any(path.is_relative_to(root.resolve()) for root in WEB_ROOTS):
+        raise RuntimeError("資料庫須放在前端與相依套件目錄之外。")
+    return path
 
 
 def make_engine() -> Engine:

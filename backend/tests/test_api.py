@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import create_app
+from backend.schema import MAX_SAFE_INTEGER
 from backend.services import activities as activity_service
 
 
@@ -23,6 +24,30 @@ def lane(client, name):
 
 def move(client, deal_id, stage, before_id=None):
     return client.post(f"/api/deals/{deal_id}/move", json={"stage": stage, "before_id": before_id})
+
+
+def test_local_api_browser_policy(client):
+    path = "/api/companies"
+    same_origin = {"Origin": "http://127.0.0.1", "Sec-Fetch-Site": "same-origin"}
+    assert client.get(path, headers=same_origin).status_code == 200
+    assert client.get(path, headers={"Sec-Fetch-Site": "cross-site"}).status_code == 403
+    assert client.get(path, headers={"Origin": "null"}).status_code == 403
+    assert client.get(path, headers={"Host": "example.invalid"}).status_code == 400
+
+
+def test_large_aggregate_amounts_keep_every_cent(client):
+    for stage in ("new", "won"):
+        deal(client, "大額商機", stage, amount=MAX_SAFE_INTEGER, probability=100)
+        deal(client, "小額商機", stage, amount=2, probability=100)
+
+    total = str(MAX_SAFE_INTEGER + 2)
+    pipeline = client.get("/api/pipeline").json()
+    assert pipeline["totals"] == {"count": 2, "amount_cents": total, "expected_cents": total}
+    assert lane(client, "new")["totals"] == pipeline["totals"]
+    dashboard = client.get("/api/dashboard").json()
+    assert dashboard["open"] == pipeline["totals"]
+    assert dashboard["won"]["amount_cents"] == dashboard["months"][-1]["amount_cents"] == total
+    assert [row["amount_cents"] for row in dashboard["stage_amounts"] if row["stage"] in ("new", "won")] == [total, total]
 
 
 def test_crud_links_and_delete_impact(client):
@@ -115,7 +140,7 @@ def test_stage_transition_and_sorting_are_persisted(client):
     assert move(client, item["id"], "new", second["id"]).status_code == 422
     assert len(client.get(f"{url}/activities").json()) == 1
 
-    with TestClient(create_app()) as restarted:
+    with TestClient(create_app(), base_url="http://127.0.0.1") as restarted:
         assert [card["id"] for card in lane(restarted, "negotiation")["cards"]] == [
             second["id"], first["id"], item["id"],
         ]

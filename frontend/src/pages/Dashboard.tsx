@@ -14,13 +14,15 @@ function ActivityLink({ activity }: { activity: Activity }) {
 }
 
 function MonthCharts({ months }: { months: Dashboard['months'] }) {
-  const data = months.map(month => ({ ...month, label: `${Number(month.month.slice(5))}月` }))
+  const data = months.map(month => ({
+    ...month, label: `${Number(month.month.slice(5))}月`, plotAmount: Number(month.amount_cents),
+  }))
   const firstMonth = months[0].month
   const lastMonth = months[months.length - 1].month
   const range = firstMonth.slice(0, 4) === lastMonth.slice(0, 4)
     ? `${Number(firstMonth.slice(5))}–${Number(lastMonth.slice(5))} 月`
     : `${firstMonth.replace('-', '/')}–${lastMonth.replace('-', '/')}`
-  const amountTarget = Math.max(100, ...months.map(month => month.amount_cents)) / 3
+  const amountTarget = Math.max(100, ...data.map(month => month.plotAmount)) / 3
   const magnitude = 10 ** Math.floor(Math.log10(amountTarget))
   const amountStep = Math.ceil(amountTarget / magnitude) * magnitude
   const countStep = Math.max(2, Math.ceil((Math.max(...months.map(month => month.count)) + 1) / 6) * 2)
@@ -37,8 +39,8 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
             {grid}{axis}
             <YAxis width={78} domain={[0, amountTicks[3]]} ticks={amountTicks} axisLine={false} tickLine={false}
               tick={{ fill: '#516b74', fontSize: 11 }} tickFormatter={money} />
-            <Tooltip formatter={value => [money(Number(value)), '成交金額']} />
-            <Area dataKey="amount_cents" stroke="#007e62" strokeWidth={2.5} fill="#06d6a0" fillOpacity={0.1}
+            <Tooltip formatter={(_value, _name, item) => [money(item.payload.amount_cents), '成交金額']} />
+            <Area dataKey="plotAmount" stroke="#007e62" strokeWidth={2.5} fill="#06d6a0" fillOpacity={0.1}
               dot={({ cx, cy, index }) => {
                 const latest = index === data.length - 1
                 return <circle key={index} cx={cx} cy={cy} r={latest ? 5 : 3.5} fill={latest ? '#06d6a0' : '#fff'}
@@ -69,7 +71,7 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
 }
 
 function StageAmounts({ rows }: { rows: Dashboard['stage_amounts'] }) {
-  const largest = Math.max(1, ...rows.map(row => row.amount_cents))
+  const largest = Math.max(1, ...rows.map(row => Number(row.amount_cents)))
   return <section className="panel stage-summary">
     <div className="panel-heading"><h2>各階段商機金額</h2>
       <Link className="text-button" to="/pipeline">開啟看板 <span aria-hidden="true">↗</span></Link>
@@ -77,7 +79,7 @@ function StageAmounts({ rows }: { rows: Dashboard['stage_amounts'] }) {
     <ul className="stage-amounts">{rows.map(row => <li key={row.stage}>
       <span className="stage-title"><i style={{ background: stages[row.stage].color }} aria-hidden="true" />{stages[row.stage].label}</span>
       <span className="num">{money(row.amount_cents)}</span>
-      <span className="bar-track" aria-hidden="true"><span style={{ width: `${row.amount_cents / largest * 100}%`, background: stages[row.stage].color }} /></span>
+      <span className="bar-track" aria-hidden="true"><span style={{ width: `${Number(row.amount_cents) / largest * 100}%`, background: stages[row.stage].color }} /></span>
     </li>)}</ul>
   </section>
 }

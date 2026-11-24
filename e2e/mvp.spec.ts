@@ -144,6 +144,54 @@ test('刪除視窗以最新跟進筆數重新確認', async ({ page, context, re
   await expect(page).toHaveURL('/deals')
 })
 
+test('編輯表單保留另一分頁剛儲存的階段和跟進日期', async ({ page, context, request }) => {
+  const deal = await create(request, 'deals', { name: '跨分頁商機', stage: 'proposal', amount_cents: 10000, probability: 40 })
+  const url = `/deals/${deal.id}`
+  await create(request, `deals/${deal.id}/activities`, { kind: 'note', content: '跨分頁跟進', follow_up: '2026-01-04' })
+  const other = await context.newPage()
+  await Promise.all([page.goto(url), other.goto(url)])
+
+  await page.getByRole('button', { name: '編輯商機' }).click()
+  await other.getByRole('button', { name: '編輯商機' }).click()
+  await other.getByLabel(/階段/).selectOption('negotiation')
+  await other.getByRole('button', { name: '儲存' }).click()
+  await expect(other.getByText('從提案移至議價')).toBeVisible()
+  await page.getByLabel(/名稱/).fill('跨分頁已改名')
+  await page.getByRole('button', { name: '儲存' }).click()
+  await expect(page.getByRole('heading', { name: '跨分頁已改名' })).toBeVisible()
+  await expect(page.getByText('75%', { exact: true })).toBeVisible()
+  await expect(page.getByText('從提案移至議價')).toHaveCount(1)
+  await expect(page.getByText('從議價移至提案')).toHaveCount(0)
+
+  const activity = (tab: Page) => tab.locator('.timeline li').filter({ hasText: '跨分頁跟進' })
+  await activity(page).getByRole('button', { name: '編輯' }).click()
+  await activity(other).getByRole('button', { name: '編輯' }).click()
+  await other.getByLabel('跟進日期').fill('2026-01-05')
+  await other.getByRole('button', { name: '儲存' }).click()
+  await expect(activity(other).getByText('2026-01-05')).toBeVisible()
+  await page.getByLabel(/內容/).fill('跨分頁跟進已改內容')
+  await page.getByRole('button', { name: '儲存' }).click()
+  await expect(activity(page).getByText('跨分頁跟進已改內容')).toBeVisible()
+  await expect(activity(page).getByText('2026-01-05')).toBeVisible()
+})
+
+test('看板和儀表板精確顯示大額合計', async ({ page, request }) => {
+  await removeDeals(request)
+  for (const stage of ['new', 'won']) {
+    await create(request, 'deals', { name: '大額商機', stage, amount_cents: Number.MAX_SAFE_INTEGER, probability: 100 })
+    await create(request, 'deals', { name: '小額商機', stage, amount_cents: 2, probability: 100 })
+  }
+  const total = 'NT$90,071,992,547,409.93'
+  await page.goto('/pipeline')
+  await expect(page.getByTestId('board-amount')).toHaveText(total)
+  await expect(page.getByTestId('board-expected')).toHaveText(total)
+  await page.getByRole('navigation').getByRole('link', { name: '儀表板' }).click()
+  const chart = page.getByRole('img', { name: /每月成交金額折線圖/ })
+  await expect(chart.locator('svg')).toBeVisible()
+  await expect(chart).toHaveAttribute('aria-label', new RegExp(total.replace(/[$.]/g, '\\$&')))
+  await expect(page.getByText('本月成交', { exact: true }).locator('..').locator('dd')).toHaveText(total)
+})
+
 test('首次讀取失敗後可以重試', async ({ page }) => {
   await page.route('**/api/companies', route => route.fulfill({
     status: 503, json: { message: '本機資料暫時無法讀取。' },

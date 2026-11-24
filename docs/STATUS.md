@@ -1,5 +1,18 @@
 # 專案進度
 
+## 2026-11-24｜第 12 步「審查分支」完成
+
+- 依繁體中文審查政策檢查 `mvp` 相對於 `main` 的變更，修正四項 Important 問題。[審查政策](REVIEW.md)
+- 本機資料保護。前端停用跨來源讀取，將檔案服務限制在前端與相依套件目錄。API 驗證本機主機與瀏覽器來源，SQLite 放在前端檔案服務範圍之外。
+- 金額精度。超出 JavaScript 安全整數範圍的合計以十進位整數字串傳遞，儀表板及看板精確顯示到分。
+- 介面行為。選填欄位的空值在升冪和降冪都排在最後。編輯商機與活動時只提交改動的欄位，保留另一分頁已儲存的階段、機率與跟進日期。
+- `npm run build` 通過。`npm test` 通過 42 項，包括 Vitest 7 項、pytest 24 項、Chrome Playwright 11 項。下一步是將 `mvp` 合併回 `main`。[Day 3 第 13 步](../notes/week1day3-claude-code.html#step-13)
+
+## 2026-11-24｜第 11 步「寫審查政策」完成
+
+- 依課程範本建立繁體中文審查政策。分別審查功能與錯誤處理、安全性，以及是否符合規格和實作計畫。Important 問題必須在合併前修正，每次最多列五個小問題（Nits）。[審查政策](REVIEW.md)
+- 下一步是依政策審查 `mvp` 相對於 `main` 的變更。[Day 3 第 12 步](../notes/week1day3-claude-code.html#step-12)
+
 ## 2026-11-24｜第 10 步「自己檢查」完成
 
 - Codex 在 Mac 執行 `UV_NO_CACHE=1 npm test`，Vitest 6 項、pytest 21 項、Chrome Playwright 9 項全數通過，共 36 項。
@@ -46,7 +59,7 @@ npm run dev
 
 - `npm test` 執行三套測試。Playwright 會啟停自己的服務，並用暫存資料庫。
 - `npm run seed` 會**清除目前選定的資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。
-- 日常資料預設存於 `data/accountable.sqlite3`。若需要獨立資料庫，可在啟動與重設時皆設定相同的 `ACCOUNTABLE_DB_PATH`。
+- 日常資料預設存於 `data/accountable.sqlite3`。若需要獨立資料庫，可在啟動與重設時皆設定相同的 `ACCOUNTABLE_DB_PATH`。請將資料庫放在 `frontend/` 與 `node_modules/` 之外。
 
 ## 2026-11-23｜MVP 實作計畫
 

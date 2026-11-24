@@ -33,13 +33,14 @@ export type Activity = {
   follow_up: string | null; completed: boolean
   owner_id: number; owner_name: string; owner_type: 'contacts' | 'deals'
 }
-export type Totals = { count: number; amount_cents: number; expected_cents: number }
+type Cents = number | string
+export type Totals = { count: number; amount_cents: Cents; expected_cents: Cents }
 export type Lane = { stage: Stage; cards: Deal[]; count: number; totals: Totals }
 export type Pipeline = { lanes: Lane[]; totals: Totals }
-type Monthly = { month: string; count: number; amount_cents: number }
+type Monthly = { month: string; count: number; amount_cents: Cents }
 export type Dashboard = {
   today: string; won: Monthly; open: Totals; months: Monthly[]
-  stage_amounts: { stage: Stage; amount_cents: number }[]
+  stage_amounts: { stage: Stage; amount_cents: Cents }[]
   recent: Activity[]
   follow_ups: (Activity & { group: keyof typeof followUpGroups })[]
 }
@@ -51,15 +52,16 @@ export function isClosed(stage: Stage) {
 const currency = new Intl.NumberFormat('zh-TW')
 const dateTime = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'short', timeStyle: 'short' })
 
-export function money(cents: number) {
+export function money(cents: Cents) {
   return `NT$${formatCents(cents, true)}`
 }
 
-export function formatCents(cents: number, group = false) {
-  const magnitude = Math.abs(cents)
-  const whole = Math.floor(magnitude / 100)
-  const decimal = String(magnitude % 100).padStart(2, '0').replace(/0+$/, '')
-  return `${cents < 0 ? '-' : ''}${group ? currency.format(whole) : whole}${decimal ? `.${decimal}` : ''}`
+export function formatCents(cents: Cents, group = false) {
+  const amount = BigInt(cents)
+  const magnitude = amount < 0n ? -amount : amount
+  const whole = magnitude / 100n
+  const decimal = String(magnitude % 100n).padStart(2, '0').replace(/0+$/, '')
+  return `${amount < 0n ? '-' : ''}${group ? currency.format(whole) : whole}${decimal ? `.${decimal}` : ''}`
 }
 
 export function parseMoney(value: string): number | null {

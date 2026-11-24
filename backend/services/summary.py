@@ -1,9 +1,14 @@
 from sqlalchemy import select
 
 from backend import clock
-from backend.schema import CLOSED, STAGES, activities, deals
+from backend.schema import CLOSED, MAX_SAFE_INTEGER, STAGES, activities, deals
 from backend.services.activities import activity_query, present_activity
 from backend.services.records import present, record_query
+
+
+def json_cents(cents):
+    # Keep existing numeric values where JavaScript can represent every cent.
+    return cents if cents <= MAX_SAFE_INTEGER else str(cents)
 
 
 def open_totals(records):
@@ -11,8 +16,8 @@ def open_totals(records):
     weighted = sum(row["amount_cents"] * row["probability"] for row in open_deals)
     return {
         "count": len(open_deals),
-        "amount_cents": sum(row["amount_cents"] for row in open_deals),
-        "expected_cents": (weighted + 50) // 100,
+        "amount_cents": json_cents(sum(row["amount_cents"] for row in open_deals)),
+        "expected_cents": json_cents((weighted + 50) // 100),
     }
 
 
@@ -72,6 +77,9 @@ def dashboard(connection):
                 months[month]["count"] += 1
                 months[month]["amount_cents"] += record["amount_cents"]
 
+    for month in months.values():
+        month["amount_cents"] = json_cents(month["amount_cents"])
+
     return {
         "today": today,
         "recent": recent,
@@ -79,5 +87,5 @@ def dashboard(connection):
         "won": months[today.isoformat()[:7]],
         "open": open_totals(records),
         "months": list(months.values()),
-        "stage_amounts": [{"stage": stage, "amount_cents": amount} for stage, amount in stage_amounts.items()],
+        "stage_amounts": [{"stage": stage, "amount_cents": json_cents(amount)} for stage, amount in stage_amounts.items()],
     }

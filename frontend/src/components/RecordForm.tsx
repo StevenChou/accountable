@@ -32,6 +32,20 @@ function initialValues(resource: Resource, row?: RecordRow, initialStage: Stage 
   }
 }
 
+function formBody(resource: Resource, values: Values) {
+  const body: Record<string, string | number | null> = Object.fromEntries(
+    Object.entries(values).map(([field, value]) => [field, value.trim() || null]),
+  )
+  if (resource === 'deals') {
+    body.amount_cents = parseMoney(values.amount_cents)
+    body.probability = Number(values.probability)
+  }
+  for (const reference of ['company_id', 'contact_id']) {
+    if (body[reference]) body[reference] = Number(body[reference])
+  }
+  return body
+}
+
 function RelationSelect({ field, label, resource, value, change }: {
   field: string; label: string; resource: 'companies' | 'contacts'; value: string; change: (value: string) => void
 }) {
@@ -72,28 +86,33 @@ export function RecordForm({ resource, row, initialStage, onClose, onSaved }: {
     event.preventDefault()
     if (busy) return
     setError(undefined)
-    const body: Record<string, string | number | null> = Object.fromEntries(
-      Object.entries(values).map(([field, value]) => [field, value.trim() || null]),
-    )
+    const body = formBody(resource, values)
     const fields: Record<string, string> = {}
     if (!body.name) fields.name = resource === 'contacts' ? '請輸入姓名。' : '請輸入名稱。'
     if (resource === 'deals') {
-      const amount = parseMoney(values.amount_cents)
-      const probability = Number(values.probability)
-      if (amount === null) fields.amount_cents = '請輸入非負金額，最多兩位小數。'
-      if (!/^\d+$/.test(values.probability) || probability > 100) fields.probability = '請輸入 0 至 100 的整數。'
+      if (body.amount_cents === null) fields.amount_cents = '請輸入非負金額，最多兩位小數。'
+      if (!/^\d+$/.test(values.probability) || Number(values.probability) > 100) fields.probability = '請輸入 0 至 100 的整數。'
       if (isClosed(stage) && !changingStage && (!values.actual_close || values.actual_close > localDate())) {
         fields.actual_close = '請輸入今天或更早的實際結案日。'
       }
-      body.amount_cents = amount
-      body.probability = probability
-    }
-    for (const reference of ['company_id', 'contact_id']) {
-      if (body[reference]) body[reference] = Number(body[reference])
     }
     if (Object.keys(fields).length) {
       setError(new ApiError(422, { message: '請檢查標示的欄位。', fields }))
       return
+    }
+    if (row) {
+      const previous = formBody(resource, initialValues(resource, row))
+      for (const field of Object.keys(body)) {
+        if (body[field] === previous[field]) delete body[field]
+      }
+      if (changingStage) {
+        delete body.probability
+        delete body.actual_close
+      }
+      if (Object.keys(body).length === 0) {
+        onSaved()
+        return
+      }
     }
     setBusy(true)
     try {

@@ -11,6 +11,7 @@ describe('輸入與顯示', () => {
     expect(parseMoney('1.001')).toBeNull()
     expect(money(123456)).toBe('NT$1,234.56')
     expect(money(Number.MAX_SAFE_INTEGER)).toBe('NT$90,071,992,547,409.91')
+    expect(money('9007199254740993')).toBe('NT$90,071,992,547,409.93')
   })
 
   it('搜尋忽略前後空白和英文字母大小寫', () => {

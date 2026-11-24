@@ -7,6 +7,8 @@ export default defineConfig({
     host: '127.0.0.1',
     port: Number(process.env.ACCOUNTABLE_WEB_PORT || 5173),
     strictPort: true,
+    cors: false,
+    fs: { allow: ['.', '../node_modules'] },
     proxy: {
       '/api': {
         target: `http://127.0.0.1:${process.env.ACCOUNTABLE_API_PORT || 8000}`,

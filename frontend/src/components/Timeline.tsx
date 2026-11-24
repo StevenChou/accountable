@@ -29,8 +29,11 @@ function ActivityForm({ resource, id, previous, close, done }: {
     setBusy(true)
     setError(undefined)
     try {
+      const followUp = due || null
       await write(previous ? `/activities/${previous.id}` : `/${resource}/${id}/activities`, previous ? 'PATCH' : 'POST', {
-        kind, content, follow_up: due || null,
+        ...(!previous || kind !== previous.kind ? { kind } : {}),
+        ...(!previous || content.trim() !== previous.content ? { content: content.trim() } : {}),
+        ...(!previous || followUp !== previous.follow_up ? { follow_up: followUp } : {}),
         ...(occurred === initialTime ? {} : { occurred_at: new Date(occurred).toISOString() }),
       })
       done()

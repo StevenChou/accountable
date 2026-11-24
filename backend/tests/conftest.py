@@ -22,7 +22,7 @@ def test_database(tmp_path, monkeypatch):
 @pytest.fixture
 def client(test_database):
     app = create_app()
-    with TestClient(app) as client:
+    with TestClient(app, base_url="http://127.0.0.1") as client:
         with app.state.engine.begin() as connection:
             for table in (activities, deals, contacts, companies):
                 connection.execute(table.delete())

@@ -16,20 +16,24 @@ const nameColumn = (resource: Resource): ColumnDef<RecordRow> => ({
   cell: ({ row }) => <Link className="record-link" to={`/${resource}/${row.original.id}`}>{row.original.name}</Link>,
 })
 
-const companyColumn: ColumnDef<RecordRow> = { accessorKey: 'company_name', header: '所屬公司' }
+function optionalColumn<Row extends RecordRow>(id: keyof Row & string, header: string): ColumnDef<RecordRow> {
+  return { id, header, accessorFn: row => (row as Row)[id] ?? undefined, sortUndefined: 'last' }
+}
+
+const companyColumn = optionalColumn<Contact | Deal>('company_name', '所屬公司')
 const columns: Record<Resource, ColumnDef<RecordRow>[]> = {
-  companies: [nameColumn('companies'), { accessorKey: 'website', header: '網站' }, { accessorKey: 'industry', header: '產業' }],
+  companies: [nameColumn('companies'), optionalColumn<Company>('website', '網站'), optionalColumn<Company>('industry', '產業')],
   contacts: [
-    nameColumn('contacts'), companyColumn, { accessorKey: 'title', header: '職稱' },
-    { accessorKey: 'email', header: '電子郵件' }, { accessorKey: 'phone', header: '電話' },
+    nameColumn('contacts'), companyColumn, optionalColumn<Contact>('title', '職稱'),
+    optionalColumn<Contact>('email', '電子郵件'), optionalColumn<Contact>('phone', '電話'),
     { id: 'status', header: '狀態', accessorFn: row => statuses[(row as Contact).status] },
   ],
   deals: [
-    nameColumn('deals'), companyColumn, { accessorKey: 'contact_name', header: '主要聯絡人' },
+    nameColumn('deals'), companyColumn, optionalColumn<Deal>('contact_name', '主要聯絡人'),
     { id: 'stage', header: '階段', accessorFn: row => stages[(row as Deal).stage].label },
     { accessorKey: 'amount_cents', header: '金額', cell: ({ row }) => <span className="num">{money((row.original as Deal).amount_cents)}</span> },
     { accessorKey: 'probability', header: '成交機率', cell: ({ row }) => <span className="num">{(row.original as Deal).probability}%</span> },
-    { accessorKey: 'close_date', header: '結案日', cell: ({ row }) => <span className="date-cell">
+    { ...optionalColumn<Deal>('close_date', '結案日'), sortingFn: 'basic', cell: ({ row }) => <span className="date-cell">
       <span className="num">{(row.original as Deal).close_date ?? '—'}</span> <Overdue overdue={(row.original as Deal).overdue} />
     </span> },
   ],

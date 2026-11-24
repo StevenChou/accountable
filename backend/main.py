@@ -3,8 +3,9 @@ from contextlib import asynccontextmanager
 from threading import Lock
 
 import uvicorn
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from sqlalchemy.exc import OperationalError
@@ -46,6 +47,17 @@ async def lifespan(app):
 
 def create_app():
     app = FastAPI(title="Accountable", lifespan=lifespan)
+
+    @app.middleware("http")
+    async def check_browser_origin(request: Request, call_next):
+        origin = request.headers.get("origin")
+        site = request.headers.get("sec-fetch-site")
+        local_origin = f"{request.url.scheme}://{request.url.netloc}"
+        if site not in (None, "none", "same-origin") or origin not in (None, local_origin):
+            return JSONResponse(status_code=403, content={"message": "請從 Accountable 的本機頁面操作。"})
+        return await call_next(request)
+
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"], www_redirect=False)
     api = APIRouter(prefix="/api")
     for resource in RECORDS:
         api.include_router(record_routes(resource))
@@ -80,4 +92,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("ACCOUNTABLE_API_PORT", "8000")))
+    uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("ACCOUNTABLE_API_PORT", "8000")), proxy_headers=False)

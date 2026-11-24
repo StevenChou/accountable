@@ -65,3 +65,18 @@ it('必填驗證及儲存失敗保留輸入', async () => {
   expect((name as HTMLInputElement).value).toBe('測試公司')
   expect(onSaved).not.toHaveBeenCalled()
 })
+
+it('排序選填結案日時，空白日期在升冪與降冪都排在最後', async () => {
+  const dates = ['2026-05-01', null, '2026-08-01', '2026-02-01', null]
+  fetchMock.mockResolvedValueOnce(Response.json(dates.map((date, index) => ({
+    id: index + 1, name: `商機 ${index}`, stage: 'new', amount_cents: 100, probability: 10, close_date: date,
+  }))))
+  render(<MemoryRouter><RecordList resource="deals" /></MemoryRouter>)
+  await screen.findByText('2026-05-01')
+  const sort = screen.getByRole('button', { name: '結案日' })
+  const cells = () => screen.getAllByRole('row').slice(1).map(row => within(row).getAllByRole('cell')[6].textContent?.trim())
+  fireEvent.click(sort)
+  expect(cells()).toEqual(['2026-02-01', '2026-05-01', '2026-08-01', '—', '—'])
+  fireEvent.click(sort)
+  expect(cells()).toEqual(['2026-08-01', '2026-05-01', '2026-02-01', '—', '—'])
+})

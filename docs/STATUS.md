@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-24｜第 13 步「merge 回 main」完成
+
+- 合併前重新執行 `UV_NO_CACHE=1 npm test`，Vitest 7 項、pytest 24 項、Chrome Playwright 11 項，共 42 項全數通過。
+- 已將本機 `main` 從 `231292a` 快轉至審查修正提交 `50e4fd9`，並以 `git branch -d mvp` 刪除已合併的本機分支。
+- 下一步是實際使用 MVP，記下後續改進想法。[Day 3 第 14 步](../notes/week1day3-claude-code.html#step-14)
+
 ## 2026-11-24｜第 12 步「審查分支」完成
 
 - 依繁體中文審查政策檢查 `mvp` 相對於 `main` 的變更，修正四項 Important 問題。[審查政策](REVIEW.md)

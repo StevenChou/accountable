@@ -4,6 +4,8 @@
 
 - Codex 在 Chrome 用暫存 SQLite 新增 `NT$120,000` 的門市耗材合約，將商機從「新商機」拖到「已確認」，並記錄一筆當天的電話跟進。確認成交機率更新為 25%，跟進出現在儀表板的「今天」待辦。
 - 依操作過程記下三項改進想法。下一步是用 PR 分享 Day 3 文件。[Day 3 第 15 步](../notes/week1day3-claude-code.html#step-15)
+- 第 15 步的流程圖補上三步各自的指令，從建立並提交 `share-day3`，到檢查後推送至 fork，再用 GitHub 或 `gh` 向 Ed 的 `main` 開 PR。[PR 流程圖](../notes/week1day3-claude-code.html#pr-workflow)
+- 第 15 步補上分享資料夾的準備說明，包括為何先從自己的 `main` 複製文件、如何建立學員資料夾，以及 README 要寫什麼。[分享資料夾準備](../notes/week1day3-claude-code.html#pr-share-prep)
 
 ## Ideas for later
 

@@ -444,6 +444,45 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space:
 .policy-row .en { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); display: block; font-weight: 500; }
 @media (max-width: 600px) { .policy-row { grid-template-columns: minmax(0, 1fr); } }
 
+/* ---------- pull request flow ---------- */
+.pr-flow { margin: 0; display: grid; gap: 12px; }
+.pr-done { padding: 12px; border-radius: var(--radius-inner); background: var(--tint-green); font-size: 14px; }
+.pr-done strong { display: block; color: var(--ink-green); }
+.pr-next-label { font-size: 14px; font-weight: 700; }
+.pr-path { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); align-items: start; gap: 30px; list-style: none; padding: 0; }
+.pr-path li {
+  position: relative;
+  background: var(--tint-neutral);
+  border-radius: var(--radius-inner);
+  padding: 12px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pr-path li + li { margin-top: 0; }
+.pr-path strong, .pr-node-detail { display: block; }
+.pr-node-detail { color: var(--ink-soft); margin-top: 4px; }
+.pr-path .pr-review { background: var(--tint-cerulean); }
+.pr-path .pr-arrow { position: absolute; left: -23px; top: 24px; color: var(--ink-cerulean); font-size: 18px; }
+.pr-step-commands { margin-top: 10px; }
+.pr-step-commands summary { cursor: pointer; color: var(--ink-cerulean); font-weight: 700; }
+.pr-step-commands p, .pr-step-commands .code { margin-top: 8px; }
+.pr-step-commands .code-head { padding: 5px 6px 0 10px; }
+.pr-step-commands .code pre { padding: 8px 10px 10px; font-size: 12.5px; }
+.pr-step-commands .copy { flex: none; }
+.pr-options { border: 1px solid var(--line); border-radius: var(--radius-inner); padding: 8px 12px; }
+.pr-options summary { cursor: pointer; font-weight: 700; }
+.pr-options .pr-field-list, .pr-options p { margin-top: 8px; }
+.pr-field-list { margin: 0; display: grid; gap: 8px; }
+.pr-field-list div { display: grid; grid-template-columns: minmax(0, 12em) minmax(0, 1fr); align-items: baseline; gap: 2px 12px; }
+.pr-field-list dt { font-weight: 700; }
+.pr-field-list dd { margin: 0; min-width: 0; }
+@media (max-width: 720px) {
+  .pr-path { grid-auto-flow: row; gap: 24px; }
+  .pr-path .pr-arrow { left: 50%; top: -26px; transform: translateX(-50%) rotate(90deg); }
+  .pr-field-list div { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* ---------- checklist ---------- */
 .checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
 .checklist li + li { margin-top: 0; }
@@ -1272,6 +1311,72 @@ git commit -m "Maintain: ideas for later"</code></pre></div>
         <div class="step-titles"><div class="stage-line"><span class="stage-tag st-share">分享</span></div><h2>用 PR 分享文件</h2><div class="en">Share your documents</div></div>
         <span class="pill s-next">下一步</span>
       </div>
+      <div class="block" id="pr-workflow">
+        <h3 id="pr-flow-title">PR 怎麼運作</h3>
+        <p>PR 就是在 GitHub 上請 Ed 把你的文件加入課程專案。</p>
+        <details class="pr-options" id="pr-share-prep">
+          <summary>為什麼先建立分享資料夾？</summary>
+          <p><code>community_contributions/</code> 是課程給學員分享成果的地方。每位學員建立自己的子資料夾，Ed 就能一眼看出這次 PR 提交的是誰的成果。</p>
+          <p>先在自己的 <code>main</code> 上，從 <code>accountable</code> 根目錄執行這兩個指令。你寫好的四份 Day 3 文件都在這個分支的 <code>docs/</code>。</p>
+          <div class="code wrap"><div class="code-head"><span>建立資料夾並複製文件</span><button class="copy" type="button">複製</button></div><pre><code>mkdir -p community_contributions/StevenChou/ &amp;&amp;
+cp docs/intent.md docs/spec.md docs/plan.md docs/REVIEW.md \
+  community_contributions/StevenChou/</code></pre></div>
+          <p>在同一個資料夾新增 <code>README.md</code>，簡短介紹你做了什麼，再附上完整 MVP 的連結。<a href="https://github.com/StevenChou/accountable">你的 GitHub fork</a></p>
+          <p>備齊五個檔案後，再用下方第一步建立 <code>share-day3</code>，並用 <code>git add</code> 將這個子資料夾加入提交。這樣 PR 的檔案範圍就容易核對。</p>
+        </details>
+        <figure class="pr-flow" aria-labelledby="pr-flow-title">
+          <div class="pr-done">
+            <strong>已完成 · 完整 MVP 已在你的 fork</strong>
+            <p>本機 <code>mvp</code> → 合併到本機 <code>main</code> → 推送到 <code>StevenChou/accountable</code> 的 <code>main</code>。</p>
+          </div>
+          <p class="pr-next-label" id="pr-next-steps">接下來 · 只分享 5 個檔案</p>
+          <ol class="pr-path" role="list" aria-labelledby="pr-next-steps">
+            <li>
+              <strong>在電腦整理文件</strong><span class="pr-node-detail">備好四份文件與 README，再從 Ed 的 <code>main</code> 建立 <code>share-day3</code>。</span>
+              <details class="pr-step-commands">
+                <summary>Git 指令</summary>
+                <p>先依上方的<a href="#pr-share-prep">資料夾準備說明</a>備齊五個檔案，再執行下列 Git 指令。</p>
+                <div class="code wrap"><div class="code-head"><span>建立分支並提交</span><button class="copy" type="button">複製</button></div><pre><code>git fetch origin &amp;&amp;
+git checkout --no-track -b share-day3 origin/main &amp;&amp;
+git add community_contributions/StevenChou/ &amp;&amp;
+git commit -m "Add Day 3 documents"</code></pre></div>
+              </details>
+            </li>
+            <li>
+              <span class="pr-arrow" aria-hidden="true">→</span><strong>推送到你的 fork</strong><span class="pr-node-detail"><code>StevenChou/accountable</code> 的 <code>share-day3</code> 是 PR 的來源。</span>
+              <details class="pr-step-commands">
+                <summary>Git 指令</summary>
+                <div class="code wrap"><div class="code-head"><span>先檢查差異</span><button class="copy" type="button">複製</button></div><pre><code>git diff --numstat origin/main...HEAD</code></pre></div>
+                <p>確認只列出那 5 個新增檔案，且第二欄的刪除行數都是 <code>0</code>，再推送。</p>
+                <div class="code wrap"><div class="code-head"><span>推送分享分支</span><button class="copy" type="button">複製</button></div><pre><code>git push -u fork share-day3</code></pre></div>
+              </details>
+            </li>
+            <li class="pr-review">
+              <span class="pr-arrow" aria-hidden="true">→</span><strong>向 Ed 開 PR</strong><span class="pr-node-detail"><code>ed-donner/accountable</code> 的 <code>main</code> 是 PR 的目的地。</span>
+              <details class="pr-step-commands">
+                <summary>GitHub 操作與 gh 指令</summary>
+                <p>在自己 fork 的 GitHub 頁面切到 <code>share-day3</code>，點 <b>Compare &amp; pull request</b>。確認下方的 Base、Compare 和 5 個檔案後，再按 <b>Create pull request</b>。</p>
+                <p>若已登入 GitHub CLI，也可以執行下列 <code>gh</code> 指令，接著填寫 PR 的標題與說明。</p>
+                <div class="code wrap"><div class="code-head"><span>開啟 PR</span><button class="copy" type="button">複製</button></div><pre><code>gh pr create \
+  --repo ed-donner/accountable \
+  --base main \
+  --head StevenChou:share-day3</code></pre></div>
+              </details>
+            </li>
+          </ol>
+        </figure>
+        <p>Ed 審查並合併後，這 5 個檔案才會進入課程專案。</p>
+        <details class="pr-options">
+          <summary>實際開 PR 時，GitHub 欄位怎麼選？</summary>
+          <dl class="pr-field-list">
+            <div><dt>Base（送到哪裡）</dt><dd><code>ed-donner/accountable</code> 的 <code>main</code>。</dd></div>
+            <div><dt>Head fork / Compare（從哪裡送）</dt><dd><code>StevenChou/accountable</code> 的 <code>share-day3</code>。</dd></div>
+            <div><dt>Files changed（送了什麼）</dt><dd>確認 5 個新增檔案都在 <code>community_contributions/&lt;你的資料夾&gt;/</code>。</dd></div>
+          </dl>
+          <p>如果 Ed 要求修改文件，推送到同一個 <code>share-day3</code> 就會更新原本的 PR。</p>
+          <p class="fine"><a href="https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork">GitHub 官方說明 · 從 fork 建立 PR</a></p>
+        </details>
+      </div>
       <div class="block">
         <div class="label">要做什麼</div>
         <div class="code wrap"><div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div><pre><code>Share today's documents in a pull request to community_contributions, following course/for_agents/AGENT_GIT_GUIDE.md.</code></pre></div>
@@ -1318,7 +1423,7 @@ git push -u fork share-day3</code></pre></div>
         <div class="row"><span class="label">你的進度</span><span class="pill s-next">下一步</span></div>
         <ul>
           <li><code>community_contributions/</code> 裡有 <code>SabiMantock</code>、<code>sarvjot23</code>、<code>verbodh-pte</code>，還沒有你的資料夾</li>
-          <li><code>main</code> 的 upstream 已經是 <code>fork/main</code>。筆記頁 <code>notes/</code> 會跟著 <code>main</code> 推到你的 fork，但不會進 PR，因為 PR 分支從 <code>origin/main</code> 開始</li>
+          <li>完整 MVP 已推到 <code>fork/main</code>。接下來從 Ed 的 <code>origin/main</code> 建立 <code>share-day3</code>，開始整理要分享的文件。</li>
         </ul>
       </div>
     </section>

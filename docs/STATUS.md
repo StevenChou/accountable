@@ -1,5 +1,16 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 7 步「用假金鑰驗證兩層防護」完成（本機版）
+
+- 在隔離的 `make-it-fail` 分支暫存含虛構金鑰的 `frontend/src/main.tsx`。pre-commit 的 Gitleaks 以 `generic-api-key` 規則阻擋提交，`HEAD` 維持原提交。
+- 將測試檔移出暫存區後，保留工作區中的虛構金鑰再執行 `npm run check`。Gitleaks 在 `check:secrets` 步驟以同一規則攔截，測試尚未開始便結束。GitHub Actions 驗證已略過。
+- 已清除測試註解與隔離的演練分支，`npm run check` 恢復通過 59 項測試。課程筆記顯示 6／16 步完成、1 步略過。下一步是[把改善步驟寫入 harness](../notes/week1day4-claude-code.html#step-8)。
+
+## 2026-11-25｜Day 4 第 6 步「把完整檢查接到 GitHub Actions」已略過
+
+- 本次以本機 `npm run check` 驗收。課程筆記顯示 5／16 步完成、1 步略過，下一步是第 7 步的本機秘密掃描演練。[Day 4 課程筆記](../notes/week1day4-claude-code.html#progress)
+- 已在 Chrome 桌面與手機版驗證略過計數、下一步連結和勾選保存。本機 `npm run check` 通過全部 59 項測試。
+
 ## 2026-11-25｜Day 4 第 5 步「把檢查接到 Git 與 Claude Code」完成
 
 - 已在本機安裝 Lefthook 的 pre-commit。在隔離的 repo 實際提交，確認 Prettier 與 Ruff 格式化並重新暫存要提交的檔案，未暫存的修改仍保留。另用 lint 錯誤、型別錯誤和虛構金鑰分別驗證提交會被攔下。提交時會略過測試。[Lefthook 設定](../lefthook.yml)

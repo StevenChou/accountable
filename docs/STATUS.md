@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 1 步「準備環境與分支」完成
+
+- 已從本機 `main`（`6b29445`，與 `fork/main` 同步）建立並切換至 `harness`。Homebrew 已安裝 gitleaks，`gitleaks version` 輸出 `8.30.1`。
+- 已確認 Node、Python 3.12、uv、Google Chrome 與專案相依套件就緒。`UV_NO_CACHE=1 npm test` 通過全部 42 項測試，包括 Vitest 7 項、pytest 24 項與 Chrome Playwright 11 項。
+- [Day 4 課程筆記](../notes/week1day4-claude-code.html#progress) 已標記第 1 步完成。下一步是[把 repo 整理成專案記憶](../notes/week1day4-claude-code.html#step-2)。
+
 ## 2026-11-25｜Day 2–4 專案開發流程速查完成
 
 - [專案開發流程速查](../notes/project-development-flow.html) 整合 Day 2 開工與權限設定、Day 3 的 MVP 與驗收，以及 Day 4 的 harness、審查與 CI。流程圖標出首次 MVP 與既有專案的驗收和合併門檻，並附課後文件分享的 PR 步驟。

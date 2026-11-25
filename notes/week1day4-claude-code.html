@@ -387,8 +387,8 @@ tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
         <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
         <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
         <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · Harness</li>
-        <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="1"></span></a></li>
-        <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="2"></span></a></li>
+        <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-done" title="完成" aria-hidden="true" data-step-status="1"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="2"></span></a></li>
         <li><a href="#step-3"><span class="toc-num">3</span>寫下自己的 coding standards<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="3"></span></a></li>
         <li><a href="#step-4"><span class="toc-num">4</span>加入完整與快速檢查<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="4"></span></a></li>
         <li><a href="#step-5"><span class="toc-num">5</span>把檢查接到 Git 與 Claude Code<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="5"></span></a></li>
@@ -422,8 +422,8 @@ tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
           <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
           <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
           <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · Harness</li>
-          <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="1"></span></a></li>
-          <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="2"></span></a></li>
+          <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-done" title="完成" aria-hidden="true" data-step-status="1"></span></a></li>
+          <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="2"></span></a></li>
           <li><a href="#step-3"><span class="toc-num">3</span>寫下自己的 coding standards<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="3"></span></a></li>
           <li><a href="#step-4"><span class="toc-num">4</span>加入完整與快速檢查<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="4"></span></a></li>
           <li><a href="#step-5"><span class="toc-num">5</span>把檢查接到 Git 與 Claude Code<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="5"></span></a></li>
@@ -463,13 +463,13 @@ tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
       <h2>進度總覽</h2>
       <p class="section-note">勾選每一步的完成判準後，目錄和下方的進度會一起更新。</p>
       <div class="counts">
-        <span class="progress-total" id="progress-total" role="status">完成 0 / 16 步</span>
+        <span class="progress-total" id="progress-total" role="status">完成 1 / 16 步</span>
       </div>
-      <p class="next" id="next-step">下一步是<a href="#step-1">準備環境與分支</a>。</p>
+      <p class="next" id="next-step">下一步是<a href="#step-2">把 repo 整理成專案記憶</a>。</p>
       <ol class="overview">
-        <li><span class="num">1</span><a href="#step-1">準備環境與分支</a><span class="pill s-next" data-step-status="1">下一步</span>
-          <span class="why">從自己的 <code>main</code> 開 <code>harness</code>，並安裝 gitleaks。</span></li>
-        <li><span class="num">2</span><a href="#step-2">把 repo 整理成專案記憶</a><span class="pill s-none" data-step-status="2">待完成</span>
+        <li><span class="num">1</span><a href="#step-1">準備環境與分支</a><span class="pill s-done" data-step-status="1">完成</span>
+          <span class="why">已從自己的 <code>main</code> 建立 <code>harness</code>，並確認 gitleaks 8.30.1 可執行。</span></li>
+        <li><span class="num">2</span><a href="#step-2">把 repo 整理成專案記憶</a><span class="pill s-next" data-step-status="2">下一步</span>
           <span class="why">把 MVP 的 intent 和 plan 歸檔，讓 <code>docs/spec.md</code> 成為產品規格。</span></li>
         <li><span class="num">3</span><a href="#step-3">寫下自己的 coding standards</a><span class="pill s-none" data-step-status="3">待完成</span>
           <span class="why">親自撰寫 <code>docs/STANDARDS.md</code>，再讓 agent 更新參照。</span></li>
@@ -575,7 +575,7 @@ tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
           <h2>準備環境與分支</h2>
           <div class="en" lang="en">Start the harness branch</div>
         </div>
-        <span class="pill s-next" data-step-status="1">下一步</span>
+        <span class="pill s-done" data-step-status="1">完成</span>
       </div>
       <div class="block">
         <h3 class="label">要做什麼</h3>
@@ -612,7 +612,7 @@ git checkout -b harness</code></pre>
       <div>
         <h3 class="label checklist-heading">完成判準</h3>
         <ul class="checklist">
-          <li><label><input type="checkbox" id="done-1"><span>我從選定的 <code>main</code> 開了 <code>harness</code>，也能執行 <code>gitleaks version</code>。</span></label></li>
+          <li><label><input type="checkbox" id="done-1" checked><span>我從選定的 <code>main</code> 開了 <code>harness</code>，也能執行 <code>gitleaks version</code>。</span></label></li>
         </ul>
       </div>
     </section>
@@ -625,7 +625,7 @@ git checkout -b harness</code></pre>
           <h2>把 repo 整理成專案記憶</h2>
           <div class="en" lang="en">The repo as memory</div>
         </div>
-        <span class="pill s-none" data-step-status="2">待完成</span>
+        <span class="pill s-next" data-step-status="2">下一步</span>
       </div>
       <div class="block">
         <h3 class="label">要做什麼</h3>
@@ -1356,10 +1356,15 @@ git commit -m "Maintain: ideas for later"</code></pre>
   var overview = document.getElementById('progress-total');
   var nextStep = document.getElementById('next-step');
   var statusClasses = { '完成': 's-done', '下一步': 's-next', '待完成': 's-none' };
-  var saved = [];
+  var saved = {};
   try {
     var stored = JSON.parse(localStorage.getItem(progressKey));
-    if (Array.isArray(stored)) saved = stored;
+    // Older versions stored only checked IDs. Unlisted steps keep their defaults.
+    if (Array.isArray(stored)) {
+      stored.forEach(function (id) { saved[id] = true; });
+    } else if (stored && typeof stored === 'object') {
+      saved = stored;
+    }
   } catch (e) {}
 
   function updateProgress() {
@@ -1391,11 +1396,10 @@ git commit -m "Maintain: ideas for later"</code></pre>
   }
 
   boxes.forEach(function (box) {
-    box.checked = saved.includes(box.id);
+    if (typeof saved[box.id] === 'boolean') box.checked = saved[box.id];
     box.addEventListener('change', function () {
-      var checkedIds = boxes.filter(function (item) { return item.checked; })
-        .map(function (item) { return item.id; });
-      try { localStorage.setItem(progressKey, JSON.stringify(checkedIds)); } catch (e) {}
+      saved[box.id] = box.checked;
+      try { localStorage.setItem(progressKey, JSON.stringify(saved)); } catch (e) {}
       updateProgress();
     });
   });

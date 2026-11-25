@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 3 步「寫下自己的 coding standards」完成
+
+- 依 Accountable 的現行做法整理六條繁體中文標準，涵蓋可讀性與變更範圍、規格與 API、型別、錯誤處理與資料保護、介面及測試。[程式撰寫標準](STANDARDS.md)
+- [AGENTS.md](../AGENTS.md) 已連到標準。[審查政策](REVIEW.md) 要求對照標準，指出不符合的規則與程式位置。
+- `UV_NO_CACHE=1 npm test` 通過全部 42 項測試。已用 Chrome 確認課程筆記顯示 3／16 步完成，下一步是[加入完整與快速檢查](../notes/week1day4-claude-code.html#step-4)。
+
 ## 2026-11-25｜Day 4 第 2 步「把 repo 整理成專案記憶」完成
 
 - MVP 的規劃文件已歸檔至 `docs/changes/mvp/`。[產品意圖](changes/mvp/intent.md) · [實作計畫](changes/mvp/plan.md)

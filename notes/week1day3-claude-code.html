@@ -639,7 +639,7 @@ td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space:
         <li><span class="num">3</span><a href="#step-3">訪談並更新 intent</a><span class="pill s-done">完成</span><span class="why">繁中 <code>docs/intent.md</code> 與規劃紀錄已提交至 <code>e124806</code></span></li>
         <li><span class="num">4</span><a href="#step-4">寫 spec</a><span class="pill s-done">完成</span><span class="why"><a href="../docs/spec.md"><code>docs/spec.md</code></a> 已對照八項成功標準並提交至 <code>13b0525</code></span></li>
         <li><span class="num">5</span><a href="#step-5">選外觀：三份設計稿</a><span class="pill s-done">完成</span><span class="why">已選定 A · 跟進工作台，設計稿與規格更新已提交至 <code>493ab08</code></span></li>
-        <li><span class="num">6</span><a href="#step-6">寫 plan</a><span class="pill s-done">完成</span><span class="why"><a href="../docs/plan.md"><code>docs/plan.md</code></a> 已依審閱結果修訂並提交至 <code>b7f8915</code></span></li>
+        <li><span class="num">6</span><a href="#step-6">寫 plan</a><span class="pill s-done">完成</span><span class="why"><a href="../docs/changes/mvp/plan.md">MVP 實作計畫</a>已依審閱結果修訂並提交至 <code>b7f8915</code></span></li>
         <li><span class="num">7</span><a href="#step-7">建置 MVP</a><span class="pill s-done">完成</span><span class="why">五個功能區塊已提交至 <code>0153385</code>，<code>npm test</code> 通過 36 項測試</span></li>
         <li><span class="num">8</span><a href="#step-8">一個指令跑所有測試</a><span class="pill s-done">完成</span><span class="why"><code>npm test</code> 通過 36 項測試，並驗證失敗時回報非零結束碼。用法已記入 <code>AGENTS.md</code></span></li>
         <li><span class="num">9</span><a href="#step-9">對照設計稿</a><span class="pill s-done">完成</span><span class="why">已比對兩種視窗尺寸，修正儀表板與看板的版面差異</span></li>
@@ -849,7 +849,7 @@ git commit -m "Plan: intent.md agreed"</code></pre></div>
         <div class="label">白話說明</div>
         <p>intent 是你的文件：要解決什麼問題、做到什麼算成功，由你決定。agent 的工作是找出寫得不清楚或沒寫到的地方，問你，再把答案寫回去。之後的 spec、plan、程式碼都從這份檔案出發，所以這裡的答案會一路影響到最後。</p>
         <p>Source Control 檢視在 VS Code 左側的活動列，會逐行顯示檔案改了什麼：綠色是新增，紅色是刪除。</p>
-        <p>目前的 <a href="../docs/intent.md"><code>docs/intent.md</code></a> 使用繁體中文，記錄第一版的問題、範圍與八條成功標準。</p>
+        <p><a href="../docs/changes/mvp/intent.md">MVP 產品意圖</a>使用繁體中文，記錄第一版的問題、範圍與八條成功標準。</p>
       </div>
       <div class="callout ed">
         <div class="label">Ed 的版本 <span class="addon">8690dec</span></div>
@@ -861,7 +861,7 @@ git commit -m "Plan: intent.md agreed"</code></pre></div>
           <li>第一版供小型企業的老闆兼業務使用，打開儀表板先回顧近期客戶往來與跟進事項。</li>
           <li>保留儀表板、公司、聯絡人、商機與商機看板。介面採繁體中文，金額一律使用新臺幣（TWD）。</li>
           <li>備妥工具與套件後，在自己的 Mac 上實測離線啟動與操作，並保留 Linux 和 Windows 的相容目標。</li>
-          <li><a href="../docs/intent.md"><code>docs/intent.md</code></a> 和 <a href="../docs/STATUS.md"><code>docs/STATUS.md</code></a> 的規劃更新已在 <code>mvp</code> 提交，commit 為 <code>e124806 Plan: intent.md agreed</code>。</li>
+          <li><a href="../docs/changes/mvp/intent.md">MVP 產品意圖</a>和 <a href="../docs/STATUS.md"><code>docs/STATUS.md</code></a> 的規劃更新已在 <code>mvp</code> 提交，commit 為 <code>e124806 Plan: intent.md agreed</code>。</li>
         </ul>
       </div>
     </section>
@@ -982,7 +982,7 @@ git commit -m "Build: plan.md"</code></pre></div>
       <div class="callout progress p-done">
         <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li>已依 A · 跟進工作台寫好 <a href="../docs/plan.md"><code>docs/plan.md</code></a>。四節涵蓋預計變動的檔案、八個建置階段、風險及對應驗收條件的測試。</li>
+          <li>已依 A · 跟進工作台寫好<a href="../docs/changes/mvp/plan.md">MVP 實作計畫</a>。四節涵蓋預計變動的檔案、八個建置階段、風險及對應驗收條件的測試。</li>
           <li>已依第一輪審閱補上測試資料庫隔離、刪除筆數重驗、拖放回應遺失等六項實作與驗收細節，並提交至 <code>b7f8915 Build: plan.md</code>。接下來進入<a href="#step-7">第 7 步</a>。</li>
         </ul>
       </div>
@@ -1024,7 +1024,7 @@ git commit -m "Build: the MVP"</code></pre></div>
       <div class="callout progress p-done">
         <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li>已依 <a href="../docs/plan.md"><code>docs/plan.md</code></a> 建置五個功能區塊，<code>npm test</code> 通過 6 項 Vitest、21 項 pytest 與 9 項 Chrome Playwright 測試。</li>
+          <li>已依 <a href="../docs/changes/mvp/plan.md">MVP 實作計畫</a>建置五個功能區塊，<code>npm test</code> 通過 6 項 Vitest、21 項 pytest 與 9 項 Chrome Playwright 測試。</li>
           <li>安裝、啟動及重設寫在 <a href="../docs/STATUS.md#在本機執行"><code>docs/STATUS.md</code></a>。MVP 已提交至 <code>0153385 Build: the MVP</code>，接下來進入<a href="#step-8">第 8 步</a>。</li>
         </ul>
       </div>
@@ -1058,7 +1058,7 @@ git commit -m "Build: the MVP"</code></pre></div>
       <div class="callout progress p-done">
         <div class="row"><span class="label">你的進度</span><span class="pill s-done">完成</span></div>
         <ul>
-          <li>已將 <code>npm test</code> 用法寫入 <a href="../AGENTS.md#testing"><code>AGENTS.md</code></a>。Playwright 會啟停測試服務並使用暫存資料庫。</li>
+          <li>已將 <code>npm test</code> 用法寫入 <a href="../AGENTS.md#測試"><code>AGENTS.md</code></a>。Playwright 會啟停測試服務並使用暫存資料庫。</li>
           <li>在 Mac 重新執行，Vitest 6 項、pytest 21 項、Chrome Playwright 9 項全部通過。另以暫存副本逐一模擬三套測試失敗，確認指令在失敗時停止並回傳非零結束碼。</li>
         </ul>
       </div>
@@ -1107,7 +1107,7 @@ git commit -m "Build: the MVP"</code></pre></div>
         <div class="code"><div class="code-head"><span>終端機</span><button class="copy" type="button">複製</button></div><pre><code>git add .
 git commit -m "Test: check command"</code></pre></div>
         <div class="label" style="margin-top:8px">成功標準 <span class="check-count" data-count-for="criteria"></span></div>
-        <p class="fine">清單對應訪談後的 <a href="../docs/intent.md"><code>docs/intent.md</code></a>。MVP 建置後可依 <a href="../docs/spec.md#驗收條件">規格的驗收條件</a> 逐項檢查。勾選紀錄儲存在目前的瀏覽器。</p>
+        <p class="fine">清單對應訪談後的 <a href="../docs/changes/mvp/intent.md">MVP 產品意圖</a>。MVP 建置後可依 <a href="../docs/spec.md#驗收條件">規格的驗收條件</a>逐項檢查。勾選紀錄儲存在目前的瀏覽器。</p>
         <ul class="checklist" data-list="criteria">
           <li><label><input type="checkbox" id="crit-1"><span><span class="no">1</span>非技術使用者備妥必要工具與相依套件後，能在自己的 Mac 上離線依文件用一個指令啟動，在瀏覽器開啟後抵達儀表板，並在各畫面看到範例資料。</span></label></li>
           <li><label><input type="checkbox" id="crit-2"><span><span class="no">2</span>使用者能從各自的表格新增、搜尋、排序、編輯及刪除公司、聯絡人和商機。刪除前會要求確認並說明對關聯紀錄的影響。重新整理或重新啟動後仍保留變更，重設指令會恢復範例資料。</span></label></li>
@@ -1317,10 +1317,10 @@ git commit -m "Maintain: ideas for later"</code></pre></div>
         <details class="pr-options" id="pr-share-prep">
           <summary>為什麼先建立分享資料夾？</summary>
           <p><code>community_contributions/</code> 是課程給學員分享成果的地方。每位學員建立自己的子資料夾，Ed 就能一眼看出這次 PR 提交的是誰的成果。</p>
-          <p>先在自己的 <code>main</code> 上，從 <code>accountable</code> 根目錄執行這兩個指令。你寫好的四份 Day 3 文件都在這個分支的 <code>docs/</code>。</p>
+          <p>從 <code>accountable</code> 根目錄執行以下指令。四份文件會從 Day 4 開始前的本機 <code>main</code> 提交 <code>6b29445</code> 取出，保留 Day 3 的文件內容。</p>
           <div class="code wrap"><div class="code-head"><span>建立資料夾並複製文件</span><button class="copy" type="button">複製</button></div><pre><code>mkdir -p community_contributions/StevenChou/ &amp;&amp;
-cp docs/intent.md docs/spec.md docs/plan.md docs/REVIEW.md \
-  community_contributions/StevenChou/</code></pre></div>
+git archive --format=tar 6b29445 docs/intent.md docs/spec.md docs/plan.md docs/REVIEW.md |
+  tar -xf - --strip-components=1 -C community_contributions/StevenChou/</code></pre></div>
           <p>在同一個資料夾新增 <code>README.md</code>，簡短介紹你做了什麼，再附上完整 MVP 的連結。<a href="https://github.com/StevenChou/accountable">你的 GitHub fork</a></p>
           <p>備齊五個檔案後，再用下方第一步建立 <code>share-day3</code>，並用 <code>git add</code> 將這個子資料夾加入提交。這樣 PR 的檔案範圍就容易核對。</p>
         </details>

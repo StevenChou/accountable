@@ -1,5 +1,12 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 2 步「把 repo 整理成專案記憶」完成
+
+- MVP 的規劃文件已歸檔至 `docs/changes/mvp/`。[產品意圖](changes/mvp/intent.md) · [實作計畫](changes/mvp/plan.md)
+- [產品規格](spec.md) 收錄問題背景、目前五個功能區塊與業務規則，補齊刪除前重新確認、跨分頁編輯、拖放回應遺失，以及大額統計精度等現有行為。[AGENTS.md](../AGENTS.md) 規定先讀產品規格，再讀當前分支的變更文件。[審查政策](REVIEW.md) 要求指出規格未涵蓋的程式行為。
+- 已將 [AGENTS.md](../AGENTS.md) 改為繁體中文，保留原有規則，並更新課程筆記與進度紀錄指向「測試」章節的連結。
+- 已驗證歸檔文件與課程連結，以及從 Day 4 開始前的提交取出四份 Day 3 分享文件的指令。`UV_NO_CACHE=1 npm test` 通過全部 42 項測試。課程筆記顯示 2／16 步完成，下一步是[寫下自己的 coding standards](../notes/week1day4-claude-code.html#step-3)。
+
 ## 2026-11-25｜Day 4 第 1 步「準備環境與分支」完成
 
 - 已從本機 `main`（`6b29445`，與 `fork/main` 同步）建立並切換至 `harness`。Homebrew 已安裝 gitleaks，`gitleaks version` 輸出 `8.30.1`。
@@ -70,7 +77,7 @@
 
 ## 2026-11-23｜測試指令驗證
 
-- 已在 [AGENTS.md](../AGENTS.md#testing) 記錄從 repo 根目錄執行 `npm test`、測試順序與暫存資料庫的設定。
+- 已在 [AGENTS.md](../AGENTS.md#測試) 記錄從 repo 根目錄執行 `npm test`、測試順序與暫存資料庫的設定。
 - 在 Mac 上重新執行 `npm test`，結果為 Vitest 6 項、pytest 21 項、Chrome Playwright 9 項，共 36 項通過，結束碼為 0。
 - 在暫存副本逐一模擬三套測試失敗。每次都確認 `npm test` 傳回非零結束碼，並在失敗的階段停止。
 - 第 8 步已完成。[Day 3 第 8 步](../notes/week1day3-claude-code.html#step-8)
@@ -99,7 +106,7 @@ npm run dev
 
 ## 2026-11-23｜MVP 實作計畫
 
-- 已依「A · 跟進工作台」撰寫 [MVP 實作計畫](plan.md)，列出預計變動的檔案、八個建置階段、風險與對應規格的驗收方式。
+- 已依「A · 跟進工作台」撰寫 [MVP 實作計畫](changes/mvp/plan.md)，列出預計變動的檔案、八個建置階段、風險與對應規格的驗收方式。
 - 已依審閱結果補齊六項實作與驗收細節，包括測試資料庫隔離、刪除筆數重驗、拖放回應遺失、直接新增已結案商機、讀取重試及跨欄統計。
 - 第 6 步的實作計畫已確認並提交至 `b7f8915`。[Day 3 課程筆記](../notes/week1day3-claude-code.html#step-6)
 
@@ -111,6 +118,6 @@ npm run dev
 
 ## 2026-11-21｜MVP 規劃
 
-- 已完成使用者訪談並更新 [產品意圖](intent.md)。確認第一版給小型企業的老闆兼業務使用，保留五個功能區塊，介面採繁體中文，金額採新臺幣。
+- 已完成使用者訪談並更新 [MVP 產品意圖](changes/mvp/intent.md)。確認第一版給小型企業的老闆兼業務使用，保留五個功能區塊，介面採繁體中文，金額採新臺幣。
 - 本機啟動與離線操作將在使用者的 Mac 上驗收，並保留 Mac、Linux 與 Windows 的相容目標。
 - [Day 3 課程筆記](../notes/week1day3-claude-code.html) 已標記第 3 步完成，並同步更新驗收清單。

@@ -1,17 +1,18 @@
 # Accountable
 
-SIDENOTE: this repo is part of a course by Ed Donner. If the student needs help, read `course/for_agents/`
+這個 repo 是 Ed Donner 課程的一部分。學員需要協助時，請查閱 `course/for_agents/`。
 
-## Where to find things
+## 專案文件
 
-- `docs/intent.md`: what we're building
-- `docs/TECH_STACK.md`: the stack
-- `docs/STATUS.md`: what's done so far
+- 先讀 [docs/spec.md](docs/spec.md)。這份規格描述產品現況，是判斷產品行為的依據。
+- 每項變更的 `intent.md` 和 `plan.md` 放在 `docs/changes/<branch name>/`。查閱變更文件時，只讀當前分支的資料夾（若有）。
+- 技術選型記錄在 [docs/TECH_STACK.md](docs/TECH_STACK.md)。
+- 已完成的工作記錄在 [docs/STATUS.md](docs/STATUS.md)。
 
-Update `docs/STATUS.md` when you finish a piece of work
+完成一項工作後，更新 `docs/STATUS.md`。
 
-## Testing
+## 測試
 
-- Run `npm test` from the repo root after installing the dependencies listed in `docs/STATUS.md`.
-- The command runs Vitest, pytest, and Playwright in order. It stops at the first failing suite and exits nonzero.
-- Playwright uses the installed Google Chrome, starts its own frontend and backend, and uses a temporary SQLite database.
+- 依 `docs/STATUS.md` 安裝相依套件後，從 repo 根目錄執行 `npm test`。
+- 測試依序執行 Vitest、pytest 和 Playwright。任一套測試失敗時，指令會停止並回傳非零結束碼。
+- Playwright 使用已安裝的 Google Chrome，自行啟動前後端服務，並使用暫存的 SQLite 資料庫。

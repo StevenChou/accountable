@@ -1,22 +1,42 @@
 {
   "name": "accountable",
   "private": true,
-  "workspaces": ["frontend"],
-  "engines": {"node": ">=24"},
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others --success first npm:dev:api npm:dev:web",
     "dev:api": "uv run --no-sync python -m backend.main",
     "dev:web": "npm run dev --workspace frontend",
     "seed": "uv run --no-sync python -m backend.seed",
-    "test": "npm run test:frontend && npm run test:backend && npm run test:e2e",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "npm run test:frontend && npm run test:backend",
     "test:frontend": "npm test --workspace frontend",
-    "test:backend": "uv run --no-sync pytest",
+    "test:backend": "uv run --no-sync pytest --cov",
     "test:e2e": "node e2e/run.mjs",
-    "build": "npm run build --workspace frontend"
+    "build": "npm run build --workspace frontend",
+    "check": "npm run check:code && npm test",
+    "check:quick": "npm run check:code && npm run test:unit",
+    "check:code": "npm run check:format && npm run lint && npm run typecheck && npm run check:secrets",
+    "check:format": "prettier --check frontend eslint.config.js scripts/check-secrets.mjs && uv run --no-sync ruff format --check backend",
+    "lint": "eslint --max-warnings=0 frontend && uv run --no-sync ruff check backend",
+    "typecheck": "tsc --noEmit -p frontend && uv run --no-sync ty check --error-on-warning backend",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "format": "prettier --write frontend eslint.config.js scripts/check-secrets.mjs && uv run --no-sync ruff format backend"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.55.0",
-    "concurrently": "^9.2.0"
+    "concurrently": "^9.2.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "typescript-eslint": "^8.74.0"
   }
 }

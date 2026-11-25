@@ -1,5 +1,12 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 4 步「加入完整與快速檢查」完成
+
+- 已建立 `npm run check`、`npm run check:quick` 和 `npm run format`。完整與快速檢查共用格式、lint、型別、機密掃描和單元測試，只有完整檢查會執行 Chrome 端對端測試。ESLint 與 Ruff 的函式循環複雜度上限均為 15。[專案指引](../AGENTS.md#測試)
+- Gitleaks 掃描本機可見的 Git 歷史、暫存區，以及工作區裡已追蹤或未被 Git 忽略的檔案。已用隔離的暫存 repo 驗證被忽略的 `.env` 可通過，加入 Git 則會掃描，輸出會遮蔽偵測到的金鑰。
+- 新增 17 項前端測試，涵蓋儀表板、看板、表單、刪除確認與活動時間軸。前端語句 89.68%、分支 84.09%、函式 84.35%、行 91.42%，後端語句 97.75%，均達到 80% 門檻。Vitest 與覆蓋率套件升至 5.1.1，安裝後 npm 回報 0 個已知漏洞。
+- `npm run check` 通過全部 59 項測試，包括 Vitest 24 項、pytest 24 項和 Playwright 11 項。`npm run check:quick` 通過 48 項單元測試。修正後的看板拖放情境另重跑三次，全數通過。[Day 4 課程筆記](../notes/week1day4-claude-code.html#step-4)
+
 ## 2026-11-25｜Day 4 第 3 步「寫下自己的 coding standards」完成
 
 - 依 Accountable 的現行做法整理六條繁體中文標準，涵蓋可讀性與變更範圍、規格與 API、型別、錯誤處理與資料保護、介面及測試。[程式撰寫標準](STANDARDS.md)
@@ -107,6 +114,7 @@ npm run dev
 在 Chrome 開啟 `http://127.0.0.1:5173/`。完成安裝後可離線執行 `npm run dev` 及使用應用程式。在同一個終端機按 Ctrl+C 停止前後端。
 
 - `npm test` 執行三套測試。Playwright 會啟停自己的服務，並用暫存資料庫。
+- 完整或快速檢查需要先安裝 gitleaks，並確認 `gitleaks version` 可執行。[安裝步驟](../notes/week1day4-claude-code.html#step-1)
 - `npm run seed` 會**清除目前選定的資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。
 - 日常資料預設存於 `data/accountable.sqlite3`。若需要獨立資料庫，可在啟動與重設時皆設定相同的 `ACCOUNTABLE_DB_PATH`。請將資料庫放在 `frontend/` 與 `node_modules/` 之外。
 

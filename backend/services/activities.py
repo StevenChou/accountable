@@ -14,10 +14,13 @@ def utc_text(value):
 
 def activity_query():
     return select(
-        activities, contacts.c.name.label("contact_name"), deals.c.name.label("deal_name"),
+        activities,
+        contacts.c.name.label("contact_name"),
+        deals.c.name.label("deal_name"),
     ).select_from(
-        activities.outerjoin(contacts, activities.c.contact_id == contacts.c.id)
-        .outerjoin(deals, activities.c.deal_id == deals.c.id)
+        activities.outerjoin(contacts, activities.c.contact_id == contacts.c.id).outerjoin(
+            deals, activities.c.deal_id == deals.c.id
+        )
     )
 
 
@@ -33,8 +36,13 @@ def present_activity(row):
 def timeline(connection, table, owner_id):
     get_row(connection, table, owner_id)
     owner = activities.c.contact_id if table is contacts else activities.c.deal_id
-    query = activity_query().where(owner == owner_id).order_by(
-        activities.c.occurred_at.desc(), activities.c.id.desc(),
+    query = (
+        activity_query()
+        .where(owner == owner_id)
+        .order_by(
+            activities.c.occurred_at.desc(),
+            activities.c.id.desc(),
+        )
     )
     return [present_activity(row) for row in connection.execute(query).mappings()]
 
@@ -55,10 +63,12 @@ def manual_values(values):
 
 
 def log_stage_change(connection, deal_id, previous, target):
-    connection.execute(activities.insert().values(
-        deal_id=deal_id,
-        kind="stage",
-        content=f"從{STAGES[previous][0]}移至{STAGES[target][0]}",
-        occurred_at=utc_text(clock.now()),
-        completed=False,
-    ))
+    connection.execute(
+        activities.insert().values(
+            deal_id=deal_id,
+            kind="stage",
+            content=f"從{STAGES[previous][0]}移至{STAGES[target][0]}",
+            occurred_at=utc_text(clock.now()),
+            completed=False,
+        )
+    )

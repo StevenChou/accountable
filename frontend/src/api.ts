@@ -3,7 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 type ErrorData = { message?: string; fields?: Record<string, string>; impact?: Record<string, number> }
 
 export class ApiError extends Error {
-  constructor(public status: number, public details: ErrorData) {
+  constructor(
+    public status: number,
+    public details: ErrorData,
+  ) {
     super(details.message || `無法讀寫資料（HTTP ${status}）。請稍後重試。`)
     this.name = 'ApiError'
   }
@@ -23,24 +26,27 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     const error: ErrorData = await response.json().catch(() => ({}))
     throw new ApiError(response.status, error)
   }
-  return response.status === 204 ? undefined as T : await response.json() as T
+  return response.status === 204 ? (undefined as T) : ((await response.json()) as T)
 }
 
-export function write<T = unknown>(path: string, method: 'POST' | 'PATCH' | 'DELETE', body?: unknown, signal?: AbortSignal) {
+export function write<T = unknown>(
+  path: string,
+  method: 'POST' | 'PATCH' | 'DELETE',
+  body?: unknown,
+  signal?: AbortSignal,
+) {
   return api<T>(path, { method, body: body === undefined ? undefined : JSON.stringify(body), signal })
 }
 
 export function useResource<T>(path: string) {
-  const [state, setState] = useState<{ path: string; data?: T; error?: unknown; busy: boolean }>(
-    { path, busy: true },
-  )
+  const [state, setState] = useState<{ path: string; data?: T; error?: unknown; busy: boolean }>({ path, busy: true })
   const active = useRef<AbortController | null>(null)
 
   const reload = useCallback(async () => {
     active.current?.abort()
     const controller = new AbortController()
     active.current = controller
-    setState(previous => ({ path, data: previous.path === path ? previous.data : undefined, busy: true }))
+    setState((previous) => ({ path, data: previous.path === path ? previous.data : undefined, busy: true }))
     try {
       const data = await api<T>(path, { signal: controller.signal })
       if (!controller.signal.aborted) {
@@ -48,7 +54,7 @@ export function useResource<T>(path: string) {
         return data
       }
     } catch (error) {
-      if (!controller.signal.aborted) setState(previous => ({ ...previous, error, busy: false }))
+      if (!controller.signal.aborted) setState((previous) => ({ ...previous, error, busy: false }))
     }
   }, [path])
 

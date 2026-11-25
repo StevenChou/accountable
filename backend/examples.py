@@ -26,25 +26,56 @@ def populate(connection):
     )
     company_ids, contact_ids, deal_ids = [], [], []
     for name, industry, slug in organizations:
-        company_ids.append(connection.execute(companies.insert().values(
-            name=name, industry=industry, website=f"https://{slug}.example",
-        )).inserted_primary_key[0])
+        company_ids.append(
+            connection.execute(
+                companies.insert().values(
+                    name=name,
+                    industry=industry,
+                    website=f"https://{slug}.example",
+                )
+            ).inserted_primary_key[0]
+        )
     for index, (name, title, status) in enumerate(people):
-        contact_ids.append(connection.execute(contacts.insert().values(
-            name=name, title=title, status=status, company_id=company_ids[index],
-            email=f"{organizations[index][2]}@example.com", phone=f"02-5550-010{index}",
-        )).inserted_primary_key[0])
+        contact_ids.append(
+            connection.execute(
+                contacts.insert().values(
+                    name=name,
+                    title=title,
+                    status=status,
+                    company_id=company_ids[index],
+                    email=f"{organizations[index][2]}@example.com",
+                    phone=f"02-5550-010{index}",
+                )
+            ).inserted_primary_key[0]
+        )
 
     sample_deals = {
         "new": [("門市包裝更新", 0, 95000, 11), ("客戶入口網站", 1, 140000, 68), ("產品型錄製作", 2, 75000, 42)],
-        "qualified": [("倉儲盤點流程", 3, 210000, 10), ("年度保養方案", 4, 125000, -3), ("南區教育訓練", 5, 185000, 18)],
+        "qualified": [
+            ("倉儲盤點流程", 3, 210000, 10),
+            ("年度保養方案", 4, 125000, -3),
+            ("南區教育訓練", 5, 185000, 18),
+        ],
         "proposal": [("產線稽核系統", 3, 280000, 4), ("門市數據整合", 0, 360000, 16), ("會員服務改版", 1, 150000, 23)],
-        "negotiation": [("年度維護合約", 5, 440000, 2), ("新廠監控部署", 4, 315000, -2), ("展示間設備升級", 2, 220000, 9)],
-        "won": [("採購系統第一期", 3, 380000, 0), ("門市設備換新", 0, 260000, 0), ("服務台導入", 5, 185000, 0),
-                ("進貨排程整合", 3, 280000, -1), ("預約網站維護", 1, 180000, -1), ("設備備品合約", 4, 145000, -1),
-                ("供應商入口平台", 0, 300000, -2), ("維修派工作業", 4, 210000, -2),
-                ("新店點導入", 0, 245000, -3), ("品質檢查建置", 3, 215000, -3),
-                ("設備資料遷移", 4, 240000, -5), ("工單流程顧問", 5, 110000, -5)],
+        "negotiation": [
+            ("年度維護合約", 5, 440000, 2),
+            ("新廠監控部署", 4, 315000, -2),
+            ("展示間設備升級", 2, 220000, 9),
+        ],
+        "won": [
+            ("採購系統第一期", 3, 380000, 0),
+            ("門市設備換新", 0, 260000, 0),
+            ("服務台導入", 5, 185000, 0),
+            ("進貨排程整合", 3, 280000, -1),
+            ("預約網站維護", 1, 180000, -1),
+            ("設備備品合約", 4, 145000, -1),
+            ("供應商入口平台", 0, 300000, -2),
+            ("維修派工作業", 4, 210000, -2),
+            ("新店點導入", 0, 245000, -3),
+            ("品質檢查建置", 3, 215000, -3),
+            ("設備資料遷移", 4, 240000, -5),
+            ("工單流程顧問", 5, 110000, -5),
+        ],
         "lost": [("連鎖據點巡檢", 0, 155000, 0), ("展會報到系統", 2, 245000, -1), ("線上訂房外掛", 1, 90000, -2)],
     }
     for stage, entries in sample_deals.items():
@@ -58,11 +89,21 @@ def populate(connection):
                 actual = today.replace(year=year, month=index + 1, day=day)
             else:
                 expected = today + timedelta(days=offset)
-            deal_ids.append(connection.execute(deals.insert().values(
-                name=name, company_id=company_ids[company], contact_id=contact_ids[company],
-                amount_cents=amount * 100, stage=stage, probability=STAGES[stage][1],
-                expected_close=expected, actual_close=actual, position=position,
-            )).inserted_primary_key[0])
+            deal_ids.append(
+                connection.execute(
+                    deals.insert().values(
+                        name=name,
+                        company_id=company_ids[company],
+                        contact_id=contact_ids[company],
+                        amount_cents=amount * 100,
+                        stage=stage,
+                        probability=STAGES[stage][1],
+                        expected_close=expected,
+                        actual_close=actual,
+                        position=position,
+                    )
+                ).inserted_primary_key[0]
+            )
 
     sample_activities = (
         ("stage", "從提案移至議價", "deal_id", 9, None, False),
@@ -78,8 +119,13 @@ def populate(connection):
     )
     for index, (kind, content, owner_type, owner, due, completed) in enumerate(sample_activities):
         owners = contact_ids if owner_type == "contact_id" else deal_ids
-        connection.execute(activities.insert().values(
-            **{owner_type: owners[owner]}, kind=kind, content=content,
-            occurred_at=utc_text(now.astimezone(UTC) - timedelta(hours=2 + index * 10)),
-            follow_up=None if due is None else today + timedelta(days=due), completed=completed,
-        ))
+        connection.execute(
+            activities.insert().values(
+                **{owner_type: owners[owner]},
+                kind=kind,
+                content=content,
+                occurred_at=utc_text(now.astimezone(UTC) - timedelta(hours=2 + index * 10)),
+                follow_up=None if due is None else today + timedelta(days=due),
+                completed=completed,
+            )
+        )

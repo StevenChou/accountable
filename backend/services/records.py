@@ -16,7 +16,8 @@ def get_row(connection, table, record_id: int):
 
 def validate_links(connection, values):
     for field, table, label in (
-        ("company_id", companies, "公司"), ("contact_id", contacts, "聯絡人"),
+        ("company_id", companies, "公司"),
+        ("contact_id", contacts, "聯絡人"),
     ):
         key = values.get(field)
         if key is not None and connection.scalar(select(table.c.id).where(table.c.id == key)) is None:
@@ -27,11 +28,11 @@ def record_query(table):
     if table is companies:
         return select(companies)
     if table is contacts:
-        return select(contacts, companies.c.name.label("company_name")).select_from(
-            contacts.outerjoin(companies)
-        )
+        return select(contacts, companies.c.name.label("company_name")).select_from(contacts.outerjoin(companies))
     return select(
-        deals, companies.c.name.label("company_name"), contacts.c.name.label("contact_name"),
+        deals,
+        companies.c.name.label("company_name"),
+        contacts.c.name.label("contact_name"),
     ).select_from(deals.outerjoin(companies).outerjoin(contacts, deals.c.contact_id == contacts.c.id))
 
 
@@ -47,22 +48,20 @@ def present(table, row, today):
 def list_records(connection, table):
     today = clock.today()
     return [
-        present(table, row, today)
-        for row in connection.execute(record_query(table).order_by(table.c.id)).mappings()
+        present(table, row, today) for row in connection.execute(record_query(table).order_by(table.c.id)).mappings()
     ]
 
 
 def detail(connection, table, record_id: int):
-    row = connection.execute(
-        record_query(table).where(table.c.id == record_id)
-    ).mappings().first()
+    row = connection.execute(record_query(table).where(table.c.id == record_id)).mappings().first()
     if row is None:
         raise missing()
     result = present(table, row, clock.today())
     if table is companies:
         for key, related in (("contacts", contacts), ("deals", deals)):
             result[key] = [
-                dict(item) for item in connection.execute(
+                dict(item)
+                for item in connection.execute(
                     select(related.c.id, related.c.name)
                     .where(related.c.company_id == record_id)
                     .order_by(related.c.name, related.c.id)
@@ -82,9 +81,13 @@ def delete_impact(connection, table, record_id: int):
     owned = owner == record_id
     result = {
         "activities": connection.scalar(select(func.count()).where(owned)),
-        "follow_ups": connection.scalar(select(func.count()).where(
-            owned, activities.c.follow_up.is_not(None), activities.c.completed.is_(False),
-        )),
+        "follow_ups": connection.scalar(
+            select(func.count()).where(
+                owned,
+                activities.c.follow_up.is_not(None),
+                activities.c.completed.is_(False),
+            )
+        ),
     }
     if table is contacts:
         result["deals"] = connection.scalar(select(func.count()).where(deals.c.contact_id == record_id))

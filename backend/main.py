@@ -77,7 +77,8 @@ def create_app():
             field = error["loc"][-1] if error["loc"] else "body"
             fields[str(field)] = FIELD_ERRORS.get(field, "請檢查輸入值。")
         return JSONResponse(
-            status_code=422, content={"message": "請檢查標示的欄位。", "fields": fields},
+            status_code=422,
+            content={"message": "請檢查標示的欄位。", "fields": fields},
         )
 
     @app.exception_handler(OperationalError)

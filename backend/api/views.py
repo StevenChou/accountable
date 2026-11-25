@@ -3,7 +3,6 @@ import os
 from fastapi import APIRouter, Request
 
 from backend.api.errors import missing
-
 from backend.api.models import MoveInput
 from backend.api.records import write
 from backend.services import summary

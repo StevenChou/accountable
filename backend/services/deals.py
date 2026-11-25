@@ -8,9 +8,9 @@ from backend.services.records import get_row
 
 
 def lane_order(connection, stage):
-    return list(connection.scalars(
-        select(deals.c.id).where(deals.c.stage == stage).order_by(deals.c.position, deals.c.id)
-    ))
+    return list(
+        connection.scalars(select(deals.c.id).where(deals.c.stage == stage).order_by(deals.c.position, deals.c.id))
+    )
 
 
 def write_order(connection, ids):

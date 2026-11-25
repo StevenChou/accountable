@@ -22,14 +22,29 @@ describe('輸入與顯示', () => {
 
 describe('看板落點', () => {
   const card = (id: number, stage: Deal['stage'] = 'proposal'): Deal => ({
-    id, stage, name: '商機', company_id: null, company_name: null, contact_id: null, contact_name: null,
-    probability: 50, amount_cents: 0, overdue: false, expected_close: null, actual_close: null, close_date: null,
+    id,
+    stage,
+    name: '商機',
+    company_id: null,
+    company_name: null,
+    contact_id: null,
+    contact_name: null,
+    probability: 50,
+    amount_cents: 0,
+    overdue: false,
+    expected_close: null,
+    actual_close: null,
+    close_date: null,
   })
 
   it('忽略拖回原位，保留欄首、欄中、欄末及空欄的插入點', () => {
     const active = card(2)
-    const lane: Lane = { stage: 'proposal', cards: [card(1), active, card(3), card(4)], count: 4,
-      totals: { amount_cents: 0, expected_cents: 0, count: 4 } }
+    const lane: Lane = {
+      stage: 'proposal',
+      cards: [card(1), active, card(3), card(4)],
+      count: 4,
+      totals: { amount_cents: 0, expected_cents: 0, count: 4 },
+    }
     expect(moveTarget(active, { stage: 'proposal', before_id: 2 }, lane)).toBeNull()
     expect(moveTarget(active, { stage: 'proposal', before_id: 3 }, lane)).toBeNull()
     for (const before_id of [1, 4, null]) {

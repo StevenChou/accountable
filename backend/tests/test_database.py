@@ -53,9 +53,8 @@ def test_start_and_reset_refuse_unowned_path(tmp_path, monkeypatch, mode):
     if mode == "outside":
         monkeypatch.setenv("ACCOUNTABLE_DB_PATH", str(tmp_path / "outside.sqlite3"))
 
-    with pytest.raises(RuntimeError):
-        with TestClient(create_app(), base_url="http://127.0.0.1"):
-            pytest.fail("測試服務應在連線前中止")
+    with pytest.raises(RuntimeError), TestClient(create_app(), base_url="http://127.0.0.1"):
+        pytest.fail("測試服務應在連線前中止")
     with pytest.raises(RuntimeError):
         reset()
 
@@ -96,6 +95,6 @@ def test_reset_preserves_database_if_population_fails(test_database, monkeypatch
             db.initialize(engine, reset=True)
         with engine.connect() as connection:
             assert connection.scalar(select(func.count()).select_from(companies)) == before
-            assert connection.scalar(select(func.count()).select_from(deals)) > 6
+            assert connection.execute(select(func.count()).select_from(deals)).scalar_one() > 6
     finally:
         engine.dispose()

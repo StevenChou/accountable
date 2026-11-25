@@ -242,6 +242,8 @@ test('跨欄更新成交機率和精確統計，並保留各種落點', async ({
   await expect(page.getByRole('region', { name: '提案', exact: true }).getByRole('link', { name: '精確案例' })).toBeVisible()
   const saved = await (await request.get(`/api/deals/${item.id}`)).json()
   expect(saved.stage).toBe('proposal')
+  // End the drag session before testing the separate add form. The pointer sensor briefly suppresses clicks after a drop.
+  await page.reload()
   await page.getByRole('button', { name: '在成交新增商機' }).click()
   const dialog = page.getByRole('dialog')
   await expect(dialog.getByLabel(/實際結案日/)).toHaveValue(localDate())

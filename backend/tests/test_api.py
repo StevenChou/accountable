@@ -47,7 +47,10 @@ def test_large_aggregate_amounts_keep_every_cent(client):
     dashboard = client.get("/api/dashboard").json()
     assert dashboard["open"] == pipeline["totals"]
     assert dashboard["won"]["amount_cents"] == dashboard["months"][-1]["amount_cents"] == total
-    assert [row["amount_cents"] for row in dashboard["stage_amounts"] if row["stage"] in ("new", "won")] == [total, total]
+    assert [row["amount_cents"] for row in dashboard["stage_amounts"] if row["stage"] in ("new", "won")] == [
+        total,
+        total,
+    ]
 
 
 def test_crud_links_and_delete_impact(client):
@@ -95,11 +98,19 @@ def test_delete_rechecks_preview_and_cascades(client):
     assert client.patch(f"/api/activities/{entry['id']}", json={"completed": True}).status_code == 404
 
 
-@pytest.mark.parametrize(("field", "value"), [
-    ("amount_cents", -1), ("amount_cents", 2.5), ("probability", 101),
-    ("probability", 50.5), ("stage", "unknown"), ("expected_close", "2026-02-30"),
-    ("company_id", 9999), ("contact_id", 9999),
-])
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("amount_cents", -1),
+        ("amount_cents", 2.5),
+        ("probability", 101),
+        ("probability", 50.5),
+        ("stage", "unknown"),
+        ("expected_close", "2026-02-30"),
+        ("company_id", 9999),
+        ("contact_id", 9999),
+    ],
+)
 def test_deal_validation(client, field, value):
     values = {"name": "欄位驗證", "stage": "new", "amount_cents": 500, "probability": 10}
     values[field] = value
@@ -125,7 +136,9 @@ def test_stage_transition_and_sorting_are_persisted(client):
     assert [card["id"] for card in lane(client, "negotiation")["cards"]] == [second["id"], first["id"]]
     assert move(client, item["id"], "negotiation", first["id"]).status_code == 200
     assert [card["id"] for card in lane(client, "negotiation")["cards"]] == [
-        second["id"], item["id"], first["id"],
+        second["id"],
+        item["id"],
+        first["id"],
     ]
     url = f"/api/deals/{item['id']}"
     record = client.get(url).json()
@@ -135,14 +148,18 @@ def test_stage_transition_and_sorting_are_persisted(client):
     assert client.get(url).json()["probability"] == 66
     assert move(client, item["id"], "negotiation").status_code == 200
     assert [card["id"] for card in lane(client, "negotiation")["cards"]] == [
-        second["id"], first["id"], item["id"],
+        second["id"],
+        first["id"],
+        item["id"],
     ]
     assert move(client, item["id"], "new", second["id"]).status_code == 422
     assert len(client.get(f"{url}/activities").json()) == 1
 
     with TestClient(create_app(), base_url="http://127.0.0.1") as restarted:
         assert [card["id"] for card in lane(restarted, "negotiation")["cards"]] == [
-            second["id"], first["id"], item["id"],
+            second["id"],
+            first["id"],
+            item["id"],
         ]
 
     won = client.patch(url, json={"stage": "won", "probability": 66}).json()
@@ -181,14 +198,24 @@ def test_activities_follow_up_groups_and_report(client):
     for i, (offset, group) in enumerate(((-1, "late"), (0, "today"), (7, "soon"), (8, "later"))):
         owner = f"contacts/{contact['id']}" if i < 2 else f"deals/{item['id']}"
         created[group] = add(
-            client, f"{owner}/activities", kind="email", content=group,
+            client,
+            f"{owner}/activities",
+            kind="email",
+            content=group,
             follow_up=(base + timedelta(days=offset)).isoformat(),
             occurred_at=f"2026-01-02T0{i}:00:00+08:00",
         )
     dashboard = client.get("/api/dashboard").json()
     assert [entry["group"] for entry in dashboard["follow_ups"]] == list(created)
     assert [entry["content"] for entry in dashboard["recent"]] == list(reversed(created))
-    assert [month["month"] for month in dashboard["months"]] == ["2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01"]
+    assert [month["month"] for month in dashboard["months"]] == [
+        "2025-08",
+        "2025-09",
+        "2025-10",
+        "2025-11",
+        "2025-12",
+        "2026-01",
+    ]
     assert client.patch(f"/api/activities/{created['soon']['id']}", json={"completed": True}).status_code == 200
     assert client.patch(f"/api/activities/{created['later']['id']}", json={"follow_up": None}).status_code == 200
     for i in range(12):

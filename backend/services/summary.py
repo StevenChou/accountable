@@ -54,19 +54,21 @@ def dashboard(connection):
     today = clock.today()
     records = list(connection.execute(select(deals)).mappings())
     recent_query = activity_query().order_by(activities.c.occurred_at.desc(), activities.c.id.desc()).limit(10)
-    follow_up_query = activity_query().where(
-        activities.c.follow_up.is_not(None), activities.c.completed.is_(False),
-    ).order_by(activities.c.follow_up, activities.c.id)
+    follow_up_query = (
+        activity_query()
+        .where(
+            activities.c.follow_up.is_not(None),
+            activities.c.completed.is_(False),
+        )
+        .order_by(activities.c.follow_up, activities.c.id)
+    )
     recent = [present_activity(row) for row in connection.execute(recent_query).mappings()]
     follow_ups = [
         {**present_activity(row), "group": follow_up_group(row["follow_up"], today)}
         for row in connection.execute(follow_up_query).mappings()
     ]
 
-    months = {
-        month: {"month": month, "count": 0, "amount_cents": 0}
-        for month in six_months(today)
-    }
+    months = {month: {"month": month, "count": 0, "amount_cents": 0} for month in six_months(today)}
     stage_amounts = dict.fromkeys(STAGES, 0)
     for record in records:
         stage = record["stage"]
@@ -87,5 +89,7 @@ def dashboard(connection):
         "won": months[today.isoformat()[:7]],
         "open": open_totals(records),
         "months": list(months.values()),
-        "stage_amounts": [{"stage": stage, "amount_cents": json_cents(amount)} for stage, amount in stage_amounts.items()],
+        "stage_amounts": [
+            {"stage": stage, "amount_cents": json_cents(amount)} for stage, amount in stage_amounts.items()
+        ],
     }

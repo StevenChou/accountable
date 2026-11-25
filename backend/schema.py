@@ -1,6 +1,17 @@
 from sqlalchemy import (
-    Boolean, CheckConstraint, Column, Date, Enum, ForeignKey, Integer,
-    MetaData, String, Table, and_, column, or_,
+    Boolean,
+    CheckConstraint,
+    Column,
+    Date,
+    Enum,
+    ForeignKey,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    and_,
+    column,
+    or_,
 )
 
 STAGES = {
@@ -19,7 +30,8 @@ MAX_SAFE_INTEGER = 2**53 - 1
 metadata = MetaData()
 
 companies = Table(
-    "companies", metadata,
+    "companies",
+    metadata,
     Column("id", Integer, primary_key=True),
     Column("name", String, nullable=False),
     Column("website", String),
@@ -28,7 +40,8 @@ companies = Table(
     sqlite_autoincrement=True,
 )
 contacts = Table(
-    "contacts", metadata,
+    "contacts",
+    metadata,
     Column("id", Integer, primary_key=True),
     Column("name", String, nullable=False),
     Column("company_id", ForeignKey(companies.c.id, ondelete="SET NULL"), index=True),
@@ -39,7 +52,8 @@ contacts = Table(
     sqlite_autoincrement=True,
 )
 deals = Table(
-    "deals", metadata,
+    "deals",
+    metadata,
     Column("id", Integer, primary_key=True),
     Column("name", String, nullable=False),
     Column("company_id", ForeignKey(companies.c.id, ondelete="SET NULL"), index=True),
@@ -52,14 +66,17 @@ deals = Table(
     Column("position", Integer, nullable=False),
     CheckConstraint(column("amount_cents").between(0, MAX_SAFE_INTEGER)),
     CheckConstraint(column("probability").between(0, 100)),
-    CheckConstraint(or_(
-        and_(column("stage").in_(CLOSED), column("actual_close").is_not(None)),
-        and_(column("stage").not_in(CLOSED), column("actual_close").is_(None)),
-    )),
+    CheckConstraint(
+        or_(
+            and_(column("stage").in_(CLOSED), column("actual_close").is_not(None)),
+            and_(column("stage").not_in(CLOSED), column("actual_close").is_(None)),
+        )
+    ),
     sqlite_autoincrement=True,
 )
 activities = Table(
-    "activities", metadata,
+    "activities",
+    metadata,
     Column("id", Integer, primary_key=True),
     Column("contact_id", ForeignKey(contacts.c.id, ondelete="CASCADE"), index=True),
     Column("deal_id", ForeignKey(deals.c.id, ondelete="CASCADE"), index=True),
@@ -68,10 +85,12 @@ activities = Table(
     Column("occurred_at", String, nullable=False),
     Column("follow_up", Date),
     Column("completed", Boolean, nullable=False, default=False),
-    CheckConstraint(or_(
-        and_(column("contact_id").is_not(None), column("deal_id").is_(None)),
-        and_(column("contact_id").is_(None), column("deal_id").is_not(None)),
-    )),
+    CheckConstraint(
+        or_(
+            and_(column("contact_id").is_not(None), column("deal_id").is_(None)),
+            and_(column("contact_id").is_(None), column("deal_id").is_not(None)),
+        )
+    ),
     sqlite_autoincrement=True,
 )
 initialized = Table("initialized", metadata, Column("id", Integer, primary_key=True))

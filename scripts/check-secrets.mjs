@@ -43,7 +43,10 @@ function scanWorkingTree() {
 }
 
 try {
-  process.exitCode = scan('git', '--log-opts=--all', '.') || scan('git', '--staged', '.') || scanWorkingTree()
+  const scanStaged = () => scan('git', '--staged', '.')
+  process.exitCode = process.argv.includes('--staged')
+    ? scanStaged()
+    : scan('git', '--log-opts=--all', '.') || scanStaged() || scanWorkingTree()
 } catch (error) {
   console.error(error.message)
   process.exitCode = 1

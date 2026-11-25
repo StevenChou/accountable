@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint'
 export default defineConfig([
   globalIgnores(['frontend/dist/', 'frontend/coverage/']),
   {
-    files: ['frontend/**/*.{js,mjs,ts,tsx}'],
+    files: ['frontend/**/*.{js,mjs,ts,tsx}', 'scripts/*.mjs', 'eslint.config.js'],
     extends: [js.configs.recommended],
     rules: { complexity: ['error', 15] },
   },
@@ -22,7 +22,7 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['frontend/*.config.{js,mjs,ts}'],
+    files: ['frontend/*.config.{js,mjs,ts}', 'scripts/*.mjs', 'eslint.config.js'],
     languageOptions: { globals: globals.node },
   },
 ])

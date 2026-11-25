@@ -1,16 +1,37 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(npm test)"
-    ],
-    "deny": [
-      "Read(./.env)"
-    ],
-    "ask": [
-      "Bash(git push *)"
-    ]
+    "allow": ["Bash(npm test)"],
+    "deny": ["Read(./.env)", "Edit(**/.env)"],
+    "ask": ["Bash(git push *)"]
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/scripts/claude-stop-check.mjs"],
+            "statusMessage": "執行 npm run check:quick"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/scripts/claude-protect-env.mjs"],
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
   }
 }

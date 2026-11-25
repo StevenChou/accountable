@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 5 步「把檢查接到 Git 與 Claude Code」完成
+
+- 已在本機安裝 Lefthook 的 pre-commit。在隔離的 repo 實際提交，確認 Prettier 與 Ruff 格式化並重新暫存要提交的檔案，未暫存的修改仍保留。另用 lint 錯誤、型別錯誤和虛構金鑰分別驗證提交會被攔下。提交時會略過測試。[Lefthook 設定](../lefthook.yml)
+- 用實際的 Claude Code 2.1.325 CLI 搭配本機模擬模型回應，確認 Stop hook 在快速檢查通過時正常結束。失敗會回傳錯誤並攔下第一次停止。Claude 呼叫工具嘗試修正後，第二次停止可正常完成，快速檢查只執行一次。[Claude Code 設定](../.claude/settings.json)
+- 在隔離的工作副本驗證，Claude Code 嘗試用 `Write` 或直接指向 `.env` 的 `Bash` 命令修改空白測試檔時都被拒絕，`.env.example` 可以寫入。`npm run check` 通過全部 59 項測試，課程筆記顯示 5／16 步完成。[Day 4 課程筆記](../notes/week1day4-claude-code.html#step-5)
+
 ## 2026-11-25｜Day 4 第 4 步「加入完整與快速檢查」完成
 
 - 已建立 `npm run check`、`npm run check:quick` 和 `npm run format`。完整與快速檢查共用格式、lint、型別、機密掃描和單元測試，只有完整檢查會執行 Chrome 端對端測試。ESLint 與 Ruff 的函式循環複雜度上限均為 15。[專案指引](../AGENTS.md#測試)
@@ -115,6 +121,7 @@ npm run dev
 
 - `npm test` 執行三套測試。Playwright 會啟停自己的服務，並用暫存資料庫。
 - 完整或快速檢查需要先安裝 gitleaks，並確認 `gitleaks version` 可執行。[安裝步驟](../notes/week1day4-claude-code.html#step-1)
+- `npm ci` 後可用 `npm run hooks:install` 安裝或確認本機 Git pre-commit hook。
 - `npm run seed` 會**清除目前選定的資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。
 - 日常資料預設存於 `data/accountable.sqlite3`。若需要獨立資料庫，可在啟動與重設時皆設定相同的 `ACCOUNTABLE_DB_PATH`。請將資料庫放在 `frontend/` 與 `node_modules/` 之外。
 

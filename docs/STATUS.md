@@ -1,5 +1,10 @@
 # 專案進度
 
+## 2026-11-25｜Day 2–4 專案開發流程速查完成
+
+- [專案開發流程速查](../notes/project-development-flow.html) 整合 Day 2 開工與權限設定、Day 3 的 MVP 與驗收，以及 Day 4 的 harness、審查與 CI。流程圖標出首次 MVP 與既有專案的驗收和合併門檻，並附課後文件分享的 PR 步驟。
+- 已用 Chrome 離線驗證桌面與手機版、兩種專案路徑、三條修正回路及 Day 2–4 課程連結。`UV_NO_CACHE=1 npm test` 通過全部 42 項測試。
+
 ## 2026-11-25｜Day 4 學習筆記完成
 
 - [Day 4 Claude Code 學習筆記](../notes/week1day4-claude-code.html) 沿用 Day 3 版型，分 16 步帶你建立 Harness，並用六個階段實作深色模式。逐字核對講義的 42 個英文提示詞與指令區塊。

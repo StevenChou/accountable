@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Code Day 4 · Harness Engineering 與深色模式</title>
+<style>
+/* Layout and palette follow the Day 3 notes. */
+:root {
+  --bg: #F0F4F5;
+  --panel: #FFFFFF;
+  --ink: #073B4C;
+  --ink-soft: #46656F;
+  --line: #D6E1E4;
+  --link: #0B6E8F;
+  --code-bg: #073B4C;
+  --code-fg: #E4EDEF;
+  --code-muted: #8FB0B8;
+  --code-btn: #0E4B5F;
+  --code-btn-hover: #145C73;
+  --tint-cerulean: #E0EFF5;
+  --tint-neutral: #E4EBED;
+  --ink-green: #036B53;
+  --ink-cerulean: #0B5C78;
+  --neutral-fill: #D3DEE1;
+  --sea: #06D6A0;
+  --marigold: #FFC145;
+  --coral: #F78C6B;
+  --cerulean-deep: #0B6E8F;
+  --raspberry-deep: #C9264F;
+  --midnight: #073B4C;
+  --white: #FFFFFF;
+
+  --font-body: "Instrument Sans", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --radius-panel: 16px;
+  --radius-inner: 12px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+code, kbd, pre { font-family: var(--font-mono); }
+:not(pre) > code {
+  font-size: 0.86em;
+  background: var(--tint-neutral);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3em; }
+li + li { margin-top: 4px; }
+
+/* ---------- header ---------- */
+.masthead {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-block: 48px 32px;
+  display: grid;
+  gap: 14px;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-green);
+}
+.masthead h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+@media (max-width: 600px) {
+  .title-separator { display: none; }
+  .title-topic { display: block; }
+}
+.lede { font-size: 17px; color: var(--ink-soft); max-width: 46em; }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.meta span { display: inline-flex; gap: 6px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.meta b { font-weight: 600; color: var(--ink); }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+.toc-side { display: none; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 232px minmax(0, 1fr); gap: 56px; }
+  .toc-side { display: block; }
+  .toc-mobile { display: none; }
+}
+.content { display: grid; gap: 28px; min-width: 0; max-width: 800px; }
+
+/* ---------- table of contents ---------- */
+.toc-side nav {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.toc-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 10px; }
+.toc-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+.toc-list li + li { margin-top: 0; }
+.toc-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.toc-list a:hover { background: var(--panel); }
+.toc-list a[aria-current="true"] { background: var(--panel); font-weight: 600; }
+.toc-sep { height: 1px; background: var(--line); margin: 8px 10px; }
+.toc-group {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 10px 10px 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toc-group .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-width: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-left: auto; }
+.toc-mobile {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 4px 18px;
+}
+.toc-mobile summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.toc-mobile .toc-list { padding-bottom: 12px; }
+
+/* ---------- status ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.s-done { background: var(--sea); color: var(--midnight); }
+.s-next { background: var(--marigold); color: var(--midnight); }
+.s-none { background: var(--neutral-fill); color: var(--ink); }
+
+/* ---------- stage tags ---------- */
+.stage-line { margin-bottom: 4px; }
+.stage-tag {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+.st-prep { background: var(--neutral-fill); color: var(--ink); }
+.st-1 { background: var(--sea); color: var(--midnight); }
+.st-2 { background: var(--marigold); color: var(--midnight); }
+.st-3 { background: var(--coral); color: var(--midnight); }
+.st-4 { background: var(--cerulean-deep); color: var(--white); }
+.st-5 { background: var(--raspberry-deep); color: var(--white); }
+.st-6 { background: var(--midnight); color: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.swatch.st-6 { box-shadow: inset 0 0 0 1px var(--line); }
+
+/* ---------- panels & sections ---------- */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+@media (max-width: 600px) { .panel { padding: 20px 18px; } }
+.panel > h2 { font-size: 24px; font-weight: 700; }
+.section-note { color: var(--ink-soft); font-size: 15px; }
+.prose { display: grid; gap: 12px; }
+.sub-h { font-size: 16.5px; font-weight: 700; margin: 10px 0 0; line-height: 1.4; }
+.fine { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+
+/* ---------- overview ---------- */
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.overview { list-style: none; padding: 0; display: grid; gap: 0; }
+.overview li + li { margin-top: 0; }
+.overview li {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.overview li:last-child { border-bottom: 0; }
+.overview .num { font-family: var(--font-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.overview a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.overview a:hover { text-decoration: underline; }
+.overview .why { grid-column: 2 / 4; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.next { background: var(--tint-neutral); border-radius: var(--radius-inner); padding: 14px 16px; font-size: 15px; }
+
+/* ---------- glossary ---------- */
+.glossary { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
+@media (min-width: 720px) { .glossary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; } }
+.glossary div { padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.glossary dt { font-weight: 700; margin-bottom: 2px; }
+.glossary dd { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-inner); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font-size: 13px; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+.stage-table { min-width: 700px; font-size: 14px; }
+.stage-table td:nth-child(1), .stage-table td:nth-child(2) { white-space: nowrap; }
+.stage-table td:nth-child(3) { min-width: 11em; }
+.stage-table code { overflow-wrap: normal; white-space: nowrap; }
+.cmd-table { min-width: 620px; }
+.cmd-table td:nth-child(2) code { white-space: nowrap; }
+.compare { min-width: 640px; font-size: 14px; }
+.compare thead th { white-space: normal; }
+.compare tbody th { font-weight: 700; width: 8em; }
+
+/* ---------- steps ---------- */
+.step-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.step-no {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight);
+  color: var(--sea);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  flex: none;
+}
+.step-titles { flex: 1 1 220px; min-width: 0; }
+.step-titles h2 { font-size: 22px; font-weight: 700; }
+.step-titles .en { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); }
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.block { display: grid; gap: 12px; min-width: 0; }
+.callout { border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.callout .label { margin-bottom: 0; }
+.plain { background: var(--tint-cerulean); }
+.plain .label { color: var(--ink-cerulean); }
+.guide { background: var(--tint-neutral); }
+
+/* ---------- code ---------- */
+.code { background: var(--code-bg); border-radius: var(--radius-inner); min-width: 0; overflow: hidden; }
+.details { border: 1px solid var(--line); border-radius: var(--radius-inner); padding: 10px 14px; }
+.details summary { color: var(--link); cursor: pointer; font-weight: 600; }
+.details > :not(summary) { margin-top: 10px; }
+.code-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 0 16px;
+  font-size: 12.5px;
+  color: var(--code-muted);
+  font-family: var(--font-mono);
+}
+.copy {
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--code-fg);
+  background: var(--code-btn);
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+.copy:hover { background: var(--code-btn-hover); }
+.code pre {
+  margin: 0;
+  padding: 10px 16px 16px;
+  overflow-x: auto;
+  color: var(--code-fg);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.code.wrap pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.code pre code { background: transparent; padding: 0; font-size: inherit; }
+/* inline code on tinted areas sits on the panel color so the chip stays visible in both themes */
+.callout code, .checklist code, .next code { background: var(--panel); }
+.short-command { white-space: nowrap; }
+.translation { font-size: 15px; color: var(--ink-soft); }
+
+/* ---------- checklist ---------- */
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist li + li { margin-top: 0; }
+.checklist label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.checklist input { width: 18px; height: 18px; margin: 3px 0 0; flex: none; accent-color: var(--ink-green); }
+.checklist input:checked + span { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+
+.footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
+@media (min-width: 1100px) { .footer { padding-left: 288px; } }
+.checklist-heading { margin: 0 0 6px; }
+.progress-total { font-weight: 700; font-variant-numeric: tabular-nums; }
+:target { scroll-margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Accountable 課程筆記 · Week 1 Day 4</div>
+  <h1>Claude Code 的 Day 4 <span class="title-separator" aria-hidden="true">·</span> <span class="title-topic">建立 Harness，實作深色模式</span></h1>
+  <p class="lede">先把檢查、審查與回饋接進工作流程，再用深色模式走一遍 Plan 到 Maintain。</p>
+  <div class="meta">
+    <span><b>原文</b><a href="../course/instructions/week1day4.md"><code>course/instructions/week1day4.md</code></a></span>
+    <span><b>起始快照</b><time datetime="2026-11-25">2026-11-25</time></span>
+    <span><b>前一課</b><a href="week1day3-claude-code.html">Week 1 Day 3</a></span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc-side">
+    <nav aria-label="桌面目錄">
+      <div class="toc-title">目錄</div>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#commits"><span class="toc-num"></span>分支與 commit</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+        <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · Harness</li>
+        <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="1"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="2"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>寫下自己的 coding standards<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="3"></span></a></li>
+        <li><a href="#step-4"><span class="toc-num">4</span>加入完整與快速檢查<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="4"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>把檢查接到 Git 與 Claude Code<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="5"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>把完整檢查接到 GitHub Actions<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="6"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>用假金鑰驗證兩層防護<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="7"></span></a></li>
+        <li><a href="#step-8"><span class="toc-num">8</span>把改善步驟寫入 harness<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="8"></span></a></li>
+        <li class="toc-group"><span class="swatch st-1" aria-hidden="true"></span>第 2 部分 · 深色模式</li>
+        <li><a href="#step-9"><span class="toc-num">9</span>開深色模式分支並確認 intent<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="9"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>讓 spec 描述變更後的產品<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="10"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>寫分階段的實作計畫<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="11"></span></a></li>
+        <li><a href="#step-12"><span class="toc-num">12</span>依 plan 實作並驗證各階段<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="12"></span></a></li>
+        <li><a href="#step-13"><span class="toc-num">13</span>跑完整檢查並留下四張截圖<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="13"></span></a></li>
+        <li><a href="#step-14"><span class="toc-num">14</span>用獨立 session 審查分支<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="14"></span></a></li>
+        <li><a href="#step-15"><span class="toc-num">15</span>改善 harness、等待 CI 並合併<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="15"></span></a></li>
+        <li><a href="#step-16"><span class="toc-num">16</span>試用兩種主題並記下想法<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="16"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+        <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <details class="toc-mobile">
+      <summary>目錄</summary>
+      <nav aria-label="手機目錄">
+        <ol class="toc-list">
+          <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+          <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+          <li><a href="#commits"><span class="toc-num"></span>分支與 commit</a></li>
+          <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+          <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+          <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · Harness</li>
+          <li><a href="#step-1"><span class="toc-num">1</span>準備環境與分支<span class="dot s-next" title="下一步" aria-hidden="true" data-step-status="1"></span></a></li>
+          <li><a href="#step-2"><span class="toc-num">2</span>把 repo 整理成專案記憶<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="2"></span></a></li>
+          <li><a href="#step-3"><span class="toc-num">3</span>寫下自己的 coding standards<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="3"></span></a></li>
+          <li><a href="#step-4"><span class="toc-num">4</span>加入完整與快速檢查<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="4"></span></a></li>
+          <li><a href="#step-5"><span class="toc-num">5</span>把檢查接到 Git 與 Claude Code<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="5"></span></a></li>
+          <li><a href="#step-6"><span class="toc-num">6</span>把完整檢查接到 GitHub Actions<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="6"></span></a></li>
+          <li><a href="#step-7"><span class="toc-num">7</span>用假金鑰驗證兩層防護<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="7"></span></a></li>
+          <li><a href="#step-8"><span class="toc-num">8</span>把改善步驟寫入 harness<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="8"></span></a></li>
+          <li class="toc-group"><span class="swatch st-1" aria-hidden="true"></span>第 2 部分 · 深色模式</li>
+          <li><a href="#step-9"><span class="toc-num">9</span>開深色模式分支並確認 intent<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="9"></span></a></li>
+          <li><a href="#step-10"><span class="toc-num">10</span>讓 spec 描述變更後的產品<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="10"></span></a></li>
+          <li><a href="#step-11"><span class="toc-num">11</span>寫分階段的實作計畫<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="11"></span></a></li>
+          <li><a href="#step-12"><span class="toc-num">12</span>依 plan 實作並驗證各階段<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="12"></span></a></li>
+          <li><a href="#step-13"><span class="toc-num">13</span>跑完整檢查並留下四張截圖<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="13"></span></a></li>
+          <li><a href="#step-14"><span class="toc-num">14</span>用獨立 session 審查分支<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="14"></span></a></li>
+          <li><a href="#step-15"><span class="toc-num">15</span>改善 harness、等待 CI 並合併<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="15"></span></a></li>
+          <li><a href="#step-16"><span class="toc-num">16</span>試用兩種主題並記下想法<span class="dot s-none" title="待完成" aria-hidden="true" data-step-status="16"></span></a></li>
+          <li class="toc-sep" aria-hidden="true"></li>
+          <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+          <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+        </ol>
+      </nav>
+    </details>
+
+    <section class="panel" id="intro">
+      <h2>這一天在做什麼</h2>
+      <div class="prose">
+        <p>Day 4 的主題是 Harness Engineering。今天把專案規格、coding standards、自動檢查、hooks 和 CI 接進 Accountable 的日常流程。規格讓 agent 知道產品現況，檢查讓它在出錯時能及早收到回饋。</p>
+        <p>先在 <code>harness</code> 分支建立這套流程，驗證後合進自己的 <code>main</code>。接著開 <code>dark-mode</code> 分支，把深色模式走完 Day 3 練過的六個階段，並在合併前用審查結果改善 harness。</p>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">怎麼讀這份頁面</h3>
+        <p>「要做什麼」提供講義原文、指令和中文說明。「白話說明」解釋每一步的用途。完成後勾選該步的「完成判準」，進度會記在目前的瀏覽器。</p>
+        <p>「給 Claude 的指示」貼到 Claude Code。「終端機」區塊由你在 repo 根目錄執行。每次 <code class="short-command">git add .</code> 前可以先用 <code class="short-command">git status --short</code> 確認哪些檔案會一起提交。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="progress">
+      <h2>進度總覽</h2>
+      <p class="section-note">勾選每一步的完成判準後，目錄和下方的進度會一起更新。</p>
+      <div class="counts">
+        <span class="progress-total" id="progress-total" role="status">完成 0 / 16 步</span>
+      </div>
+      <p class="next" id="next-step">下一步是<a href="#step-1">準備環境與分支</a>。</p>
+      <ol class="overview">
+        <li><span class="num">1</span><a href="#step-1">準備環境與分支</a><span class="pill s-next" data-step-status="1">下一步</span>
+          <span class="why">從自己的 <code>main</code> 開 <code>harness</code>，並安裝 gitleaks。</span></li>
+        <li><span class="num">2</span><a href="#step-2">把 repo 整理成專案記憶</a><span class="pill s-none" data-step-status="2">待完成</span>
+          <span class="why">把 MVP 的 intent 和 plan 歸檔，讓 <code>docs/spec.md</code> 成為產品規格。</span></li>
+        <li><span class="num">3</span><a href="#step-3">寫下自己的 coding standards</a><span class="pill s-none" data-step-status="3">待完成</span>
+          <span class="why">親自撰寫 <code>docs/STANDARDS.md</code>，再讓 agent 更新參照。</span></li>
+        <li><span class="num">4</span><a href="#step-4">加入完整與快速檢查</a><span class="pill s-none" data-step-status="4">待完成</span>
+          <span class="why">建立 <code>check</code>、<code>check:quick</code> 與 <code>format</code> 三個 npm scripts。</span></li>
+        <li><span class="num">5</span><a href="#step-5">把檢查接到 Git 與 Claude Code</a><span class="pill s-none" data-step-status="5">待完成</span>
+          <span class="why">在 commit 前、Claude 結束一輪時、編輯 <code>.env</code> 前各設一道檢查。</span></li>
+        <li><span class="num">6</span><a href="#step-6">把完整檢查接到 GitHub Actions</a><span class="pill s-none" data-step-status="6">待完成</span>
+          <span class="why">在每次 push 先掃秘密，再跑完整檢查。</span></li>
+        <li><span class="num">7</span><a href="#step-7">用假金鑰驗證兩層防護</a><span class="pill s-none" data-step-status="7">待完成</span>
+          <span class="why">觀察 pre-commit 擋下提交，再確認 CI 也會在秘密掃描步驟攔下。</span></li>
+        <li><span class="num">8</span><a href="#step-8">把改善步驟寫入 harness</a><span class="pill s-none" data-step-status="8">待完成</span>
+          <span class="why">加上 <code>docs/IMPROVE.md</code>，然後把 <code>harness</code> 合回 <code>main</code>。</span></li>
+        <li><span class="num">9</span><a href="#step-9">開深色模式分支並確認 intent</a><span class="pill s-none" data-step-status="9">待完成</span>
+          <span class="why">開 <code>dark-mode</code> 分支，回答至多三個問題並確認成功標準。</span></li>
+        <li><span class="num">10</span><a href="#step-10">讓 spec 描述變更後的產品</a><span class="pill s-none" data-step-status="10">待完成</span>
+          <span class="why">依 intent 和 brand skill 更新 <code>docs/spec.md</code>，審閱設計 diff。</span></li>
+        <li><span class="num">11</span><a href="#step-11">寫分階段的實作計畫</a><span class="pill s-none" data-step-status="11">待完成</span>
+          <span class="why">把檔案、建置順序、風險和測試寫入變更專屬的 plan。</span></li>
+        <li><span class="num">12</span><a href="#step-12">依 plan 實作並驗證各階段</a><span class="pill s-none" data-step-status="12">待完成</span>
+          <span class="why">開新 session，照計畫實作，安排好的測試隨各階段執行。</span></li>
+        <li><span class="num">13</span><a href="#step-13">跑完整檢查並留下四張截圖</a><span class="pill s-none" data-step-status="13">待完成</span>
+          <span class="why">執行 <code>npm run check</code>，手動走過 intent，保存兩個畫面各兩種主題的證據。</span></li>
+        <li><span class="num">14</span><a href="#step-14">用獨立 session 審查分支</a><span class="pill s-none" data-step-status="14">待完成</span>
+          <span class="why">先依 <code>docs/REVIEW.md</code> 取得報告，再修正 Important 問題。</span></li>
+        <li><span class="num">15</span><a href="#step-15">改善 harness、等待 CI 並合併</a><span class="pill s-none" data-step-status="15">待完成</span>
+          <span class="why">用這次審查改善流程，推送分支，確認 CI 通過再決定合併。</span></li>
+        <li><span class="num">16</span><a href="#step-16">試用兩種主題並記下想法</a><span class="pill s-none" data-step-status="16">待完成</span>
+          <span class="why">在合併後的 App 試用亮色和深色，將觀察留在 <code>docs/STATUS.md</code>。</span></li>
+      </ol>
+      <div class="callout guide">
+        <h3 class="label">你的起點</h3>
+        <p>本機 <code>main</code> 已合入 MVP，<code>fork</code> remote 已設定。Day 3 的文件分享仍列為待辦，可接著閱讀 Day 3 的 PR 步驟。<a href="week1day3-claude-code.html#step-15">Day 3 第 15 步</a> · <a href="../docs/STATUS.md">專案進度</a></p>
+      </div>
+    </section>
+
+    <section class="panel" id="commits">
+      <h2>分支與 commit</h2>
+      <p class="section-note">每個檢查點驗收後使用講義的 commit 訊息。兩部分依序合回自己的 <code>main</code>。</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="分支與 commit 對照">
+        <table class="stage-table">
+          <thead><tr><th scope="col">分支或階段</th><th scope="col">步驟</th><th scope="col">產出</th><th scope="col">commit 訊息</th></tr></thead>
+          <tbody>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-2">2</a></td><td>產品規格和 MVP 歷史文件</td><td><code>Harness: reorganize the docs</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-3">3</a></td><td>Coding standards</td><td><code>Harness: coding standards</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-4">4</a></td><td>npm 檢查與格式化指令</td><td><code>Harness: npm run check</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-5">5</a></td><td>Git 與 Claude Code hooks</td><td><code>Harness: hooks</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-6">6</a></td><td>GitHub Actions</td><td><code>Harness: CI</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">演練分支</span></td><td><a href="#step-7">7</a></td><td>一次性的秘密掃描演練</td><td><code>Fake key</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">Harness</span></td><td><a href="#step-8">8</a></td><td>改善流程與合併</td><td><code>Harness: improve</code></td></tr>
+            <tr><td><span class="stage-tag st-1">1 Plan</span></td><td><a href="#step-9">9</a></td><td>深色模式 intent</td><td><code>Plan: intent.md agreed</code></td></tr>
+            <tr><td><span class="stage-tag st-2">2 Design</span></td><td><a href="#step-10">10</a></td><td>更新產品 spec</td><td><code>Design: spec.md</code></td></tr>
+            <tr><td><span class="stage-tag st-3">3 Build</span></td><td><a href="#step-11">11</a>–<a href="#step-12">12</a></td><td>計畫、功能與測試</td><td><code>Build: plan.md</code><br><code>Build: dark mode</code></td></tr>
+            <tr><td><span class="stage-tag st-4">4 Test</span></td><td><a href="#step-13">13</a></td><td>檢查結果與四張截圖</td><td><code>Test: checks and screenshots</code></td></tr>
+            <tr><td><span class="stage-tag st-5">5 Deploy</span></td><td><a href="#step-14">14</a>–<a href="#step-15">15</a></td><td>審查修正、改善 harness、CI 與合併</td><td><code>Deploy: review fixes</code><br><code>Deploy: harness improved</code><br><code>Deploy: CI fix</code>（CI 失敗且需修正時）</td></tr>
+            <tr><td><span class="stage-tag st-6">6 Maintain</span></td><td><a href="#step-16">16</a></td><td>試用後的觀察</td><td><code>Maintain: ideas for later</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="glossary">
+      <h2>名詞解釋</h2>
+      <dl class="glossary">
+        <div><dt>Harness</dt><dd>圍繞 agent 與專案的工作流程。今天用 repo 文件提供脈絡，用 hooks、測試和 CI 提供回饋，再根據失誤改善規則。</dd></div>
+        <div><dt>spec、intent、plan</dt><dd>spec 描述整個產品的行為。每次變更的 intent 記下原因、限制與成功標準，plan 記下實作及驗證方式。</dd></div>
+        <div><dt>Hook</dt><dd>在某個事件發生時自動執行的動作。例如 Git 的 pre-commit 在提交前檢查，Claude Code 的 hook 可在停止或編輯時提供回饋。</dd></div>
+        <div><dt>CI（Continuous Integration）</dt><dd>把檢查接到共用的執行環境。今天 GitHub Actions 每次收到 push 都會跑，結果與該次 commit 綁在一起。</dd></div>
+        <div><dt>gitleaks</dt><dd>掃描疑似金鑰與其他秘密的工具。練習會用一組完全虛構的資料，驗證本機和 CI 的兩次攔截。</dd></div>
+        <div><dt>單元測試覆蓋率</dt><dd>衡量測試執行過多少程式碼。以這個數字掌握測試涵蓋程度，並用具體情境核對行為有被驗證。</dd></div>
+        <div><dt>循環複雜度</dt><dd>衡量函式有多少獨立控制流程。主線以 ESLint 的 <code>complexity</code> 和 Ruff 的 <code>C901</code> 設定每個函式的門檻。</dd></div>
+        <div><dt>色彩 tokens</dt><dd>給 UI 色彩角色命名，例如文字、背景與邊框。元件共用同一組名稱，由主題提供對應的色值。</dd></div>
+        <div><dt>Proof</dt><dd>實作計畫中的驗證章節，列出哪些單元與端對端測試能證明功能完成。</dd></div>
+        <div><dt>Important</dt><dd>依審查政策判定須在合併前修正的問題。與這次變更相關的問題先修正再驗證。</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel" id="commands">
+      <h2>今天用到的指令</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="指令速查">
+        <table class="cmd-table">
+          <thead><tr><th scope="col">用途</th><th scope="col">指令</th><th scope="col">時機</th></tr></thead>
+          <tbody>
+            <tr><td>確認分支和檔案狀態</td><td><code>git status --short --branch</code></td><td>開始前和提交前</td></tr>
+            <tr><td>完整檢查</td><td><code>npm run check</code></td><td>第 4 步建立。Test 階段與 CI 執行</td></tr>
+            <tr><td>快速檢查</td><td><code>npm run check:quick</code></td><td>Claude Code 結束一輪時</td></tr>
+            <tr><td>寫入格式修正</td><td><code>npm run format</code></td><td>第 4 步建立，需要修格式時</td></tr>
+            <tr><td>推送到自己的 fork</td><td><code>git push fork harness</code><br><code>git push fork dark-mode</code></td><td>啟動兩個分支的 CI</td></tr>
+            <tr><td>重新開 Claude 對話</td><td><code>/clear</code></td><td>第 9、12、14 步</td></tr>
+            <tr><td>確認模型或用量</td><td><code>/model</code><br><code>/usage</code></td><td>開始長步驟前</td></tr>
+            <tr><td>在終端機接續上一個 session</td><td><code>claude --continue</code></td><td>關掉終端機後</td></tr>
+            <tr><td>啟動本機 App</td><td><code>npm run dev</code></td><td>Test 和 Maintain 試用</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="step-1">
+      <div class="step-head">
+        <span class="step-no">1</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 準備</span></div>
+          <h2>準備環境與分支</h2>
+          <div class="en" lang="en">Start the harness branch</div>
+        </div>
+        <span class="pill s-next" data-step-status="1">下一步</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>Day 3 的 MVP 已合併到本機 <code>main</code>，而 <code>fork</code> remote 已設定。從自己的版本接著做。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 從自己的 main 開分支</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout main
+git checkout -b harness</code></pre>
+        </div>
+        <p>依作業系統安裝一次 gitleaks。安裝後用 <code>gitleaks version</code> 確認終端機找得到它。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · macOS</span><button class="copy" type="button">複製</button></div>
+          <pre><code>brew install gitleaks</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · Windows</span><button class="copy" type="button">複製</button></div>
+          <pre><code>winget install -e --id Gitleaks.Gitleaks</code></pre>
+        </div>
+        <details class="details">
+          <summary>若要改用 Ed 的 Day 3 版本</summary>
+          <p>先確認工作目錄乾淨、<code>origin</code> 指向 Ed 的 repo，且已取得 <code>origin/week1day3-end</code>。在自己的 <code>main</code> 上執行以下指令。<code>my-version</code> 保留你的版本，<code>-B main</code> 會把本機 <code>main</code> 移到 Ed 的版本。</p>
+          <div class="code">
+            <div class="code-head"><span>終端機 · 選用 Ed 的版本</span><button class="copy" type="button">複製</button></div>
+            <pre><code>git branch my-version
+git checkout --no-track -B main origin/week1day3-end
+git checkout -b harness</code></pre>
+          </div>
+        </details>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>今天用兩條分支。先把共用的檢查與工作規則合回 <code>main</code>，再開 <code>dark-mode</code>。這樣深色模式從第一個 commit 就能使用同一套檢查。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-1"><span>我從選定的 <code>main</code> 開了 <code>harness</code>，也能執行 <code>gitleaks version</code>。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-2">
+      <div class="step-head">
+        <span class="step-no">2</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 文件</span></div>
+          <h2>把 repo 整理成專案記憶</h2>
+          <div class="en" lang="en">The repo as memory</div>
+        </div>
+        <span class="pill s-none" data-step-status="2">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Please reorganize the docs, ready for future changes. Move docs/intent.md and docs/plan.md into docs/changes/mvp/. Rewrite docs/spec.md so it describes the whole product as it stands today, bringing in the problem statement from the intent and removing anything that makes the intent the authority. Update AGENTS.md: spec.md is the first thing to read, each change has a folder docs/changes/&lt;branch name&gt;/ with its intent.md and plan.md, and only the current change's folder gets read. Add a line to docs/REVIEW.md to flag code that spec.md doesn't describe. Don't change any code.</code></pre>
+        </div>
+        <p class="translation">中文意思是把舊 intent 與 plan 搬到 <code>docs/changes/mvp/</code>。將問題背景收進 <code>docs/spec.md</code>，改寫成目前整個產品的規格。更新 <code>AGENTS.md</code>，先讀 spec，再讀當前分支的 <code>docs/changes/&lt;branch name&gt;/</code>。在 <code>docs/REVIEW.md</code> 加一條，要求審查時指出 spec 未描述的行為。這一批只改文件。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交文件整理</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: reorganize the docs"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p><code>spec.md</code> 讓下個 session 知道產品現在怎麼運作。各分支的 intent 留下當時想解決的問題，plan 留下實作及驗證方式。從歷史文件找決策背景時，也能看出它屬於哪一次變更。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-2"><span>MVP 文件已歸檔，spec 描述現況，<code>AGENTS.md</code> 與審查政策都已更新。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-3">
+      <div class="step-head">
+        <span class="step-no">3</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 標準</span></div>
+          <h2>寫下自己的 coding standards</h2>
+          <div class="en" lang="en">Write your standards</div>
+        </div>
+        <span class="pill s-none" data-step-status="3">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>親自寫 <code>docs/STANDARDS.md</code>。用自己的話定義怎樣的程式碼算好，哪些做法你希望看到，哪些你會在審查時要求修正。幾條清楚的規則就夠。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Point to docs/STANDARDS.md from AGENTS.md, and add a line to docs/REVIEW.md to check changes against it. Don't change docs/STANDARDS.md.</code></pre>
+        </div>
+        <p class="translation">請 Claude 從 <code>AGENTS.md</code> 指向這份文件，並在 <code>docs/REVIEW.md</code> 加入對照 coding standards 的審查項目。保留你寫的原文。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交規範</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: coding standards"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>規則寫到能對照 diff 判斷。例如「同一條業務規則集中在一處」比「保持乾淨」更容易檢查。能用工具判定的部分，下一步放進自動檢查。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-3"><span>我已親自寫下可供審查的標準，並在 <code>AGENTS.md</code> 和 <code>docs/REVIEW.md</code> 找得到它。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-4">
+      <div class="step-head">
+        <span class="step-no">4</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 自動檢查</span></div>
+          <h2>加入完整與快速檢查</h2>
+          <div class="en" lang="en">Add the checks</div>
+        </div>
+        <span class="pill s-none" data-step-status="4">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Add npm run check, which runs all of these and fails if any of them fails:
+- Prettier and ESLint for the frontend, using the recommended TypeScript, React Hooks and accessibility rules
+- ruff format and ruff check for the backend
+- A maximum cyclomatic complexity of 15 per function, using ESLint's complexity rule and ruff's C901 rule
+- tsc for the frontend and ty for the backend
+- gitleaks across the repo, allowing the git-ignored .env
+- npm test, with unit test coverage of at least 80%
+Add npm run check:quick, which runs the same checks without the end-to-end tests. Add npm run format to fix the formatting. Fix what the checks find, without weakening any rule. If a rule doesn't suit this project, ask me first. Add npm run check to AGENTS.md, run it and show me the output.</code></pre>
+        </div>
+        <ul>
+                   <li><code>npm run check</code> 檢查前端 Prettier、ESLint（TypeScript、React Hooks、無障礙）與後端 Ruff。前後端每個函式的循環複雜度上限為 15，型別分別用 <code>tsc</code> 和 <code>ty</code> 檢查。</li>
+                   <li>再用 gitleaks 掃 repo，只允許 Git 已忽略的 <code>.env</code> 例外，最後執行 <code>npm test</code>。講義主線的單元測試覆蓋率門檻為 80%。</li>
+                   <li><code>npm run check:quick</code> 略過端對端測試，其餘檢查照跑。<code>npm run format</code> 會寫入格式修正。請 Claude 把完整指令加到 <code>AGENTS.md</code>，執行並顯示輸出。若規則不適合，先由你決定是否調整。</li>
+                 </ul>
+        <p>這通常是今天最久的一步。講義允許在貼出提示詞前調低 80%，或移除 <code>, with unit test coverage of at least 80%</code>。若想在 Claude Code 用平行 agent，可選擇把開頭改為 <code>Use a dynamic workflow to add npm run check</code>，保留後續原文。這通常會用掉更多方案額度。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交檢查指令</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: npm run check"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>把共同的品質門檻寫成一個會回報失敗的指令，開發者和 CI 就能跑相同的檢查。快速版讓每次 agent 結束前也跑得起。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-4"><span>三個指令已建立，<code>npm run check</code> 通過，並確認快速版只省略端對端測試。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-5">
+      <div class="step-head">
+        <span class="step-no">5</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · Hooks</span></div>
+          <h2>把檢查接到 Git 與 Claude Code</h2>
+          <div class="en" lang="en">Add the hooks</div>
+        </div>
+        <span class="pill s-none" data-step-status="5">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Add three hooks:
+- A lefthook pre-commit hook that formats the staged files, then runs lint, types and gitleaks. Skip the tests, so that it stays quick.
+- A hook for this coding agent that runs npm run check:quick when you finish a turn and sends any failure back to you to fix. It should block once and then let you stop, so it can't loop forever.
+- A hook for this coding agent that blocks any edit to .env.
+Test each one and tell me how you tested it. If this coding agent doesn't support one of these hooks, tell me.</code></pre>
+        </div>
+        <ol>
+                   <li>Lefthook 的 pre-commit 先格式化已暫存的檔案，再執行 lint、型別檢查與 gitleaks。略過測試，以縮短每次 commit 的等待。</li>
+                   <li>Claude Code 結束一輪時跑 <code>npm run check:quick</code>，把失敗回傳給 Claude 修正。同一次停止流程最多阻擋一次，避免反覆觸發。</li>
+                   <li>Claude Code 嘗試編輯 <code>.env</code> 時應被攔下。請 agent 分別回報三個 hook 的驗證方法及結果。</li>
+                 </ol>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交 hooks</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: hooks"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>Git hook 在你提交時執行，和使用哪個 agent 無關。另兩個 hook 在 Claude Code 的操作過程給回饋。手動測 <code>.env</code> 的保護可在隔離的工作副本使用空白測試檔，確認操作被攔下。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-5"><span>已驗證 pre-commit、快速檢查的停止行為，以及 <code>.env</code> 編輯保護。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-6">
+      <div class="step-head">
+        <span class="step-no">6</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · CI</span></div>
+          <h2>把完整檢查接到 GitHub Actions</h2>
+          <div class="en" lang="en">Add CI</div>
+        </div>
+        <span class="pill s-none" data-step-status="6">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>到自己的 GitHub fork 開啟 <strong>Actions</strong>。如果 GitHub 要求啟用 workflows，先啟用。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Add .github/workflows/ci.yml with one job named check that runs on every push to any branch. It installs gitleaks and runs it across the repo first, so a leaked secret fails the run straight away. Then it installs Node and uv, and runs npm run check with the Google Chrome already on GitHub's runner. If it fails, upload the Playwright report. Add no secrets. astral-sh/setup-uv has no major version tags like v10, so use the full version number of its latest release, and let it install the latest uv.</code></pre>
+        </div>
+        <p class="translation">建立 <code>.github/workflows/ci.yml</code>，只有一個 <code>check</code> job，推任何分支都會跑。先安裝並執行 gitleaks，再準備 Node 和 uv，使用 runner 上的 Google Chrome 跑 <code>npm run check</code>。失敗時上傳 Playwright 報告，不需新增 secrets。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交並推送 CI 設定</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: CI"
+git push fork harness</code></pre>
+        </div>
+        <p>到 Actions 看 <code>harness</code> 的 run。講義的第一次執行約 15 分鐘。若失敗，把失敗步驟與錯誤貼給 Claude，找出原因、修正並重新 push。</p>
+        <div class="callout guide">
+          <h3 class="label">課程指南 · CI 常見問題</h3>
+          <ul><li><code>Set up job</code> 找不到 <code>astral-sh/setup-uv</code> 時，檢查參照是否用了完整的 release tag，例如 <code>v10.3.3</code> 是完整格式，<code>v10</code> 會找不到。講義要求選當時最新的完整 tag，讓 action 自行安裝最新的 uv。</li><li>端對端測試使用 GitHub Ubuntu runner 已有的 Google Chrome。若本機成功、CI 失敗，先從 Linux runner 的錯誤與 Playwright 報告找差異。</li></ul>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>GitHub 上的執行紀錄可以讓你知道推上去的 commit 是否通過。把掃描放在前面，偵測到秘密時就能提早結束。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-6"><span>自己的 fork 已啟用 Actions，<code>harness</code> 的完整檢查有一筆成功的 run。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-7">
+      <div class="step-head">
+        <span class="step-no">7</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 安全演練</span></div>
+          <h2>用假金鑰驗證兩層防護</h2>
+          <div class="en" lang="en">Security: make it fail</div>
+        </div>
+        <span class="pill s-none" data-step-status="7">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>從 <code>harness</code> 開一次性的 <code>make-it-fail</code> 分支。在 <code>frontend/src/main.tsx</code> 最上面加一行註解，把角括號內的文字換成自己編的 32 個英數字元。整個演練只使用這組假資料。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 開演練分支</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout -b make-it-fail</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>程式碼 · 假金鑰註解</span><button class="copy" type="button">複製</button></div>
+          <pre><code>// const apiKey = "&lt;32 random letters and digits&gt;";</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 驗證 pre-commit 拒絕提交</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Fake key"</code></pre>
+        </div>
+        <p>先確認失敗訊息確實來自 gitleaks。接著在這個演練分支上刻意略過本機 hook，把假資料推到自己的 fork。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 驗證 GitHub Actions 的秘密掃描</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git commit --no-verify -m "Fake key"
+git push fork make-it-fail</code></pre>
+        </div>
+        <p>到 Actions 確認 workflow 在 secret scan 失敗。記下攔截結果就可以清理這個演練分支，在保留的 <code>harness</code> 分支重新確認檢查可通過。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 回到 harness 並刪除本機與 fork 的演練分支</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout harness
+git branch -D make-it-fail
+git push fork --delete make-it-fail</code></pre>
+        </div>
+        <div class="callout guide">
+          <h3 class="label">課程指南 · 演練後還是失敗</h3>
+          <p>gitleaks 會掃分支歷史。若清理前 <code>npm run check</code> 仍看到假金鑰，確認本機和 fork 上的 <code>make-it-fail</code> 都已刪除。</p>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>這一步收集兩筆證據。一筆是本機拒絕提交，另一筆是 GitHub 執行秘密掃描後拒絕通過。這兩筆結果分別證明 Git hook 和 CI 的檢查有生效。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-7"><span>我看到了兩層攔截的結果，已刪除兩端的演練分支並確認 <code>harness</code> 檢查恢復通過。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-8">
+      <div class="step-head">
+        <span class="step-no">8</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">Harness · 改善與合併</span></div>
+          <h2>把改善步驟寫入 harness</h2>
+          <div class="en" lang="en">Add the improvement step</div>
+        </div>
+        <span class="pill s-none" data-step-status="8">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 保留講義指定原文</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Create docs/IMPROVE.md with exactly this text, and add a line to AGENTS.md to follow it at Deploy, after the review fixes and before the merge.
+
+# Improve the harness
+
+Run this at Deploy, after the review fixes and before the merge.
+
+1. Look at what went wrong on this change: the review's findings, what the person corrected and what the checks caught.
+2. For a mistake that has happened twice, add the correction to AGENTS.md or docs/REVIEW.md, or suggest a change to docs/STANDARDS.md for the person to make. If a tool can catch it, add it to the checks instead.
+3. Remove anything out of date.
+4. Improve this file, so that the next round makes a better change. Keep this as the last step.</code></pre>
+        </div>
+        <p class="translation">在 Deploy 的審查修正之後、合併之前，回看審查發現、你的修正與工具抓到的錯誤。同一錯誤出現兩次時，能自動檢查就加到工具，其餘補到 agent 指示或審查政策，也可以建議由你更新 coding standards。清掉過時內容，最後回頭改進這份流程。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交改善流程</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Harness: improve"</code></pre>
+        </div>
+        <p>確認 <code>harness</code> 的檢查結果，回到自己的 <code>main</code> 合併。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 合併 harness</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout main
+git merge harness
+git branch -d harness</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>這份文件讓團隊把反覆發生的問題轉成下一次就能用的檢查。等深色模式審查完成，就用那次變更留下的具體發現走一遍。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-8"><span><code>AGENTS.md</code> 已指示何時執行 <code>docs/IMPROVE.md</code>，且 <code>harness</code> 已合入 <code>main</code>。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-9">
+      <div class="step-head">
+        <span class="step-no">9</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-1">階段 1 · Plan</span></div>
+          <h2>開深色模式分支並確認 intent</h2>
+          <div class="en" lang="en">Agree on the dark mode intent</div>
+        </div>
+        <span class="pill s-none" data-step-status="9">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 從已合入 harness 的 main 開分支</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout -b dark-mode</code></pre>
+        </div>
+        <p>在 Claude Code 輸入 <code>/clear</code> 開新 session，再貼下方指示。回答 Claude 提出的問題，讀過它寫回 <code>docs/changes/dark-mode/intent.md</code> 的內容再提交。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 含完整 intent</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Create docs/changes/dark-mode/intent.md with the text below. Then read it with docs/spec.md and ask me about anything unclear, at most three questions. Update the intent with my answers.
+
+# Intent: dark mode
+
+## Problem
+
+Accountable only has a light mode, and some people prefer a dark screen.
+
+## Proposed outcome
+
+A dark mode with a toggle on every page, across every section.
+
+## Constraints
+
+- Light mode stays the default, and the app remembers the choice.
+- Light mode looks exactly as it does today, apart from the toggle.
+- Colors stay in one place, as tokens, with no scattered overrides.
+- Text in dark mode meets the same contrast rules as spec.md.
+- Charts, dialogs and messages follow the mode too.
+- No new dependencies unless the plan makes the case for one.
+
+## Not in this change
+
+- Following the device's own dark mode setting.
+- A layout for phones.
+
+## Success criteria
+
+1. npm run check passes.
+2. A new end-to-end test proves that the toggle works and is remembered after a reload.
+3. Screenshots of the dashboard and the pipeline in both modes are saved in docs/changes/dark-mode/.</code></pre>
+        </div>
+        <ul>
+                   <li>每個功能區塊的頁面都可切換。亮色是預設值，重新載入後應保留上次的選擇。亮色外觀維持既有樣式，只新增切換控制。</li>
+                   <li>顏色集中到 tokens。深色文字符合現有 spec 的對比規則，圖表、對話框與訊息一起切換。有理由新增套件時，先在 plan 說明。</li>
+                   <li>這次的範圍以 App 內的主題選擇為準，沿用現有瀏覽器版面。跟隨裝置主題與手機版面留待後續變更。</li>
+                   <li>成功證據包括完整檢查通過、新的端對端測試，以及儀表板和商機看板在亮色與深色各一張，共四張截圖。</li>
+                 </ul>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交確認過的 intent</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Plan: intent.md agreed"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>先用 intent 把使用者看得到的結果寫清楚。像「切換後重新載入仍然是深色」之後可以直接變成 Playwright 的測試情境。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-9"><span>我已回答規劃問題，確認亮色預設、模式記憶、驗收證據與變更範圍。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-10">
+      <div class="step-head">
+        <span class="step-no">10</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-2">階段 2 · Design</span></div>
+          <h2>讓 spec 描述變更後的產品</h2>
+          <div class="en" lang="en">Update the product spec</div>
+        </div>
+        <span class="pill s-none" data-step-status="10">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Read docs/changes/dark-mode/intent.md and update docs/spec.md so it describes the product with dark mode, as it will be once this change is merged. Use the brand skill. List any concerns at the top of your reply.</code></pre>
+        </div>
+        <p class="translation">請 Claude 依深色模式 intent 與品牌規範，就合併後的產品行為更新 <code>docs/spec.md</code>，回覆時把疑慮放在最前面。</p>
+        <p>先處理疑慮，再從 VS Code 的 Source Control 檢視 <code>docs/spec.md</code> 的差異。確認切換控制、跨頁面行為與共用元件的外觀都能用這份規格驗收。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交設計規格</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Design: spec.md"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>Day 3 從空白建立完整規格。這次是在同一份規格增修深色模式的行為，分支上的 spec diff 就是本次要審查的設計。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-10"><span>我已查看 spec diff、處理設計疑慮，並確認變更後的行為符合 intent。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-11">
+      <div class="step-head">
+        <span class="step-no">11</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-3">階段 3 · Build</span></div>
+          <h2>寫分階段的實作計畫</h2>
+          <div class="en" lang="en">Write the build plan</div>
+        </div>
+        <span class="pill s-none" data-step-status="11">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Read docs/changes/dark-mode/intent.md and docs/spec.md and write docs/changes/dark-mode/plan.md with four sections: Files that change, Order of work, Risks and Proof. Order the work in phases. Proof lists the unit and end-to-end tests. Don't write any code yet.</code></pre>
+        </div>
+        <p class="translation">請 Claude 讀 intent 和 spec，撰寫 <code>docs/changes/dark-mode/plan.md</code>。保留 Files that change、Order of work、Risks、Proof 四節，將工作分階段安排，並在 Proof 列出單元和端對端測試。這一步先審計畫。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交實作計畫</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Build: plan.md"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>審閱時把 Proof 逐條對回 intent。計畫應說明如何驗證亮色預設、切換和重新載入，以及怎樣確認圖表等共用元件套到了同一主題。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-11"><span>plan 有四個指定章節。我已審閱各階段順序、風險與對應測試。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-12">
+      <div class="step-head">
+        <span class="step-no">12</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-3">階段 3 · Build</span></div>
+          <h2>依 plan 實作並驗證各階段</h2>
+          <div class="en" lang="en">Build dark mode</div>
+        </div>
+        <span class="pill s-none" data-step-status="12">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>在 Claude Code 輸入 <code>/clear</code>，接著貼下方指示。讓新 session 讀 repo 內已確認的 plan。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Implement docs/changes/dark-mode/plan.md, following its order of work. Write the tests in its Proof section and run them as you go. Leave the commits to me.</code></pre>
+        </div>
+        <p class="translation">依 plan 的順序實作，補上 Proof 裡的測試並邊做邊跑。請 Claude 把提交留給你，你讀過 diff 與測試結果再 commit。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交深色模式實作</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Build: dark mode"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>依計畫檢查主題的狀態與色彩 tokens 是否同時供整個 App 使用。圖表、對話框和提示訊息常有自己的樣式，可以特別對照 spec 看它們是否也隨切換更新。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-12"><span>深色模式已依 plan 實作，Proof 的測試已撰寫並執行，我也已審閱 diff。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-13">
+      <div class="step-head">
+        <span class="step-no">13</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-4">階段 4 · Test</span></div>
+          <h2>跑完整檢查並留下四張截圖</h2>
+          <div class="en" lang="en">Check it yourself and save screenshots</div>
+        </div>
+        <span class="pill s-none" data-step-status="13">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Run npm run check and fix failures until it passes. Then take the screenshots in the intent's success criteria with Playwright, and show me the output and the screenshots.</code></pre>
+        </div>
+        <p class="translation">請 Claude 跑完整檢查並修到通過，再用 Playwright 截下 intent 指定的畫面，給你看檢查輸出與截圖。</p>
+        <p>自己再執行一次 <code>npm run check</code>，開 App 檢查亮色預設、切換、跨頁面狀態與重新載入。查看兩種主題的對比度，並打開圖表、對話框與訊息。確認四張截圖都在 <code>docs/changes/dark-mode/</code>。</p>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="驗收截圖清單">
+          <table>
+            <thead><tr><th scope="col">畫面</th><th scope="col">亮色</th><th scope="col">深色</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">儀表板（Dashboard）</th><td>一張</td><td>一張</td></tr>
+              <tr><th scope="row">商機看板（Pipeline）</th><td>一張</td><td>一張</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交檢查結果與截圖</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Test: checks and screenshots"</code></pre>
+        </div>
+        <p>若 Build 已把截圖包含在 commit，而 Git 顯示沒有可提交的變更，確認截圖的位置與內容後即可往下一步。</p>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>端對端測試能反覆驗證切換和持久化。截圖讓你並排看色彩與共用元件；親自試用則能確認點擊、跨頁面與重新載入的整段流程。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-13"><span>我已自己跑過完整檢查、驗收各頁面與重新載入，並確認四張截圖的位置和主題。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-14">
+      <div class="step-head">
+        <span class="step-no">14</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-5">階段 5 · Deploy</span></div>
+          <h2>用獨立 session 審查分支</h2>
+          <div class="en" lang="en">Review the branch</div>
+        </div>
+        <span class="pill s-none" data-step-status="14">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>在 Claude Code 輸入 <code>/clear</code>，用新 session 審查 <code>dark-mode</code> 相對 <code>main</code> 的差異。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Review this branch against main with docs/REVIEW.md. Report only, skip style.</code></pre>
+        </div>
+        <p class="translation">依 <code>docs/REVIEW.md</code> 審查相對 <code>main</code> 的變更。這一輪先報告問題，略過風格項目。</p>
+        <p>讀過審查報告，再修正列為 Important 的問題並驗證修正。若有改動，把它們作為獨立的一筆 commit。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交審查修正</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Deploy: review fixes"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>新 session 能直接以規格、審查政策和 diff 判斷功能。見到 Important 問題時，先記下受影響的情境，再確認修正及測試是否對準該情境。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-14"><span>我已讀過獨立審查報告，所有 Important 問題都已處理並驗證。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-15">
+      <div class="step-head">
+        <span class="step-no">15</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-5">階段 5 · Deploy</span></div>
+          <h2>改善 harness、等待 CI 並合併</h2>
+          <div class="en" lang="en">Improve the harness and merge</div>
+        </div>
+        <span class="pill s-none" data-step-status="15">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>在剛執行審查的同一個 session 請 Claude 跑改善流程。這樣可以用到這次審查的具體發現。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Follow docs/IMPROVE.md for this change. Leave the commits to me.</code></pre>
+        </div>
+        <p class="translation">針對這一次變更執行 <code>docs/IMPROVE.md</code>。看哪些錯誤一再發生，把改善落到規則或檢查。提交留給你。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交改善並推送 dark-mode</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Deploy: harness improved"
+git push fork dark-mode</code></pre>
+        </div>
+        <p>打開自己的 fork 的 Actions，等這個分支的 run 完成。講義的例子約 20 分鐘。若失敗，用下面的提示詞附上出錯步驟與訊息，修正、檢查並重推。</p>
+        <details class="details">
+          <summary>CI 失敗時的提示詞與重推指令</summary>
+          <div class="code wrap">
+            <div class="code-head"><span>給 Claude 的指示 · CI 排錯</span><button class="copy" type="button">複製</button></div>
+            <pre><code>The CI run failed with this error: [paste the error]. Find the root cause, fix it and run npm run check. Leave the commits to me.</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head"><span>終端機 · 提交修正並重推</span><button class="copy" type="button">複製</button></div>
+            <pre><code>git add .
+git commit -m "Deploy: CI fix"
+git push fork dark-mode</code></pre>
+          </div>
+        </details>
+        <p>看到綠燈後，對照課程投影片 <strong>Would you merge it?</strong> 及自己的驗收證據。確認接受變更後，在本機合回 <code>main</code>。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 合併 dark-mode</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git checkout main
+git merge dark-mode
+git branch -d dark-mode</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>合併前把驗收結果、審查修正和 CI 狀態一起看。你最後接受的是 CI 這次跑過的 commit，所以重推修正後要看新的 run。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-15"><span><code>docs/IMPROVE.md</code> 已執行，fork 上最後一次 CI 通過，我已核對驗收結果並合併。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-16">
+      <div class="step-head">
+        <span class="step-no">16</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-6">階段 6 · Maintain</span></div>
+          <h2>試用兩種主題並記下想法</h2>
+          <div class="en" lang="en">Maintain</div>
+        </div>
+        <span class="pill s-none" data-step-status="16">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>從 <code>main</code> 用 <code>npm run dev</code> 啟動 App。用亮色和深色各走一遍你平常的工作，例如在儀表板看待跟進事項，再到商機看板確認卡片狀態。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button">複製</button></div>
+          <pre><code>Here's what I noticed using the app: [your notes]. Add these to docs/STATUS.md under Ideas for later, one line each.</code></pre>
+        </div>
+        <p class="translation">把 <code>[your notes]</code> 換成你試用時觀察到的情境，請 Claude 逐項記入 <code>docs/STATUS.md</code> 的 <strong>Ideas for later</strong>，一項一行。讀過再提交。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交維護筆記</span><button class="copy" type="button">複製</button></div>
+          <pre><code>git add .
+git commit -m "Maintain: ideas for later"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>記下在哪個畫面做了什麼、下次想改善哪個地方。具體的情境可以讓未來的 intent 有一個清楚的起點。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-16"><span>我已在合併後的 App 試過兩種主題，並將實際觀察留在 <code>docs/STATUS.md</code>。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="usage">
+      <h2>用量上限與 session</h2>
+      <div class="prose">
+        <p>第 4 步可能需要補不少單元測試，時間和用量會隨覆蓋率目標增加。課程指南建議較小方案可用 Sonnet。用 <code>/model</code> 確認所用模型，<code>/usage</code> 查看方案用量。</p>
+        <p>建置因用量上限中斷時，可以等額度重置後在原 session 繼續。若已關掉終端機，在同一個 repo 根目錄執行 <code>claude --continue</code>。到了 Plan、Build 實作或 Deploy 審查的指定檢查點，再用 <code>/clear</code> 從 repo 的文件開始讀。</p>
+      </div>
+      <p class="fine"><a href="../course/for_agents/AGENT_COURSE_GUIDE.md">課程指南 · Models and usage limits</a> · <a href="../course/coding_agents/claude_code.md">Claude Code 課程手冊</a></p>
+    </section>
+
+    <section class="panel" id="cheap">
+      <h2>便宜模型路線的差異</h2>
+      <p class="section-note">免費或低成本模型也做同一個 harness 和深色模式。講義提供更小的步驟，可從自己的 Day 3 成果繼續。</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="主線與便宜模型路線比較">
+        <table class="compare">
+          <thead><tr><th scope="col">項目</th><th scope="col">主線</th><th scope="col">便宜模型路線</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">檢查</th><td>一次加完整檢查，含複雜度、<code>ty</code> 和覆蓋率</td><td>先加格式、lint 和前端型別，再加 gitleaks 和測試。複雜度、<code>ty</code> 和覆蓋率省略</td></tr>
+            <tr><th scope="row">Hooks</th><td>Lefthook、agent 結束一輪時的檢查、<code>.env</code> 編輯保護</td><td>保留 Lefthook，可視 agent 支援選加 <code>.env</code> 編輯保護</td></tr>
+            <tr><th scope="row">CI</th><td>使用 Chrome 跑 <code>npm run check</code></td><td>從一開始用 <code>npm run check:quick</code>，CI 省略端對端測試</td></tr>
+            <tr><th scope="row">深色模式</th><td>完整 intent，依計畫實作與測試</td><td>縮短 intent，每個 phase 開新 session，完成在 plan 標記後再提交</td></tr>
+            <tr><th scope="row">驗收</th><td>完整檢查、手動試用、保存四張截圖</td><td>完整檢查，手動走過每頁的兩種主題，省略截圖</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine"><a href="../course/cheap_llm_instructions/week1day4.md">Week 1 Day 4 · 便宜模型路線講義</a></p>
+    </section>
+  </main>
+</div>
+
+<footer class="footer">
+  <p>依據 Day 4 講義和 Week 1 課程指南整理，版型沿用 Day 3。<a href="../course/instructions/week1day4.md">Day 4 講義</a> · <a href="../course/for_agents/AGENT_GUIDE_WEEK1.md">Week 1 課程指南</a> · <a href="week1day3-claude-code.html">Day 3 筆記</a></p>
+</footer>
+
+<script>
+(function () {
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = block.querySelector('.copy');
+    var code = block.querySelector('pre code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function () {
+      var text = code.textContent;
+      function done(ok) {
+        btn.textContent = ok ? '已複製' : '請手動選取';
+        setTimeout(function () { btn.textContent = '複製'; }, 1600);
+      }
+      function fallback() {
+        try {
+          var range = document.createRange();
+          range.selectNodeContents(code);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          var ok = document.execCommand('copy');
+          if (ok) sel.removeAllRanges();
+          done(ok);
+        } catch (e) { done(false); }
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  // Keep the overview, navigation, and acceptance checkboxes in sync.
+  var progressKey = 'w1d4-claude-code-checklist';
+  var boxes = Array.from(document.querySelectorAll('.checklist input[type="checkbox"]'));
+  var overview = document.getElementById('progress-total');
+  var nextStep = document.getElementById('next-step');
+  var statusClasses = { '完成': 's-done', '下一步': 's-next', '待完成': 's-none' };
+  var saved = [];
+  try {
+    var stored = JSON.parse(localStorage.getItem(progressKey));
+    if (Array.isArray(stored)) saved = stored;
+  } catch (e) {}
+
+  function updateProgress() {
+    var done = boxes.filter(function (box) { return box.checked; }).length;
+    var next = boxes.findIndex(function (box) { return !box.checked; });
+
+    boxes.forEach(function (box, index) {
+      var status = box.checked ? '完成' : index === next ? '下一步' : '待完成';
+      document.querySelectorAll('[data-step-status="' + (index + 1) + '"]').forEach(function (indicator) {
+        indicator.classList.remove('s-done', 's-next', 's-none');
+        indicator.classList.add(statusClasses[status]);
+        if (indicator.classList.contains('pill')) {
+          indicator.textContent = status;
+        } else {
+          indicator.title = status;
+        }
+      });
+    });
+
+    overview.textContent = '完成 ' + done + ' / ' + boxes.length + ' 步';
+    if (next === -1) {
+      nextStep.textContent = 'Day 4 的 ' + boxes.length + ' 步皆已完成。';
+      return;
+    }
+    var link = document.createElement('a');
+    link.href = '#step-' + (next + 1);
+    link.textContent = boxes[next].closest('section').querySelector('h2').textContent;
+    nextStep.replaceChildren('下一步是', link, '。');
+  }
+
+  boxes.forEach(function (box) {
+    box.checked = saved.includes(box.id);
+    box.addEventListener('change', function () {
+      var checkedIds = boxes.filter(function (item) { return item.checked; })
+        .map(function (item) { return item.id; });
+      try { localStorage.setItem(progressKey, JSON.stringify(checkedIds)); } catch (e) {}
+      updateProgress();
+    });
+  });
+  updateProgress();
+
+  // Highlight the current section in the side index
+  if ('IntersectionObserver' in window) {
+    var links = {};
+    document.querySelectorAll('.toc-side a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && links[entry.target.id]) {
+          Object.keys(links).forEach(function (k) { links[k].removeAttribute('aria-current'); });
+          links[entry.target.id].setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { observer.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

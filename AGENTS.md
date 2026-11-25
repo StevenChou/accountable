@@ -8,6 +8,7 @@
 - 每項變更的 `intent.md` 和 `plan.md` 放在 `docs/changes/<branch name>/`。查閱變更文件時，只讀當前分支的資料夾（若有）。
 - 技術選型記錄在 [docs/TECH_STACK.md](docs/TECH_STACK.md)。
 - 撰寫或修改程式時，遵循 [docs/STANDARDS.md](docs/STANDARDS.md)。
+- 在 Deploy 階段修正審查發現後、合併前，依 [docs/IMPROVE.md](docs/IMPROVE.md) 回顧並改善 harness。
 - 已完成的工作記錄在 [docs/STATUS.md](docs/STATUS.md)。
 
 完成一項工作後，更新 `docs/STATUS.md`。

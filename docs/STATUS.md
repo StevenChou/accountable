@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-25｜Day 4 第 8 步「把改善步驟寫入 harness」完成
+
+- 依講義原文建立 [docs/IMPROVE.md](IMPROVE.md)。[AGENTS.md](../AGENTS.md) 指定在 Deploy 階段修正審查發現後、合併前執行改善流程。
+- 本機 `npm run check` 通過全部 59 項測試（Vitest 24 項、pytest 24 項、Chrome Playwright 11 項）。`harness` 已快轉合併回本機 `main`，並刪除已合併的本機分支。
+- 課程筆記顯示 7／16 步完成、1 步略過。下一步是[開深色模式分支並確認 intent](../notes/week1day4-claude-code.html#step-9)。
+
 ## 2026-11-25｜Day 4 第 7 步「用假金鑰驗證兩層防護」完成（本機版）
 
 - 在隔離的 `make-it-fail` 分支暫存含虛構金鑰的 `frontend/src/main.tsx`。pre-commit 的 Gitleaks 以 `generic-api-key` 規則阻擋提交，`HEAD` 維持原提交。

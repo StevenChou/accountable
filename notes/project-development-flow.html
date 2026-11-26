@@ -108,6 +108,9 @@ main { display: grid; gap: 24px; }
 .node p { font-size: 15px; }
 .node .criterion { color: var(--ink-soft); font-size: 14px; }
 .node .route-note { margin-top: 3px; padding: 7px 10px; border-radius: 8px; background: var(--tint-marigold); font-size: 14px; }
+.node .routes { margin-block: 4px; }
+.node .route-card { background: var(--panel); padding: 10px 12px; }
+.node .route-card h4 { margin: 0; font-size: 15px; line-height: 1.35; }
 .tag {
   flex: none;
   padding: 3px 8px;
@@ -237,7 +240,7 @@ main { display: grid; gap: 24px; }
       <ul class="setup-list" role="list">
         <li>
           <h3>文件與審查規則</h3>
-          <p>從 <code>AGENTS.md</code> 指向產品規格、當前變更、<code>STANDARDS.md</code>、<code>REVIEW.md</code> 和 <code>IMPROVE.md</code>。</p>
+          <p>用 <code>AGENTS.md</code> 記錄產品規格、當前變更、撰寫標準與改善流程的入口。審查依 <code>REVIEW.md</code> 核對行為與標準。</p>
         </li>
         <li>
           <h3>本機檢查</h3>
@@ -245,7 +248,7 @@ main { display: grid; gap: 24px; }
         </li>
         <li>
           <h3>CI 與秘密保護</h3>
-          <p>每次推送先掃秘密，再跑完整檢查。將金鑰留在 Git 已忽略的 <code>.env</code>。agent 支援時，加入阻擋編輯該檔案的 hook。</p>
+          <p>啟用 Day 4 的 CI 流程時，每次推送先掃秘密，再跑完整檢查。將金鑰留在 Git 已忽略的 <code>.env</code>。agent 支援時，加入阻擋編輯該檔案的 hook。</p>
         </li>
       </ul>
       <p class="section-note">Accountable 用 <code>npm run check:quick</code> 與 <code>npm run check</code>。套用到其他專案時，換成該專案的指令。<a href="week1day4-claude-code.html#step-1">Day 4 的 Harness 設定步驟</a></p>
@@ -273,7 +276,7 @@ main { display: grid; gap: 24px; }
       <li class="flow-row" id="design">
         <div class="node">
           <div class="node-top"><span class="tag tag-design" lang="en">Design</span><h3>審閱變更後的產品行為</h3></div>
-          <p>建立或更新 <code>spec.md</code>，親自讀過差異。有介面改動時先選定設計稿。</p>
+          <p>新產品建立 <code>spec.md</code>，依需要選定介面設計稿。既有產品用規格差異審閱變更後的行為，並標出要用原畫面比對的部分。<a href="week1day4-claude-code.html#step-10">Day 4 規格差異</a></p>
           <p class="criterion"><strong>完成判準</strong> 已確認變更後的產品行為及本次要採用的設計。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
@@ -281,7 +284,7 @@ main { display: grid; gap: 24px; }
       <li class="flow-row" id="build">
         <div class="node">
           <div class="node-top"><span class="tag tag-build" lang="en">Build</span><h3>先排計畫，再分段實作</h3></div>
-          <p>在 <code>plan.md</code> 列出改動、順序、風險與測試。開新 session，依計畫分段做、分段測。學員審閱差異與結果後再提交。</p>
+          <p>在 <code>plan.md</code> 列出改動、順序、風險，並在 Proof 寫明對應的測試。開新 session，依計畫分段做、分段測。學員審閱差異與結果後再提交。</p>
           <p class="criterion"><strong>完成判準</strong> 計畫中的改動和測試已完成，開發中的檢查通過。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
@@ -290,7 +293,7 @@ main { display: grid; gap: 24px; }
         <div class="node">
           <div class="node-top"><span class="tag tag-test" lang="en">Test</span><h3>跑完整檢查，親手驗收</h3></div>
           <p>首次 MVP 用 <code>npm test</code> 跑單元和端對端測試。已設定 harness 就跑完整檢查，例如 <code>npm run check</code>。</p>
-          <p>親手走過 <code>intent.md</code> 的成功標準。有介面改動時，用瀏覽器比對設計稿並留下畫面證據。<a href="week1day3-claude-code.html#step-9">Day 3 瀏覽器驗收</a></p>
+          <p>親手走過 <code>intent.md</code> 的成功標準。有介面改動時，用瀏覽器留下畫面證據。首版介面比對設計稿。既有介面沿用相同資料與視窗尺寸，比對要保留的外觀，再依新規格驗收改動。<a href="week1day3-claude-code.html#step-9">Day 3 設計稿驗收</a> · <a href="week1day4-claude-code.html#step-13">Day 4 主題驗收</a></p>
           <p class="criterion"><strong>完成判準</strong> 完整檢查通過，成功標準都有驗收證據。</p>
         </div>
         <div class="recovery">
@@ -307,38 +310,50 @@ main { display: grid; gap: 24px; }
               <div class="node-top"><span class="tag tag-deploy" lang="en">Deploy</span><h3>開新 session 獨立審查</h3></div>
               <p>依 <code>REVIEW.md</code> 審查分支相對主分支的差異。</p>
               <p class="criterion"><strong>完成判準</strong> 已完成審查，發現的 Important 問題都已修正並驗證。</p>
-              <p class="route-note">首次 MVP 尚未設定 CI 時，本機驗收和審查都通過後，<a href="#merge">前往合併判斷</a>。</p>
+              <p class="route-note">若尚未建立 harness 改善流程（例如首次 MVP），審查修正驗證後可直接<a href="#merge-check">驗證待合併提交</a>。</p>
             </div>
             <div class="recovery">
               <h4>有 Important 問題</h4>
               <p>依發現修正，重跑受影響的測試與完整檢查，再核對該問題是否已解決。</p>
               <a href="#review">回審查確認</a>
             </div>
-            <div class="flow-next" aria-hidden="true"><span>已驗證 · 有 Harness</span></div>
+            <div class="flow-next" aria-hidden="true"><span>已有改善流程</span></div>
           </li>
           <li class="flow-row">
             <div class="node">
               <h3>改善 harness</h3>
-              <p>依 <code>IMPROVE.md</code> 回顧審查、人指出的問題與檢查結果。同一錯誤出現兩次時，能自動檢查就加到工具，其餘補到指示或審查規則。</p>
+              <p>依 <code>IMPROVE.md</code> 記下 Important 問題的實際觸發條件，和原計畫的 Proof 對照。確認回歸測試重現該情境，且會由完整檢查執行。</p>
+              <p>同一錯誤出現兩次時，能自動檢查就加到工具，其餘補到指示或審查規則。深色模式用延遲載入重現亮色閃現，並在窄視窗重現導覽換列。<a href="../docs/IMPROVE.md">改善流程</a></p>
             </div>
             <div class="flow-next" aria-hidden="true"></div>
           </li>
-          <li class="flow-row" id="ci">
+          <li class="flow-row" id="merge-check">
             <div class="node">
-              <h3>推送分支並確認 CI</h3>
-              <p class="criterion"><strong>完成判準</strong> 最後一次推送的提交已通過 CI。</p>
+              <h3>驗證待合併提交</h3>
+              <div class="routes">
+                <div class="route-card" id="local-check">
+                  <h4>本機驗收</h4>
+                  <p>專案允許本機驗收時，對待合併提交跑完整檢查。Accountable 有 harness 時用 <code>npm run check</code>，首次 MVP 用 <code>npm test</code>。</p>
+                  <p><a href="week1day4-claude-code.html#step-15">Day 4 本機版</a></p>
+                </div>
+                <div class="route-card" id="ci">
+                  <h4>CI 驗收</h4>
+                  <p>專案啟用 CI 時，推送待合併的分支，確認通過的 CI 結果對應到待合併的提交。</p>
+                </div>
+              </div>
+              <p class="criterion"><strong>完成判準</strong> 已取得待合併提交的檢查通過紀錄。</p>
             </div>
             <div class="recovery">
-              <h4>CI 未通過</h4>
-              <p>看失敗紀錄找根因。修正後跑完整檢查並重推，查看新的執行結果。</p>
-              <a href="#ci">回 CI 確認</a>
+              <h4>檢查未通過</h4>
+              <p>從失敗輸出找根因。修正後對新提交重跑完整檢查。走 CI 路徑時，再推送並確認新結果。</p>
+              <a href="#merge-check">回到提交驗證</a>
             </div>
             <div class="flow-next" aria-hidden="true"><span>通過</span></div>
           </li>
           <li class="flow-row" id="merge">
             <div class="node">
               <h3>核對證據，由你決定合併</h3>
-              <p>核對本機驗收與審查結果。已有 CI 時，確認通過的是這次要合併的提交，再合回主分支。</p>
+              <p>核對驗收證據、審查修正，以及待合併提交的檢查結果。確認接受變更後，合回主分支。</p>
             </div>
             <div class="flow-next" aria-hidden="true"></div>
           </li>
@@ -348,6 +363,7 @@ main { display: grid; gap: 24px; }
         <div class="node">
           <div class="node-top"><span class="tag tag-maintain" lang="en">Maintain</span><h3>在合併後的版本試用</h3></div>
           <p>走一遍日常操作，把發現記到 <code>docs/STATUS.md</code> 的 Ideas for later。</p>
+          <p>例如在窄視窗捲到看板右側，從商機詳情返回時發現捲動位置歸零。<a href="../docs/STATUS.md#ideas-for-later">深色模式的試用觀察</a></p>
           <p class="criterion"><strong>完成判準</strong> 記下具體情境，下一次規劃時有據可查。</p>
         </div>
         <div class="loop-back"><a href="#plan">回 Plan 開始下一次規劃</a></div>

@@ -1,5 +1,12 @@
 # 專案進度
 
+## 2026-11-26｜Day 4 第 13 步「跑完整檢查並留下四張截圖」完成
+
+- `UV_NO_CACHE=1 npm run check` 通過 66 項測試。使用暫存 SQLite 與獨立 Chrome 設定檔走訪五個區塊、列表及詳情與「找不到頁面」，確認重新整理和重開保留主題，清除網站資料後回到亮色。
+- 量測兩種主題中切換控制、圖表刻度與提示、逾期標示、對話框和錯誤訊息。代表性一般文字均達 4.5:1。1024 px 下可使用共用導覽、看板橫向捲動與鍵盤拖曳。
+- 四張 Playwright 截圖以同一組範例資料和 1440 × 1000 視窗擷取。亮色與變更前的差異限於新增按鈕。[亮色儀表板](changes/dark-mode/dashboard-light.png) · [深色儀表板](changes/dark-mode/dashboard-dark.png) · [亮色商機看板](changes/dark-mode/pipeline-light.png) · [深色商機看板](changes/dark-mode/pipeline-dark.png)
+- 課程筆記顯示 12／16 步完成、1 步略過。下一步是[用獨立 session 審查分支](../notes/week1day4-claude-code.html#step-14)。
+
 ## 2026-11-26｜Day 4 第 12 步「依 plan 實作並驗證各階段」完成
 
 - 亮色為預設，頂端的深色模式按鈕可用滑鼠或鍵盤操作。五個功能區塊及「找不到頁面」共用切換入口。以獨立的 Chrome 測試設定檔驗證重新整理及重開瀏覽器後保留選擇，清除網站資料後回到亮色。

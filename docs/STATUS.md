@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-26｜Day 4 第 9 步「開深色模式分支並確認 intent」完成
+
+- 從已合入 harness 的 `main` 建立 `dark-mode`，並以繁體中文確認[深色模式變更意圖](changes/dark-mode/intent.md)。首次開啟預設亮色，同一瀏覽器重新整理或重開會保留選擇，清除網站資料後回到亮色。「找不到頁面」也沿用目前主題並提供切換入口。
+- `UV_NO_CACHE=1 npm run check` 通過現有的 59 項測試，作為實作前的基線。
+- 課程筆記顯示 8／16 步完成、1 步略過。下一步是[讓 spec 描述變更後的產品](../notes/week1day4-claude-code.html#step-10)。
+
 ## 2026-11-25｜Day 4 第 8 步「把改善步驟寫入 harness」完成
 
 - 依講義原文建立 [docs/IMPROVE.md](IMPROVE.md)。[AGENTS.md](../AGENTS.md) 指定在 Deploy 階段修正審查發現後、合併前執行改善流程。

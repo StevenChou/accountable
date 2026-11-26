@@ -278,9 +278,12 @@ button:disabled {
 .theme-toggle {
   margin-inline-start: auto;
 }
-.theme-toggle span {
+.theme-toggle-state {
   margin-inline-start: 4px;
   color: var(--muted);
+}
+.theme-toggle-compact {
+  display: none;
 }
 
 main {
@@ -1057,6 +1060,25 @@ dialog::backdrop {
   th,
   td {
     padding-inline: 9px;
+  }
+}
+@media (730px < width < 900px) {
+  .masthead {
+    gap: 0;
+  }
+  .masthead nav {
+    margin-inline-start: 5vw;
+  }
+  .theme-toggle {
+    flex: 0 0 28px;
+    padding-inline: 0;
+    font-size: 12px;
+  }
+  .theme-toggle-label {
+    display: none;
+  }
+  .theme-toggle-compact {
+    display: inline;
   }
 }
 @media (max-width: 730px) {

@@ -47,8 +47,17 @@ export default function App({ initialTheme = 'light' }: { initialTheme?: Theme }
             </NavLink>
           ))}
         </nav>
-        <button type="button" className="secondary theme-toggle" aria-pressed={dark} onClick={toggleTheme}>
-          深色模式 <span aria-hidden="true">{dark ? '開啟' : '關閉'}</span>
+        <button
+          type="button"
+          className="secondary theme-toggle"
+          aria-label="亮色與深色模式"
+          aria-pressed={dark}
+          onClick={toggleTheme}
+        >
+          <span className="theme-toggle-label">
+            深色模式 <span className="theme-toggle-state">{dark ? '開啟' : '關閉'}</span>
+          </span>
+          <span className="theme-toggle-compact">{dark ? '深色' : '亮色'}</span>
         </button>
       </header>
       <main>

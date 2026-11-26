@@ -1,23 +1,17 @@
 export type Theme = 'light' | 'dark'
 
-const themePreference = 'accountable-theme'
-
-export function readTheme(): Theme {
-  try {
-    return window.localStorage.getItem(themePreference) === 'dark' ? 'dark' : 'light'
-  } catch {
-    return 'light'
-  }
-}
-
-export function applyTheme(theme: Theme) {
-  document.documentElement.dataset.theme = theme
+export function readInitialTheme(): Theme {
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
 }
 
 export function saveTheme(theme: Theme) {
-  applyTheme(theme)
+  const { dataset } = document.documentElement
+  dataset.theme = theme
+  const key = dataset.themeStorageKey
+  if (!key) return
+
   try {
-    window.localStorage.setItem(themePreference, theme)
+    window.localStorage.setItem(key, theme)
   } catch {
     // The current page can still use the selected theme when storage is unavailable.
   }

@@ -1,15 +1,20 @@
-import { afterEach, expect, it, vi } from 'vitest'
-import { readTheme, saveTheme } from './theme'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { readInitialTheme, saveTheme } from './theme'
+
+beforeEach(() => {
+  document.documentElement.dataset.themeStorageKey = 'accountable-theme'
+})
 
 afterEach(() => {
   window.localStorage.removeItem('accountable-theme')
   delete document.documentElement.dataset.theme
+  delete document.documentElement.dataset.themeStorageKey
 })
 
-it('尚未選擇或偏好無效時使用亮色', () => {
-  expect(readTheme()).toBe('light')
-  window.localStorage.setItem('accountable-theme', 'unknown')
-  expect(readTheme()).toBe('light')
+it('文件尚未套用有效主題時使用亮色', () => {
+  expect(readInitialTheme()).toBe('light')
+  document.documentElement.dataset.theme = 'unknown'
+  expect(readInitialTheme()).toBe('light')
 })
 
 it.each(['dark', 'light'] as const)('套用並儲存 %s 主題', (theme) => {
@@ -17,19 +22,15 @@ it.each(['dark', 'light'] as const)('套用並儲存 %s 主題', (theme) => {
 
   expect(document.documentElement.dataset.theme).toBe(theme)
   expect(window.localStorage.getItem('accountable-theme')).toBe(theme)
-  expect(readTheme()).toBe(theme)
+  expect(readInitialTheme()).toBe(theme)
 })
 
-it('瀏覽器拒絕儲存時預設亮色，仍可套用主題', () => {
-  const error = new DOMException('Storage unavailable', 'SecurityError')
-  vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-    throw error
-  })
+it('瀏覽器拒絕儲存時仍可套用主題', () => {
   vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-    throw error
+    throw new DOMException('Storage unavailable', 'SecurityError')
   })
 
-  expect(readTheme()).toBe('light')
   saveTheme('dark')
   expect(document.documentElement.dataset.theme).toBe('dark')
+  expect(window.localStorage.getItem('accountable-theme')).toBeNull()
 })

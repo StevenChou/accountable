@@ -1,9 +1,18 @@
 <!doctype html>
-<html lang="zh-Hant-TW">
+<html lang="zh-Hant-TW" data-theme="light" data-theme-storage-key="accountable-theme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f0f4f5" />
+    <script>
+      try {
+        const { dataset } = document.documentElement
+        if (window.localStorage.getItem(dataset.themeStorageKey) === 'dark') dataset.theme = 'dark'
+      } catch {
+        // The document defaults to light when browser storage is unavailable.
+      }
+    </script>
+    <link rel="stylesheet" href="/src/styles.css" />
     <link rel="icon" href="data:," />
     <title>Accountable</title>
   </head>

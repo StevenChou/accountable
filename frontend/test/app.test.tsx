@@ -88,7 +88,7 @@ it('共用頁首可用鍵盤切換，跨頁仍維持選擇', async () => {
   const user = userEvent.setup()
   render(<App />)
 
-  const toggle = screen.getByRole('button', { name: '深色模式' })
+  const toggle = screen.getByRole('button', { name: '亮色與深色模式' })
   expect(toggle.textContent).toContain('關閉')
   toggle.focus()
   await user.keyboard('{Enter}')
@@ -98,11 +98,11 @@ it('共用頁首可用鍵盤切換，跨頁仍維持選擇', async () => {
 
   await user.click(screen.getByRole('link', { name: '公司' }))
   expect(await screen.findByRole('link', { name: company.name })).toBeTruthy()
-  expect(screen.getByRole('button', { name: '深色模式', pressed: true })).toBe(toggle)
+  expect(screen.getByRole('button', { name: '亮色與深色模式', pressed: true })).toBe(toggle)
 
   window.history.back()
   expect(await screen.findByText('找不到頁面。')).toBeTruthy()
-  expect(screen.getByRole('button', { name: '深色模式', pressed: true })).toBe(toggle)
+  expect(screen.getByRole('button', { name: '亮色與深色模式', pressed: true })).toBe(toggle)
   toggle.focus()
   await user.keyboard(' ')
   expect(toggle.getAttribute('aria-pressed')).toBe('false')

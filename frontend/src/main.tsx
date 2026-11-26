@@ -1,8 +1,5 @@
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import './styles.css'
-import { applyTheme, readTheme } from './theme'
+import { readInitialTheme } from './theme'
 
-const theme = readTheme()
-applyTheme(theme)
-createRoot(document.getElementById('root')!).render(<App initialTheme={theme} />)
+createRoot(document.getElementById('root')!).render(<App initialTheme={readInitialTheme()} />)

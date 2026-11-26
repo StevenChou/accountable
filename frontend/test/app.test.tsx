@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { beforeEach, expect, it, vi } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import App from '../src/App'
 import type { Dashboard } from '../src/domain'
 import { activity, company, contact } from './fixtures'
@@ -23,6 +24,11 @@ const dashboard: Dashboard = {
 beforeEach(() => {
   fetchMock.mockReset()
   vi.stubGlobal('fetch', fetchMock)
+})
+
+afterEach(() => {
+  window.localStorage.removeItem('accountable-theme')
+  delete document.documentElement.dataset.theme
 })
 
 it('首頁顯示成交圖表，更新跟進失敗時保留待辦供重試', async () => {
@@ -74,4 +80,31 @@ it('找不到頁面時可返回儀表板', async () => {
 
   fireEvent.click(screen.getByRole('link', { name: '返回儀表板' }))
   expect(await screen.findByText('目前沒有近期活動。')).toBeTruthy()
+})
+
+it('共用頁首可用鍵盤切換，跨頁仍維持選擇', async () => {
+  window.history.replaceState(null, '', '/missing')
+  fetchMock.mockResolvedValueOnce(Response.json([company]))
+  const user = userEvent.setup()
+  render(<App />)
+
+  const toggle = screen.getByRole('button', { name: '深色模式' })
+  expect(toggle.textContent).toContain('關閉')
+  toggle.focus()
+  await user.keyboard('{Enter}')
+  expect(toggle.getAttribute('aria-pressed')).toBe('true')
+  expect(toggle.textContent).toContain('開啟')
+  expect(document.documentElement.dataset.theme).toBe('dark')
+
+  await user.click(screen.getByRole('link', { name: '公司' }))
+  expect(await screen.findByRole('link', { name: company.name })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '深色模式', pressed: true })).toBe(toggle)
+
+  window.history.back()
+  expect(await screen.findByText('找不到頁面。')).toBeTruthy()
+  expect(screen.getByRole('button', { name: '深色模式', pressed: true })).toBe(toggle)
+  toggle.focus()
+  await user.keyboard(' ')
+  expect(toggle.getAttribute('aria-pressed')).toBe('false')
+  expect(document.documentElement.dataset.theme).toBe('light')
 })

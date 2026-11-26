@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties } from 'react'
+import { useRef, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -99,12 +99,7 @@ function Card({ card, disabled }: { card: Deal; disabled: boolean }) {
 function Column({ lane, disabled, onAdd }: { lane: Lane; disabled: boolean; onAdd: () => void }) {
   const stage = stages[lane.stage]
   return (
-    <section
-      className="lane"
-      data-stage={lane.stage}
-      aria-label={stage.label}
-      style={{ '--stage-color': stage.color } as CSSProperties}
-    >
+    <section className="lane" data-stage={lane.stage} aria-label={stage.label}>
       <header className="lane-header">
         <div className="lane-title">
           <i aria-hidden="true" />

@@ -1,8 +1,9 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router'
 import { RecordList } from './pages/RecordList'
 import { RecordDetail } from './pages/RecordDetail'
 import { resourceNames, type Resource } from './domain'
+import { saveTheme, type Theme } from './theme'
 
 const DashboardPage = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.DashboardPage })))
 const PipelinePage = lazy(() => import('./pages/Pipeline').then((module) => ({ default: module.PipelinePage })))
@@ -15,7 +16,16 @@ const navigation = [
   { path: '/pipeline', label: '商機看板', icon: '▥' },
 ]
 
-export default function App() {
+export default function App({ initialTheme = 'light' }: { initialTheme?: Theme }) {
+  const [theme, setTheme] = useState(initialTheme)
+  const dark = theme === 'dark'
+
+  function toggleTheme() {
+    const nextTheme = dark ? 'light' : 'dark'
+    saveTheme(nextTheme)
+    setTheme(nextTheme)
+  }
+
   return (
     <BrowserRouter>
       <header className="masthead">
@@ -37,6 +47,9 @@ export default function App() {
             </NavLink>
           ))}
         </nav>
+        <button type="button" className="secondary theme-toggle" aria-pressed={dark} onClick={toggleTheme}>
+          深色模式 <span aria-hidden="true">{dark ? '開啟' : '關閉'}</span>
+        </button>
       </header>
       <main>
         <Suspense

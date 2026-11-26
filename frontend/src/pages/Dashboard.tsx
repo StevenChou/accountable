@@ -26,6 +26,9 @@ import {
   type Dashboard,
 } from '../domain'
 
+const chartTickStyle = { fill: 'var(--muted)', fontSize: 11 }
+const tooltipContent = { backgroundColor: 'var(--paper)', borderColor: 'var(--chart-tooltip-line)' }
+
 function ActivityLink({ activity }: { activity: Activity }) {
   return (
     <Link className="record-link" to={`/${activity.owner_type}/${activity.owner_id}#timeline`}>
@@ -52,10 +55,8 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
   const countStep = Math.max(2, Math.ceil((Math.max(...months.map((month) => month.count)) + 1) / 6) * 2)
   const amountTicks = [0, amountStep, 2 * amountStep, 3 * amountStep]
   const countTicks = [0, countStep, 2 * countStep, 3 * countStep]
-  const grid = <CartesianGrid vertical={false} stroke="#e3ecec" />
-  const axis = (
-    <XAxis dataKey="label" scale="band" tickLine={false} axisLine={false} tick={{ fill: '#516b74', fontSize: 11 }} />
-  )
+  const grid = <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
+  const axis = <XAxis dataKey="label" scale="band" tickLine={false} axisLine={false} tick={chartTickStyle} />
   return (
     <div className="charts">
       <section className="panel chart-panel">
@@ -78,16 +79,21 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
                 ticks={amountTicks}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#516b74', fontSize: 11 }}
+                tick={chartTickStyle}
                 tickFormatter={money}
               />
-              <Tooltip formatter={(_value, _name, item) => [money(item.payload.amount_cents), '成交金額']} />
+              <Tooltip
+                contentStyle={tooltipContent}
+                cursor={{ stroke: 'var(--chart-cursor)' }}
+                formatter={(_value, _name, item) => [money(item.payload.amount_cents), '成交金額']}
+              />
               <Area
                 dataKey="plotAmount"
-                stroke="#007e62"
+                stroke="var(--chart-line)"
                 strokeWidth={2.5}
-                fill="#06d6a0"
+                fill="var(--green)"
                 fillOpacity={0.1}
+                activeDot={{ stroke: 'var(--paper)' }}
                 dot={({ cx, cy, index }) => {
                   const latest = index === data.length - 1
                   return (
@@ -96,8 +102,8 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
                       cx={cx}
                       cy={cy}
                       r={latest ? 5 : 3.5}
-                      fill={latest ? '#06d6a0' : '#fff'}
-                      stroke="#007e62"
+                      fill={latest ? 'var(--green)' : 'var(--paper)'}
+                      stroke="var(--chart-line)"
                       strokeWidth={2}
                     />
                   )
@@ -129,14 +135,22 @@ function MonthCharts({ months }: { months: Dashboard['months'] }) {
                 allowDecimals={false}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#516b74', fontSize: 11 }}
+                tick={chartTickStyle}
               />
-              <Tooltip formatter={(value) => [`${value} 筆`, '成交筆數']} />
+              <Tooltip
+                contentStyle={tooltipContent}
+                itemStyle={{ color: 'var(--chart-bar-tooltip-ink)' }}
+                cursor={{ fill: 'var(--chart-cursor)', stroke: 'var(--chart-cursor)' }}
+                formatter={(value) => [`${value} 筆`, '成交筆數']}
+              />
               <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={34} isAnimationActive={false}>
                 {data.map((month, index) => (
-                  <Cell key={month.month} fill={index === data.length - 1 ? '#118ab2' : '#a7d9e6'} />
+                  <Cell
+                    key={month.month}
+                    fill={index === data.length - 1 ? 'var(--chart-bar)' : 'var(--chart-bar-earlier)'}
+                  />
                 ))}
-                <LabelList dataKey="count" position="top" offset={6} fill="#073b4c" fontSize={11} />
+                <LabelList dataKey="count" position="top" offset={6} fill="var(--ink)" fontSize={11} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -158,16 +172,14 @@ function StageAmounts({ rows }: { rows: Dashboard['stage_amounts'] }) {
       </div>
       <ul className="stage-amounts">
         {rows.map((row) => (
-          <li key={row.stage}>
+          <li key={row.stage} data-stage={row.stage}>
             <span className="stage-title">
-              <i style={{ background: stages[row.stage].color }} aria-hidden="true" />
+              <i aria-hidden="true" />
               {stages[row.stage].label}
             </span>
             <span className="num">{money(row.amount_cents)}</span>
             <span className="bar-track" aria-hidden="true">
-              <span
-                style={{ width: `${(Number(row.amount_cents) / largest) * 100}%`, background: stages[row.stage].color }}
-              />
+              <span style={{ width: `${(Number(row.amount_cents) / largest) * 100}%` }} />
             </span>
           </li>
         ))}

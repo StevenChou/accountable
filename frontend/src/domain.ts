@@ -1,10 +1,10 @@
 export const stages = {
-  new: { label: '新商機', probability: 10, color: '#06d6a0' },
-  qualified: { label: '已確認', probability: 25, color: '#ffc145' },
-  proposal: { label: '提案', probability: 50, color: '#f78c6b' },
-  negotiation: { label: '議價', probability: 75, color: '#118ab2' },
-  won: { label: '成交', probability: 100, color: '#073b4c' },
-  lost: { label: '失單', probability: 0, color: '#ef476f' },
+  new: { label: '新商機', probability: 10 },
+  qualified: { label: '已確認', probability: 25 },
+  proposal: { label: '提案', probability: 50 },
+  negotiation: { label: '議價', probability: 75 },
+  won: { label: '成交', probability: 100 },
+  lost: { label: '失單', probability: 0 },
 } as const
 
 export const statuses = { lead: '潛在客戶', qualified: '已確認', customer: '既有客戶' } as const

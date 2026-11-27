@@ -1,26 +1,26 @@
-This project will use the following high level technical stack:
+本專案採用以下技術堆疊。
 
-1. Node.js 26, the current LTS (24 or later works) / TypeScript for the frontend, using React and Vite, in `frontend/`
-2. Python 3.12 for the backend using uv, with FastAPI, in `backend/`, with `pyproject.toml` and `uv.lock` at the repo root
+1. 前端位於 `frontend/`，使用 Node.js 26（目前的 LTS，24 以上也可使用）和 TypeScript，搭配 React 與 Vite。
+2. 後端位於 `backend/`，使用 Python 3.12、uv 與 FastAPI，`pyproject.toml` 和 `uv.lock` 放在 repo 根目錄。
 
-The frontend gets its data from the backend's JSON API. The backend keeps the data in a local SQLite database file, using SQLAlchemy Core with no raw SQL, and fills it with the sample data when the database is new.
+前端透過後端的 JSON API 取得資料。後端將資料儲存在本機 SQLite 檔案中，一律使用 SQLAlchemy Core 的查詢建構工具存取資料。建立資料庫時會填入範例資料。
 
-Prefer popular, well-supported libraries to custom code, such as for the data tables, the charts and the drag-and-drop pipeline. Don't hand-roll what a mature library does well.
+資料表格、圖表與可拖曳的商機看板等功能，優先採用廣泛使用且有良好支援的成熟函式庫。現有函式庫可妥善處理的功能，直接沿用。
 
-For now it runs locally. Later, Supabase will provide sign-in and the database, and the app will be deployed to Render.
+目前應用程式在本機執行。之後會由 Supabase 提供登入與資料庫，並將應用程式部署到 Render。
 
-Commands are npm scripts in a `package.json` at the repo root, with `frontend/` as an npm workspace, so they work the same on Mac, Linux and Windows:
+開發指令定義在 repo 根目錄的 `package.json`，`frontend/` 設為 npm workspace。macOS、Linux 與 Windows 都使用相同指令。
 
-- `npm run dev` starts the backend and the frontend together
-- `npm test` runs all the tests and fails if any test fails
-- `npm run seed` resets the database to the sample data
+- `npm run dev` 同時啟動前端與後端。
+- `npm test` 執行全部測試。任一測試失敗時，指令會回傳非零結束碼。
+- `npm run seed` 將資料庫重設為範例資料。
 
-`docs/STATUS.md` says how to run the app. `README.md` is the course's own guide, so leave it as it is.
+應用程式的執行方式記錄在 `docs/STATUS.md`。`README.md` 是課程指南，請保留原文。
 
-Testing will cover:
+測試涵蓋以下項目。
 
-1. Unit tests for the frontend, using Vitest
-2. Unit tests for the backend, using pytest
-3. End-to-end tests of the whole app in a browser, in `e2e/`, using Playwright Test (`@playwright/test`) with the installed Google Chrome. They start the app themselves, so `npm test` needs nothing else running.
+1. 使用 Vitest 執行前端單元測試。
+2. 使用 pytest 執行後端單元測試。
+3. `e2e/` 的測試使用 Playwright Test（`@playwright/test`）和已安裝的 Google Chrome，在瀏覽器中執行整個應用程式的端對端測試。測試會自行啟動應用程式，直接執行 `npm test` 即可。
 
-The tests use a database of their own, so running them never changes your data.
+測試使用獨立的資料庫，測試寫入僅限於該資料庫。

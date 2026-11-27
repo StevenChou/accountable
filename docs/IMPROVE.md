@@ -1,8 +1,8 @@
-# Improve the harness
+# 改善開發防護機制
 
-Run this at Deploy, after the review fixes and before the merge.
+在部署（Deploy）階段修正審查發現後、合併前執行這個流程。
 
-1. Look at what went wrong on this change: the review's findings, what the person corrected and what the checks caught. For each Important finding, record the conditions that reproduce it and compare them with the cases in the original Proof.
-2. For a mistake that has happened twice, add the correction to AGENTS.md or docs/REVIEW.md, or suggest a change to docs/STANDARDS.md for the person to make. If a tool can catch it, add it to the checks instead. When the review fix already added a regression test, verify that it exercises the conditions from step 1 and runs through the standard check command.
-3. Remove anything out of date.
-4. Improve this file, so that the next round makes a better change. Keep this as the last step.
+1. 回顧這次變更遇到的問題，包含審查發現、開發者做了哪些修正，以及檢查攔下了哪些問題。逐項記錄 Important 問題的重現條件，並與原始實作計畫的 Proof 所列案例比對。
+2. 同一錯誤若已發生兩次，能用工具偵測時，就把它納入自動檢查。其餘情況將修正方式寫入 `AGENTS.md` 或 `docs/REVIEW.md`，或請開發者更新 `docs/STANDARDS.md`。若已為審查修正加入回歸測試，確認測試涵蓋第 1 步的重現條件，且標準檢查指令會執行該測試。
+3. 移除過時的內容。
+4. 更新這份文件，讓下一輪變更能依改進後的流程進行。每次都在最後執行這一步。

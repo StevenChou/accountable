@@ -1,5 +1,9 @@
 # 專案進度
 
+## 2026-11-27｜開發文件繁體中文化
+
+- 將 [開發防護機制的改善流程](IMPROVE.md) 與 [技術堆疊](TECH_STACK.md) 翻成繁體中文，保留原有步驟、技術版本與指令。
+
 ## 2026-11-27｜Day 5 第 3 步「接上快速 CI 並合併 subagents」完成（本機版）
 
 - 建立 [CI workflow](../.github/workflows/ci.yml)。任何分支推送時先用 Gitleaks 掃描 Git 歷史，再用 Node.js 26、Python 3.12 和鎖定的相依套件執行 `npm run check:quick`。Playwright 由本機完整檢查執行。

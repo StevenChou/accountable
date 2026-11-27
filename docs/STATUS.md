@@ -3,6 +3,7 @@
 ## 2026-11-27｜Day 5 第 2 步「建立並試跑兩個子代理」完成
 
 - 建立 `reviewer` 與 `ui-check` 的專案設定。在新開的 Claude Code session 中以 Haiku 委派，兩個子代理都以 Sonnet 執行。`reviewer` 的 hook 只允許唯讀 Git 查詢，已驗證可讀取提交及拒絕寫入、重導向和串接指令。
+- 兩份子代理的描述和提示詞改用繁體中文，沿用原有的模型與工具權限設定。
 - `reviewer` 依審查政策檢查 `b5cd061`，回報 0 項 Important 和 3 項文件可讀性建議，涉及 Proof 的出處、標準檢查指令及第 2 點的段落結構。
 - `ui-check` 用 Playwright MCP 檢查亮色儀表板與商機看板，兩頁均無主控台錯誤或警告。截圖存於 Git 忽略的 `.playwright-mcp/day5-dashboard.png` 與 `.playwright-mcp/day5-pipeline.png`。補查確認近期活動的 10 筆資料皆可捲動查看。試跑服務已停止，暫存 SQLite 已清理。
 - `UV_NO_CACHE=1 npm run check` 通過全部 69 項測試。在 Chrome 桌面與手機尺寸確認講義顯示完成 2／16 步，重新整理後保留手動勾選。下一步是[接上快速 CI 並合併 subagents](../notes/week1day5-claude-code.html#step-3)。

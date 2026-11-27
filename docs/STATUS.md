@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-27｜Day 5 第 3 步「接上快速 CI 並合併 subagents」完成（本機版）
+
+- 建立 [CI workflow](../.github/workflows/ci.yml)。任何分支推送時先用 Gitleaks 掃描 Git 歷史，再用 Node.js 26、Python 3.12 和鎖定的相依套件執行 `npm run check:quick`。Playwright 由本機完整檢查執行。
+- 本機 `actionlint` 與 Gitleaks 歷史掃描皆通過，`UV_NO_CACHE=1 npm run check:quick` 通過 53 項測試。以待合併提交的本機完整檢查作為快轉合併依據。
+- `subagents` 合併至本機 `main`，已清理本機分支。fork 的 GitHub Actions 驗證待首次推送。講義標記為「完成（本機版）」。[Day 5 第 3 步](../notes/week1day5-claude-code.html#step-3)
+
 ## 2026-11-27｜Day 5 第 2 步「建立並試跑兩個子代理」完成
 
 - 建立 `reviewer` 與 `ui-check` 的專案設定。在新開的 Claude Code session 中以 Haiku 委派，兩個子代理都以 Sonnet 執行。`reviewer` 的 hook 只允許唯讀 Git 查詢，已驗證可讀取提交及拒絕寫入、重導向和串接指令。

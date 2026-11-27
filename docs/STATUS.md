@@ -1,5 +1,17 @@
 # 專案進度
 
+## 2026-11-27｜Day 5 第 5 步「連接唯讀 Supabase MCP」完成
+
+- Supabase MCP 設在 Claude Code 的本機範圍，限定 `accountable` 專案並啟用 `read_only=true`。使用者完成 OAuth 授權後，`claude mcp get supabase` 顯示已連線。
+- 依需求在 [`.mcp.json`](../.mcp.json) 加上共用的 `project` scope，指向同一個唯讀 Supabase 專案。兩份設定名稱同為 `supabase`，Claude Code 會優先使用 `local` 設定。協作者使用 `project` 設定時各自完成 OAuth 授權。
+- 用 jsdom 驗證講義顯示完成 5／16 步及勾選保存。`UV_NO_CACHE=1 npm run check:quick` 通過 53 項測試。下一步是[確認登入、搜尋與選單的 intent](../notes/week1day5-claude-code.html#step-6)。
+
+## 2026-11-27｜Day 5 第 4 步「建立 multi-user 與 Supabase 專案」完成
+
+- 從本機 `main` 建立 `multi-user`。在既有的 Supabase `accountable` 專案確認已有一位完成 Email 驗證的使用者。
+- 使用者修正本機 `.env` 的變數名稱後，課程驗證腳本確認 Session pooler 可連線、Project URL 與資料庫屬於同一專案、Supabase Auth 接受 publishable key，以及自行註冊已關閉。`.env` 由 Git 忽略。
+- 在 Chrome 桌面與手機尺寸驗證講義完成 4／16 步及勾選保存。`UV_NO_CACHE=1 npm run check` 通過 69 項測試。下一步是[連接唯讀 Supabase MCP](../notes/week1day5-claude-code.html#step-5)。
+
 ## 2026-11-27｜補充可重用的產品規格管理流程
 
 - 在開發流程速查補上規格入口、區域規格、變更紀錄、程式與測試的用途，說明怎麼查閱、更新、拆分和審查規格。以商機階段的成交機率變更示範如何辨認跨功能影響。[產品規格怎麼組織與維護](../notes/project-development-flow.html#spec-structure)

@@ -5,7 +5,7 @@ tools: Read, mcp__playwright__browser_navigate, mcp__playwright__browser_snapsho
 model: sonnet
 ---
 
-先讀 `docs/spec.md` 和 `.claude/skills/brand/SKILL.md`。使用呼叫者提供的本機回送網址開啟運行中的 App。檢查指定頁面，未指定時走訪規格所列的五個主要功能區塊。
+先讀 `docs/spec.md` 和 `.claude/skills/brand/SKILL.md`，再依索引查閱待檢查頁面的區域規格及適用的共用介面規則。使用呼叫者提供的本機回送網址開啟運行中的 App。檢查指定頁面，未指定時走訪規格所列的五個主要功能區塊。
 
 等每頁顯示資料後，對照規格和品牌規範檢查畫面文字、版面、字型、色彩與操作行為。查看瀏覽器主控台是否有錯誤。需要讀取瀏覽器計算後的樣式時，使用唯讀 DOM 查詢。保持應用程式資料與原始碼原樣。
 

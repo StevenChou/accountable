@@ -4,7 +4,7 @@
 
 ## 專案文件
 
-- 先讀 [docs/spec.md](docs/spec.md)。這份規格描述產品現況，是判斷產品行為的依據。
+- 先讀 [產品摘要與規格索引](docs/spec.md)，再查閱本次變更涉及的區域規格及適用的共用規則。變更產品行為時，在同一項變更中同步更新受影響的規格及驗收條件。產品範圍或文件入口有異動時，也要更新索引。
 - 每項變更的 `intent.md` 和 `plan.md` 放在 `docs/changes/<branch name>/`。查閱變更文件時，只讀當前分支的資料夾（若有）。
 - 技術選型記錄在 [docs/TECH_STACK.md](docs/TECH_STACK.md)。
 - 撰寫或修改程式時，遵循 [docs/STANDARDS.md](docs/STANDARDS.md)。

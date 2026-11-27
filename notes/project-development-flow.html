@@ -80,6 +80,12 @@ main { display: grid; gap: 24px; }
 .routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .route-card { display: grid; align-content: start; gap: 6px; padding: 14px 16px; border-radius: 12px; background: var(--bg); }
 .route-card p { font-size: 15px; }
+.spec-map, .spec-map dd { margin: 0; }
+.spec-map dt { font-weight: 700; }
+.spec-map dd { font-size: 15px; }
+.spec-guidance { display: grid; gap: 6px; }
+.spec-guidance ol { margin: 0; padding-inline-start: 1.4em; }
+.spec-guidance li + li { margin-top: 4px; }
 .disclosure { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
 .disclosure summary { color: var(--link); font-weight: 700; cursor: pointer; }
 .disclosure > :not(summary) { margin-top: 10px; }
@@ -210,6 +216,7 @@ main { display: grid; gap: 24px; }
   <nav class="jump-links" aria-label="頁面導覽">
     <a class="primary" href="#workflow-template">取得 workflow 檢核表</a>
     <a href="#starting-points">選擇專案起點</a>
+    <a href="#spec-structure">組織與維護產品規格</a>
     <a href="#workflow">跳到開發流程圖</a>
   </nav>
 </header>
@@ -228,7 +235,8 @@ main { display: grid; gap: 24px; }
 
 ## 專案設定
 
-- 主分支、規格與審查規則所在位置　〈填寫〉
+- 主分支　〈填寫〉
+- 規格入口、區域規格目錄（適用時）、變更紀錄目錄及審查政策所在位置　〈填寫〉
 - 本機快速檢查指令　〈填寫〉
 - 本機完整檢查指令　〈填寫〉
 - 共用 CI 的工作名稱與結果連結　〈啟用時填寫〉
@@ -238,15 +246,16 @@ main { display: grid; gap: 24px; }
 
 - [ ] 開分支。確認工作區與起始提交，從主分支開始。
 - [ ] Plan。確認 intent 裡的問題、對象、範圍和成功標準。
-- [ ] Design。核對規格差異與變更後的產品行為。
+- [ ] Design。先讀規格入口，再沿索引查閱受影響的區域與共用規則。更新規格與驗收條件，核對規格差異是否符合已確認的變更意圖。
 - [ ] Build。計畫列出順序、風險和 Proof，分段實作並驗證。
 - [ ] Test。本機完整檢查已通過，成功標準都有驗收證據。
-- [ ] Deploy。獨立審查、修正 Important 問題，再依結果改善既有的 harness。
+- [ ] Deploy。獨立核對受影響的規格、實作及測試，修正 Important 問題，再依結果改善既有的 harness。
 - [ ] 合併。待合併提交取得完整檢查與適用的 CI 結果，由人核對後合併。
 - [ ] Maintain。在交付版本走一次日常操作，記下具體觀察和後續想法。
 
 ## 依變更啟用
 
+- [ ] Design 需要拆分規格時，保留原入口作為摘要與索引，按功能搬移細節，核對內容與連結，更新代理閱讀指引和審查政策。先獨立提交規格搬移，再提交產品行為的變更。
 - [ ] Test 有介面變更時，用 ui-check 或手動檢查並保存畫面證據。
 - [ ] Test 有外部服務時，用授權的驗收環境試跑正式啟動方式，核對適用的 migration 與存取規則。
 - [ ] 合併前有共用 CI 時，確認同一個待合併提交的分支 CI 已通過。
@@ -306,6 +315,55 @@ main { display: grid; gap: 24px; }
     </details>
   </section>
 
+  <section class="panel" id="spec-structure" aria-labelledby="spec-structure-heading">
+    <h2 id="spec-structure-heading">產品規格怎麼組織與維護</h2>
+    <p>每次開工從同一份規格入口了解產品，再依這次變更的範圍查閱細節。以下用 Accountable 的文件路徑示範，套用到其他專案時，將實際位置記入上方的檢核表。</p>
+
+    <dl class="routes spec-map">
+      <div class="route-card">
+        <dt><code>docs/spec.md</code> · 規格入口</dt>
+        <dd>每個代理開工先讀。放產品摘要、適用全產品的重要規則，以及能找到各區域規格的索引。</dd>
+      </div>
+      <div class="route-card">
+        <dt><code>docs/specs/&lt;area&gt;.md</code> · 區域規格</dt>
+        <dd>變更碰到該區域時查閱。記錄功能目前應有的行為、適用條件、例外情境及驗收條件。</dd>
+      </div>
+      <div class="route-card">
+        <dt><code>docs/changes/&lt;branch&gt;/</code> · 變更紀錄</dt>
+        <dd>處理該分支時讀取。<code>intent.md</code> 記錄為什麼改與成功標準，<code>plan.md</code> 記錄實作順序、風險與驗證方式。合併後保留為此次變更的紀錄。</dd>
+      </div>
+      <div class="route-card">
+        <dt>程式與測試 · 實際行為的證據</dt>
+        <dd>核對行為時查閱。程式顯示系統實際怎麼運作，測試提供已覆蓋情境的驗證證據。用規格判斷產品應該怎麼運作。</dd>
+      </div>
+    </dl>
+
+    <div class="spec-guidance">
+      <h3>每次變更怎麼讀、怎麼更新</h3>
+      <ol>
+        <li>先讀規格入口，從索引找出直接受影響的區域和共用規則。也確認其他區域是否會使用改動後的資料或行為，再讀當前分支的意圖與計畫（若有）。</li>
+        <li>在同一次變更更新受影響的規格與驗收條件。每條共用規則選定一處維護，其他區域以連結引用。例如預期營收的計算規則寫在統計規格，儀表板與看板各自描述呈現時機並連過去。</li>
+        <li>審查時對照受影響的規格、實作及測試。若有落差，以已確認的變更意圖判斷。實作偏離既定行為時修正程式，產品方向已確認調整時更新規格。兩種情況都要補足相關的驗收證據。</li>
+      </ol>
+    </div>
+
+    <div class="spec-guidance">
+      <h3>什麼時候拆分規格</h3>
+      <p>規格容易查找時，可以集中在一份。當同一份文件涵蓋多個功能，找一條規則得反覆翻找時，就按產品區域拆分。</p>
+      <ol>
+        <li>在原路徑保留摘要、重要規則與索引，將既有細節移到對應區域。核對搬移前後的行為與驗收條件，並確認索引及內部連結都能找到內容。</li>
+        <li>更新代理閱讀指引和審查政策。Accountable 會更新 <code>AGENTS.md</code> 與 <code>docs/REVIEW.md</code>，讓代理先讀入口，再查閱並審查受影響的區域規格。</li>
+        <li>先獨立提交規格搬移，再提交這次的行為變更。審查者可以逐筆核對文件搬移與行為差異。<a href="week1day5-claude-code.html#step-7">Day 5 拆分規格</a> · <a href="week1day5-claude-code.html#step-8">Day 5 更新產品行為</a></li>
+      </ol>
+    </div>
+
+    <div class="route-card">
+      <h3>Accountable 範例 · 調整商機移入議價時的預設成交機率</h3>
+      <p>先從規格入口找到商機與商機看板規則，核對表單變更與跨欄拖放。成交機率也會影響儀表板的預期營收，因此要一起讀儀表板與共用統計規則。</p>
+      <p>把新機率寫在共用的階段規則，並確認表單與看板規格都指向同一處。驗收時分別用表單及拖放把測試商機移入議價，確認兩種操作都套用新機率，再用已知商機金額核對儀表板更新後的預期營收。</p>
+    </div>
+  </section>
+
   <section class="panel" id="workflow" aria-labelledby="flow-heading">
     <h2 id="flow-heading">每次變更照流程走</h2>
     <ol class="flow-list" role="list" aria-label="開發流程">
@@ -328,8 +386,8 @@ main { display: grid; gap: 24px; }
         <div class="node">
           <div class="node-top"><span class="tag tag-design" lang="en">Design</span><h3>審閱變更後的產品行為</h3></div>
           <p>新產品建立 <code>spec.md</code>，依需要選定介面設計稿。既有產品用規格差異審閱變更後的行為，並標出要用原畫面比對的部分。<a href="week1day4-claude-code.html#step-10">Day 4 規格差異</a></p>
-          <p>若規格已難以查找，先把摘要與索引留在原路徑，將細節按產品區域拆開。規格重組單獨提交，再寫這次的行為變更。<a href="week1day5-claude-code.html#step-7">Day 5 拆分規格</a></p>
-          <p class="criterion"><strong>完成判準</strong> 已確認變更後的產品行為及本次要採用的設計。</p>
+          <p>先讀規格入口，再沿索引查閱本次影響的區域與共用規則。規格難以查找時，先獨立提交文件重組，再寫這次的行為變更。<a href="#spec-structure">產品規格怎麼組織與維護</a></p>
+          <p class="criterion"><strong>完成判準</strong> 已確認變更後的產品行為與採用的設計，並核對受影響的區域、共用規則及驗收條件。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
       </li>

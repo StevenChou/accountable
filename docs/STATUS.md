@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-27｜Day 5 第 1 步「確認 Day 4 起點並開分支」完成
+
+- 確認工作區乾淨，且 `main`（`7c0ef09`）包含 Day 4 的深色模式及合併前修正。確認 `fork` 指向 `StevenChou/accountable`，並從自己的 `main` 建立及切換到 `subagents`。
+- Gitleaks `8.30.1` 可用。`UV_NO_CACHE=1 npm run check` 通過 69 項測試，`UV_NO_CACHE=1 npm run check:quick` 通過 53 項測試。
+- Chrome 在桌面與手機尺寸驗證講義顯示完成 1／16 步，並在重新整理後保留手動勾選。下一步是[建立並試跑兩個子代理](../notes/week1day5-claude-code.html#step-2)。
+
 ## 2026-11-27｜將 Day 5 融入專案開發流程
 
 - 加入可複製的 Markdown 檢核表，以本機完整驗收為預設，並列出介面、外部服務、共用 CI 和正式部署適用時的完成判準。[Workflow 檢核表](../notes/project-development-flow.html#workflow-template)

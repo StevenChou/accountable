@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-27｜Day 5 第 6 步「確認登入、搜尋與選單的 intent」完成
+
+- 確認 Supabase 帳密登入、團隊共用資料、頂欄搜尋及使用者選單的目標、限制、範圍與六項成功標準。[多人共用變更意圖](changes/multi-user/intent.md)
+- 使用者確認公司、聯絡人、商機與活動的新增者顯示完整 Email。首次主題沿用亮色，選單新增跟隨系統選項。
+- 用 jsdom 驗證講義顯示完成 6／16 步、勾選保存和意圖文件連結。`UV_NO_CACHE=1 npm run check:quick` 通過 53 項測試。下一步是[把現有規格拆成索引與區域文件](../notes/week1day5-claude-code.html#step-7)。
+
 ## 2026-11-27｜Day 5 第 5 步「連接唯讀 Supabase MCP」完成
 
 - Supabase MCP 設在 Claude Code 的本機範圍，限定 `accountable` 專案並啟用 `read_only=true`。使用者完成 OAuth 授權後，`claude mcp get supabase` 顯示已連線。

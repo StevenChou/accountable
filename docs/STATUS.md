@@ -1,10 +1,16 @@
 # 專案進度
 
-## 2026-11-27｜Day 5 第 10 步「按計畫實作並執行測試」程式已實作
+## 2026-11-27｜Day 5 第 11 步「跑完整檢查與 ui-check」完成
+
+- 使用隔離的 Chromium Headless Shell 重跑 `npm run check`，共通過 94 項測試。Claude 的 `ui-check` 用虛構帳號走訪五個功能區塊、三種紀錄詳情和找不到頁面。主控台錯誤及警告均為 0。
+- 複核兩種主題、鍵盤、全站搜尋、登入後詳情與登出，以及 1024px 頁首。儀表板可捲到第 10 筆活動，成交欄可捲到第 12 張卡片。電話與 Email 欄位沿用原有字型，複核後沒有本次變更新增的 UI 問題。
+- 報告和 12 張截圖存於本機 `.playwright-mcp/day5-ui-check/`。隔離瀏覽器與測試服務已關閉，暫存資料庫已清理。下一步是[試跑兩種模式並驗證線上資料庫](../notes/week1day5-claude-code.html#step-12)。
+
+## 2026-11-27｜Day 5 第 10 步「按計畫實作並執行測試」完成
 
 - 已接上登入與 CRM API 驗證、操作人與 SQLite 升級、全站搜尋、使用者選單及三種主題模式。已建立正式啟動入口和 [Render 設定](../render.yaml)。[實作計畫](changes/multi-user/plan.md)
-- 無正式設定和帶虛構正式設定時，`npm run check:quick` 均通過 74 項測試。前端正式建置通過，另以程序內 HTTP 檢查確認其靜態資源、紀錄直連及未登入的 API 回應。測試使用暫存 SQLite 與虛構使用者。
-- Playwright 已辨識 20 項端對端測試。瀏覽器執行仍待授權，因此第 10 步的完成判準尚未勾選。Supabase 與 Render 的線上驗收依課程在後續步驟執行。[Day 5 第 10 步](../notes/week1day5-claude-code.html#step-10)
+- 無正式設定時，快速檢查及 Playwright 通過。帶虛構正式設定時，`npm run check` 通過。兩種條件各通過 94 項測試，包括 37 項 Vitest、37 項 pytest 和 20 項 Playwright。端對端測試使用 Chromium Headless Shell、暫存 SQLite 與虛構使用者。
+- 前端正式建置通過，另以程序內 HTTP 檢查確認其靜態資源、紀錄直連及未登入的 API 回應。下一步是[跑完整檢查與 ui-check](../notes/week1day5-claude-code.html#step-11)，正式 Supabase 與 Render 的線上驗收依課程在後續步驟執行。
 
 ## 2026-11-27｜Day 5 第 9 步「寫出三階段的實作計畫」完成
 
@@ -279,7 +285,9 @@ npm run dev
 
 在瀏覽器開啟 `http://127.0.0.1:5173/`。本機開發可用虛構帳號 `alex@example.test` 或 `sam@example.test` 登入，密碼均為 `accountable-demo`。完成安裝後可離線執行 `npm run dev` 及使用應用程式。在同一個終端機按 Ctrl+C 停止前後端。
 
+- 若分開啟動，兩個終端機都在 repo 根目錄。執行 `npm run dev:api` 啟動 `8000` 的後端，執行 `npm run dev:web` 啟動 `5173` 的前端。若網頁能開啟卻顯示 HTTP 500，先確認後端已啟動，並用 `curl -f http://127.0.0.1:5173/api/health` 檢查前端能否連到後端。
 - `npm test` 執行三套測試。Playwright 會啟停自己的服務，並用暫存資料庫。
+- Playwright 預設使用已安裝的 Google Chrome。若改用 Chromium Headless Shell，先執行 `npx playwright install chromium --only-shell`，再執行 `ACCOUNTABLE_E2E_BROWSER=chromium npm run check`。
 - 完整或快速檢查需要先安裝 gitleaks，並確認 `gitleaks version` 可執行。[安裝步驟](../notes/week1day4-claude-code.html#step-1)
 - `npm ci` 後可用 `npm run hooks:install` 安裝或確認本機 Git pre-commit hook。
 - `npm run seed` 會**清除目前選定的本機 SQLite 資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。

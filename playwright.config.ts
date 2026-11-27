@@ -24,7 +24,7 @@ export default defineConfig({
   workers: 1,
   use: {
     baseURL,
-    channel: 'chrome',
+    channel: process.env.ACCOUNTABLE_E2E_BROWSER === 'chromium' ? undefined : 'chrome',
     viewport: { width: 1440, height: 1000 },
     trace: 'retain-on-failure',
   },

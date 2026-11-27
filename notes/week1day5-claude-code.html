@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Code Day 5 · 子代理、多人共用與上線</title>
+<style>
+/* Layout and palette follow the Day 4 notes. */
+:root {
+  --bg: #F0F4F5;
+  --panel: #FFFFFF;
+  --ink: #073B4C;
+  --ink-soft: #46656F;
+  --line: #D6E1E4;
+  --link: #0B6E8F;
+  --code-bg: #073B4C;
+  --code-fg: #E4EDEF;
+  --code-muted: #8FB0B8;
+  --code-btn: #0E4B5F;
+  --code-btn-hover: #145C73;
+  --tint-cerulean: #E0EFF5;
+  --tint-neutral: #E4EBED;
+  --ink-green: #036B53;
+  --ink-cerulean: #0B5C78;
+  --neutral-fill: #D3DEE1;
+  --sea: #06D6A0;
+  --marigold: #FFC145;
+  --coral: #F78C6B;
+  --cerulean-deep: #0B6E8F;
+  --raspberry-deep: #C9264F;
+  --midnight: #073B4C;
+  --white: #FFFFFF;
+
+  --font-body: "Instrument Sans", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --radius-panel: 16px;
+  --radius-inner: 12px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible, .table-wrap:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+code, kbd, pre { font-family: var(--font-mono); }
+:not(pre) > code {
+  font-size: 0.86em;
+  background: var(--tint-neutral);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.35; margin: 0; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3em; }
+li + li { margin-top: 4px; }
+
+/* ---------- header ---------- */
+.masthead {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-block: 48px 32px;
+  display: grid;
+  gap: 14px;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-green);
+}
+.masthead h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+@media (max-width: 600px) {
+  .title-separator { display: none; }
+  .title-topic { display: block; }
+}
+.lede { font-size: 17px; color: var(--ink-soft); max-width: 46em; }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.meta span { display: inline-flex; gap: 6px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.meta b { font-weight: 600; color: var(--ink); }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+.toc-side { display: none; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 232px minmax(0, 1fr); gap: 56px; }
+  .toc-side { display: block; }
+  .toc-mobile { display: none; }
+}
+.content { display: grid; gap: 28px; min-width: 0; max-width: 800px; }
+
+/* ---------- table of contents ---------- */
+.toc-side nav {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.toc-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 10px; }
+.toc-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+.toc-list li + li { margin-top: 0; }
+.toc-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.toc-list a:hover { background: var(--panel); }
+.toc-list a[aria-current="true"] { background: var(--panel); font-weight: 600; }
+.toc-sep { height: 1px; background: var(--line); margin: 8px 10px; }
+.toc-group {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 10px 10px 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toc-group .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-width: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-left: auto; }
+.toc-mobile {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 4px 18px;
+}
+.toc-mobile summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 12px 0;
+}
+.toc-mobile .toc-list { padding-bottom: 12px; }
+
+/* ---------- status ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.s-done { background: var(--sea); color: var(--midnight); }
+.s-next { background: var(--marigold); color: var(--midnight); }
+.s-none { background: var(--neutral-fill); color: var(--ink); }
+
+/* ---------- stage tags ---------- */
+.stage-line { margin-bottom: 4px; }
+.stage-tag {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+.st-prep { background: var(--neutral-fill); color: var(--ink); }
+.st-1 { background: var(--sea); color: var(--midnight); }
+.st-2 { background: var(--marigold); color: var(--midnight); }
+.st-3 { background: var(--coral); color: var(--midnight); }
+.st-4 { background: var(--cerulean-deep); color: var(--white); }
+.st-5 { background: var(--raspberry-deep); color: var(--white); }
+.st-6 { background: var(--midnight); color: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.swatch.st-6 { box-shadow: inset 0 0 0 1px var(--line); }
+
+/* ---------- panels & sections ---------- */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius-panel);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+@media (max-width: 600px) { .panel { padding: 20px 18px; } }
+.panel > h2 { font-size: 24px; font-weight: 700; }
+.section-note { color: var(--ink-soft); font-size: 15px; }
+.prose { display: grid; gap: 12px; }
+.fine { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+
+/* ---------- overview ---------- */
+.counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.overview { list-style: none; padding: 0; display: grid; gap: 0; }
+.overview li + li { margin-top: 0; }
+.overview li {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+@media (max-width: 360px) { .overview li { grid-template-columns: 1.6em minmax(0, 1fr) auto; gap: 2px 8px; } }
+.overview li:last-child { border-bottom: 0; }
+.overview .num { font-family: var(--font-mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.overview a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.overview a:hover { text-decoration: underline; }
+.overview .why { grid-column: 2 / 4; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.next { background: var(--tint-neutral); border-radius: var(--radius-inner); padding: 14px 16px; font-size: 15px; }
+
+/* ---------- glossary ---------- */
+.glossary { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; margin: 0; }
+@media (min-width: 720px) { .glossary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 32px; } }
+.glossary div { padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.glossary dt { font-weight: 700; margin-bottom: 2px; }
+.glossary dd { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-inner); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font-size: 13px; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+.stage-table { min-width: 700px; font-size: 14px; }
+.stage-table td:nth-child(1), .stage-table td:nth-child(2) { white-space: nowrap; }
+.stage-table td:nth-child(3) { min-width: 11em; }
+.stage-table code { overflow-wrap: normal; white-space: nowrap; }
+.cmd-table { min-width: 620px; }
+.cmd-table td:nth-child(2) code { white-space: nowrap; }
+.compare { min-width: 640px; font-size: 14px; }
+.compare thead th { white-space: normal; }
+.compare tbody th { font-weight: 700; width: 8em; }
+
+/* ---------- steps ---------- */
+.step-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.step-no {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--midnight);
+  color: var(--sea);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  flex: none;
+}
+.step-titles { flex: 1 1 220px; min-width: 0; }
+.step-titles h2 { font-size: 22px; font-weight: 700; }
+.step-titles .en { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); }
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.block { display: grid; gap: 12px; min-width: 0; }
+.callout { border-radius: var(--radius-inner); padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.callout .label { margin-bottom: 0; }
+.plain { background: var(--tint-cerulean); }
+.plain .label { color: var(--ink-cerulean); }
+.guide { background: var(--tint-neutral); }
+
+/* ---------- code ---------- */
+.code { background: var(--code-bg); border-radius: var(--radius-inner); min-width: 0; overflow: hidden; }
+.details { border: 1px solid var(--line); border-radius: var(--radius-inner); padding: 10px 14px; }
+.details summary { color: var(--link); cursor: pointer; font-weight: 600; }
+.details > :not(summary) { margin-top: 10px; }
+.code-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 0 16px;
+  font-size: 12.5px;
+  color: var(--code-muted);
+  font-family: var(--font-mono);
+}
+.copy {
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--code-fg);
+  background: var(--code-btn);
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+.copy:hover { background: var(--code-btn-hover); }
+.code pre {
+  margin: 0;
+  padding: 10px 16px 16px;
+  overflow-x: auto;
+  color: var(--code-fg);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.code.wrap pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.code pre code { background: transparent; padding: 0; font-size: inherit; }
+/* inline code on tinted areas sits on the panel color so the chip stays visible in both themes */
+.callout code, .checklist code, .next code { background: var(--panel); }
+.translation { font-size: 15px; color: var(--ink-soft); }
+
+/* ---------- checklist ---------- */
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist li + li { margin-top: 0; }
+.checklist label {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.checklist input { width: 18px; height: 18px; margin: 3px 0 0; flex: none; accent-color: var(--ink-green); }
+.checklist input:checked + span { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+
+.footer { max-width: 1160px; margin: 40px auto 0; font-size: 14px; color: var(--ink-soft); }
+@media (min-width: 1100px) { .footer { padding-left: 288px; } }
+.checklist-heading { margin: 0 0 6px; }
+.progress-total { font-weight: 700; font-variant-numeric: tabular-nums; }
+:target { scroll-margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Accountable 課程筆記 · Week 1 Day 5</div>
+  <h1>Claude Code 的 Day 5 <span class="title-separator" aria-hidden="true">·</span> <span class="title-topic">子代理、多人共用與上線</span></h1>
+  <p class="lede">用子代理分別審查程式與畫面，為 Accountable 加入登入、搜尋與使用者選單，再部署到 Render。</p>
+  <div class="meta">
+    <span><b>速查</b><a href="project-development-flow.html">專案開發流程圖</a></span>
+    <span><b>原文</b><a href="../course/instructions/week1day5.md"><code>course/instructions/week1day5.md</code></a></span>
+    <span><b>前一課</b><a href="week1day4-claude-code.html">Week 1 Day 4</a></span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc-side">
+    <nav aria-label="桌面目錄">
+      <div class="toc-title">目錄</div>
+      <ol class="toc-list">
+        <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+        <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+        <li><a href="#commits"><span class="toc-num"></span>分支與 commit</a></li>
+        <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+        <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+        <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · 子代理與 CI</li>
+        <li><a href="#step-1"><span class="toc-num">1</span>確認 Day 4 起點並開分支<span class="dot s-next" title="下一步" role="img" aria-label="下一步" data-step-status="1"></span></a></li>
+        <li><a href="#step-2"><span class="toc-num">2</span>建立並試跑兩個子代理<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="2"></span></a></li>
+        <li><a href="#step-3"><span class="toc-num">3</span>接上快速 CI 並合併 subagents<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="3"></span></a></li>
+        <li class="toc-group"><span class="swatch st-1" aria-hidden="true"></span>第 2 部分 · 多人共用</li>
+        <li><a href="#step-4"><span class="toc-num">4</span>建立 multi-user 與 Supabase 專案<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="4"></span></a></li>
+        <li><a href="#step-5"><span class="toc-num">5</span>連接唯讀 Supabase MCP<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="5"></span></a></li>
+        <li><a href="#step-6"><span class="toc-num">6</span>確認登入、搜尋與選單的 intent<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="6"></span></a></li>
+        <li><a href="#step-7"><span class="toc-num">7</span>把現有規格拆成索引與區域文件<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="7"></span></a></li>
+        <li><a href="#step-8"><span class="toc-num">8</span>讓規格描述變更後的產品<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="8"></span></a></li>
+        <li><a href="#step-9"><span class="toc-num">9</span>寫出三階段的實作計畫<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="9"></span></a></li>
+        <li><a href="#step-10"><span class="toc-num">10</span>按計畫實作並執行測試<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="10"></span></a></li>
+        <li><a href="#step-11"><span class="toc-num">11</span>跑完整檢查與 ui-check<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="11"></span></a></li>
+        <li><a href="#step-12"><span class="toc-num">12</span>試跑兩種模式並驗證線上資料庫<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="12"></span></a></li>
+        <li><a href="#step-13"><span class="toc-num">13</span>審查分支並依發現改善 harness<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="13"></span></a></li>
+        <li><a href="#step-14"><span class="toc-num">14</span>等 CI 通過、合併並推送 main<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="14"></span></a></li>
+        <li><a href="#step-15"><span class="toc-num">15</span>設定 Render Blueprint 並驗收上線<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="15"></span></a></li>
+        <li><a href="#step-16"><span class="toc-num">16</span>試用線上版本並寫下觀察<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="16"></span></a></li>
+        <li class="toc-sep" aria-hidden="true"></li>
+        <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+        <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <details class="toc-mobile">
+      <summary>目錄</summary>
+      <nav aria-label="手機目錄">
+        <ol class="toc-list">
+          <li><a href="#intro"><span class="toc-num"></span>這一天在做什麼</a></li>
+          <li><a href="#progress"><span class="toc-num"></span>進度總覽</a></li>
+          <li><a href="#commits"><span class="toc-num"></span>分支與 commit</a></li>
+          <li><a href="#glossary"><span class="toc-num"></span>名詞解釋</a></li>
+          <li><a href="#commands"><span class="toc-num"></span>今天用到的指令</a></li>
+          <li class="toc-group"><span class="swatch st-prep" aria-hidden="true"></span>第 1 部分 · 子代理與 CI</li>
+          <li><a href="#step-1"><span class="toc-num">1</span>確認 Day 4 起點並開分支<span class="dot s-next" title="下一步" role="img" aria-label="下一步" data-step-status="1"></span></a></li>
+          <li><a href="#step-2"><span class="toc-num">2</span>建立並試跑兩個子代理<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="2"></span></a></li>
+          <li><a href="#step-3"><span class="toc-num">3</span>接上快速 CI 並合併 subagents<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="3"></span></a></li>
+          <li class="toc-group"><span class="swatch st-1" aria-hidden="true"></span>第 2 部分 · 多人共用</li>
+          <li><a href="#step-4"><span class="toc-num">4</span>建立 multi-user 與 Supabase 專案<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="4"></span></a></li>
+          <li><a href="#step-5"><span class="toc-num">5</span>連接唯讀 Supabase MCP<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="5"></span></a></li>
+          <li><a href="#step-6"><span class="toc-num">6</span>確認登入、搜尋與選單的 intent<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="6"></span></a></li>
+          <li><a href="#step-7"><span class="toc-num">7</span>把現有規格拆成索引與區域文件<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="7"></span></a></li>
+          <li><a href="#step-8"><span class="toc-num">8</span>讓規格描述變更後的產品<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="8"></span></a></li>
+          <li><a href="#step-9"><span class="toc-num">9</span>寫出三階段的實作計畫<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="9"></span></a></li>
+          <li><a href="#step-10"><span class="toc-num">10</span>按計畫實作並執行測試<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="10"></span></a></li>
+          <li><a href="#step-11"><span class="toc-num">11</span>跑完整檢查與 ui-check<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="11"></span></a></li>
+          <li><a href="#step-12"><span class="toc-num">12</span>試跑兩種模式並驗證線上資料庫<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="12"></span></a></li>
+          <li><a href="#step-13"><span class="toc-num">13</span>審查分支並依發現改善 harness<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="13"></span></a></li>
+          <li><a href="#step-14"><span class="toc-num">14</span>等 CI 通過、合併並推送 main<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="14"></span></a></li>
+          <li><a href="#step-15"><span class="toc-num">15</span>設定 Render Blueprint 並驗收上線<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="15"></span></a></li>
+          <li><a href="#step-16"><span class="toc-num">16</span>試用線上版本並寫下觀察<span class="dot s-none" title="待完成" role="img" aria-label="待完成" data-step-status="16"></span></a></li>
+          <li class="toc-sep" aria-hidden="true"></li>
+          <li><a href="#usage"><span class="toc-num"></span>用量上限與 session</a></li>
+          <li><a href="#cheap"><span class="toc-num"></span>便宜模型路線的差異</a></li>
+        </ol>
+      </nav>
+    </details>
+
+    <section class="panel" id="intro">
+      <h2>這一天在做什麼</h2>
+      <div class="prose">
+        <p>Day 5 的主題是 Subagents and Agent Teams。先讓 <code>reviewer</code> 專心看變更，讓 <code>ui-check</code> 專心用瀏覽器驗收。把這兩個子代理和快速 CI 合回 <code>main</code> 後，再做多人共用的 Accountable。</p>
+        <p>今天沿用 Plan、Design、Build、Test、Deploy、Maintain。完成後，小團隊可用 Supabase 帳號登入由 Render 提供的 Accountable、查找共用資料，並透過使用者選單切換主題或登出。</p>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">怎麼讀這份頁面</h3>
+        <p>把「給 Claude 的指示」貼到 Claude Code，在 repo 根目錄執行「終端機」指令。要提交前先用 <code>git status --short</code> 看有哪些檔案。符合「完成判準」再勾選，進度會記在目前的瀏覽器。</p>
+      </div>
+    </section>
+
+    <section class="panel" id="progress">
+      <h2>進度總覽</h2>
+      <div class="counts">
+        <span class="progress-total" id="progress-total" role="status">完成 0 / 16 步</span>
+      </div>
+      <p class="next" id="next-step">下一步是<a href="#step-1">確認 Day 4 起點並開分支</a>。</p>
+      <ol class="overview">
+        <li><span class="num">1</span><a href="#step-1">確認 Day 4 起點並開分支</a><span class="pill s-next" data-step-status="1">下一步</span>
+          <span class="why">從已合入深色模式的 main 開出 subagents。</span></li>
+        <li><span class="num">2</span><a href="#step-2">建立並試跑兩個子代理</a><span class="pill s-none" data-step-status="2">待完成</span>
+          <span class="why">試用唯讀 reviewer，請 ui-check 檢查儀表板與商機看板。</span></li>
+        <li><span class="num">3</span><a href="#step-3">接上快速 CI 並合併 subagents</a><span class="pill s-none" data-step-status="3">待完成</span>
+          <span class="why">建立或更新 GitHub Actions，把端對端測試留在本機完整檢查。</span></li>
+        <li><span class="num">4</span><a href="#step-4">建立 multi-user 與 Supabase 專案</a><span class="pill s-none" data-step-status="4">待完成</span>
+          <span class="why">建立共用資料庫和第一位使用者，關閉註冊並驗證本機設定。</span></li>
+        <li><span class="num">5</span><a href="#step-5">連接唯讀 Supabase MCP</a><span class="pill s-none" data-step-status="5">待完成</span>
+          <span class="why">只讓 Claude 檢查這一個 Supabase 專案。</span></li>
+        <li><span class="num">6</span><a href="#step-6">確認登入、搜尋與選單的 intent</a><span class="pill s-none" data-step-status="6">待完成</span>
+          <span class="why">把產品目標、限制、範圍與成功標準寫進 intent。</span></li>
+        <li><span class="num">7</span><a href="#step-7">把現有規格拆成索引與區域文件</a><span class="pill s-none" data-step-status="7">待完成</span>
+          <span class="why">先調整規格文件的組織方式，讓後續設計差異容易讀。</span></li>
+        <li><span class="num">8</span><a href="#step-8">讓規格描述變更後的產品</a><span class="pill s-none" data-step-status="8">待完成</span>
+          <span class="why">用規格寫出登入前後、共用資料、搜尋與選單的實際行為。</span></li>
+        <li><span class="num">9</span><a href="#step-9">寫出三階段的實作計畫</a><span class="pill s-none" data-step-status="9">待完成</span>
+          <span class="why">依序安排登入與資料庫、搜尋、使用者選單，先寫驗證方式。</span></li>
+        <li><span class="num">10</span><a href="#step-10">按計畫實作並執行測試</a><span class="pill s-none" data-step-status="10">待完成</span>
+          <span class="why">按照三階段落實規格並執行 Proof 的測試。</span></li>
+        <li><span class="num">11</span><a href="#step-11">跑完整檢查與 ui-check</a><span class="pill s-none" data-step-status="11">待完成</span>
+          <span class="why">跑含端對端測試的完整檢查，檢視每頁回報與截圖。</span></li>
+        <li><span class="num">12</span><a href="#step-12">試跑兩種模式並驗證線上資料庫</a><span class="pill s-none" data-step-status="12">待完成</span>
+          <span class="why">分別用 SQLite 和 Supabase 登入，確認線上所有資料表啟用 RLS。</span></li>
+        <li><span class="num">13</span><a href="#step-13">審查分支並依發現改善 harness</a><span class="pill s-none" data-step-status="13">待完成</span>
+          <span class="why">使用 reviewer 審查，修正重要問題並回顧護欄。</span></li>
+        <li><span class="num">14</span><a href="#step-14">等 CI 通過、合併並推送 main</a><span class="pill s-none" data-step-status="14">待完成</span>
+          <span class="why">用同一個待合併提交核對本機完整檢查與分支 CI。</span></li>
+        <li><span class="num">15</span><a href="#step-15">設定 Render Blueprint 並驗收上線</a><span class="pill s-none" data-step-status="15">待完成</span>
+          <span class="why">用 fork 的 main 建立服務，從正式網址登入。</span></li>
+        <li><span class="num">16</span><a href="#step-16">試用線上版本並寫下觀察</a><span class="pill s-none" data-step-status="16">待完成</span>
+          <span class="why">用實際工作流程試用，將觀察記到 Ideas for later。</span></li>
+      </ol>
+    </section>
+
+    <section class="panel" id="commits">
+      <h2>分支與 commit</h2>
+      <p class="section-note">依序把 <code>subagents</code> 和 <code>multi-user</code> 合回自己的 <code>main</code>。Supabase 和 Render 的帳號設定在各自平台操作，提交前核對 Git 變更。</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="分支與 commit 對照">
+        <table class="stage-table">
+          <thead><tr><th scope="col">分支或階段</th><th scope="col">步驟</th><th scope="col">產出</th><th scope="col">commit 訊息</th></tr></thead>
+          <tbody>
+            <tr><td><span class="stage-tag st-prep">subagents</span></td><td><a href="#step-2">2</a></td><td>專案子代理</td><td><code>Subagents: reviewer and ui-check</code></td></tr>
+            <tr><td><span class="stage-tag st-prep">subagents</span></td><td><a href="#step-3">3</a></td><td>快速 CI</td><td><code>CI: leave out the end-to-end tests</code></td></tr>
+            <tr><td><span class="stage-tag st-1">1 Plan</span></td><td><a href="#step-6">6</a></td><td>確認 intent</td><td><code>Plan: intent.md agreed</code></td></tr>
+            <tr><td><span class="stage-tag st-2">2 Design</span></td><td><a href="#step-7">7</a>、<a href="#step-8">8</a></td><td>重組規格、設計變更</td><td><code>Design: split the spec</code><br><code>Design: the spec</code></td></tr>
+            <tr><td><span class="stage-tag st-3">3 Build</span></td><td><a href="#step-9">9</a>、<a href="#step-10">10</a></td><td>實作計畫、功能與測試</td><td><code>Build: plan.md</code><br><code>Build: sign-in, search and the user menu</code></td></tr>
+            <tr><td><span class="stage-tag st-4">4 Test</span></td><td><a href="#step-11">11</a>、<a href="#step-12">12</a></td><td>完整檢查、UI 及正式模式驗收</td><td><code>Test: checks and ui-check</code></td></tr>
+            <tr><td><span class="stage-tag st-5">5 Deploy</span></td><td><a href="#step-13">13</a>、<a href="#step-14">14</a></td><td>審查、改善 harness、CI</td><td><code>Deploy: review fixes</code><br><code>Deploy: harness improved</code><br><code>Deploy: independent review</code>（選做）<br><code>Deploy: CI fix</code>（CI 失敗時）</td></tr>
+            <tr><td><span class="stage-tag st-6">6 Maintain</span></td><td><a href="#step-16">16</a></td><td>記錄試用觀察</td><td><code>Maintain: ideas for later</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="glossary">
+      <h2>名詞解釋</h2>
+      <dl class="glossary">
+        <div><dt>Subagent</dt><dd>由主 session 委派的專項助手，有自己的上下文、工具權限和模型，可把檢查結果交回主 session。</dd></div>
+        <div><dt>Agent Teams</dt><dd>多個工作 session 由領隊分派任務，隊友也能彼此溝通。這是本日影片的示範。</dd></div>
+        <div><dt>CI</dt><dd>GitHub Actions 在收到 push 時執行檢查，結果對應到該次提交。</dd></div>
+        <div><dt>Supabase Auth 與 Postgres</dt><dd>Auth 管理團隊帳號及登入憑證，Postgres 儲存共用的 CRM 資料。</dd></div>
+        <div><dt>Session pooler</dt><dd>Supabase 提供的資料庫連線方式。講義使用面板列出的 pooler 主機與 port 5432。</dd></div>
+        <div><dt>Publishable key</dt><dd>瀏覽器可使用的專案識別金鑰。資料的存取仍依使用者身分以及資料庫政策限制。</dd></div>
+        <div><dt>MCP</dt><dd>讓 Claude 連接工具的協定。本日用 Playwright MCP 檢查頁面，用唯讀 Supabase MCP 檢查指定專案。</dd></div>
+        <div><dt>Migration 與 RLS</dt><dd>Migration 跟著程式版本演進資料庫結構。RLS 是資料列層級安全性，可限制資料列的讀寫。</dd></div>
+        <div><dt>Render Blueprint</dt><dd>以 repo 裡的 render.yaml 描述要建立和部署的服務。</dd></div>
+        <div><dt>Proof</dt><dd>實作計畫裡列出的驗證方式，用單元與端對端測試對應成功標準。</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel" id="commands">
+      <h2>今天用到的指令</h2>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="指令速查">
+        <table class="cmd-table">
+          <thead><tr><th scope="col">用途</th><th scope="col">指令</th><th scope="col">時機</th></tr></thead>
+          <tbody>
+            <tr><td>確認分支和檔案</td><td><code>git status --short --branch</code></td><td>開分支或提交前</td></tr>
+            <tr><td>重啟 Claude Code</td><td><code>/exit</code></td><td>回終端機再執行 claude，讓新子代理與 MCP 設定載入</td></tr>
+            <tr><td>清除對話上下文</td><td><code>/clear</code></td><td>開始 Plan、Build 實作與 Deploy 審查時</td></tr>
+            <tr><td>查看模型、用量、MCP</td><td><code>/model</code><br><code>/usage</code><br><code>/mcp</code></td><td>選模型、查用量與認證 Supabase</td></tr>
+            <tr><td>驗證 Supabase 設定</td><td><code>uv run course/check_supabase.py</code></td><td>手動填好 .env 後</td></tr>
+            <tr><td>本機完整檢查</td><td><code>npm run check</code></td><td>含 Playwright，Test 與合併前執行</td></tr>
+            <tr><td>GitHub Actions 快速檢查</td><td><code>npm run check:quick</code></td><td>CI 使用，省略 Playwright 端對端測試</td></tr>
+            <tr><td>啟動本機開發版</td><td><code>npm run dev</code></td><td>用本機 SQLite 與虛構隊友驗收</td></tr>
+            <tr><td>本機啟動正式版</td><td><code>npm start</code></td><td>依正式設定連接 Supabase 並執行 migrations</td></tr>
+            <tr><td>推送功能分支與 main</td><td><code>git push fork multi-user</code><br><code>git push fork main</code></td><td>先驗證功能分支，再由 main 的 CI 接續部署</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="step-1">
+      <div class="step-head">
+        <span class="step-no">1</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">準備</span></div>
+          <h2>確認 Day 4 起點並開分支</h2>
+          <div class="en" lang="en">Start the subagents branch</div>
+        </div>
+        <span class="pill s-next" data-step-status="1">下一步</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>先在 repo 根目錄確認工作目錄乾淨，且 <code>fork</code> 指向自己的 GitHub fork。這份 repo 的 Day 4 已合併深色模式，本機有完整與快速檢查，GitHub Actions 當時略過。第 3 步會從這個起點補上 CI。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 檢查目前狀態</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git status --short --branch
+git remote -v
+gitleaks version</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 從自己的 main 開分支</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git checkout main
+git checkout -b subagents</code></pre>
+        </div>
+        <details class="details">
+          <summary>改從 Ed 的 Day 4 版本開始</summary>
+          <p>先確認目前在自己的 <code>main</code>，工作目錄乾淨，並已取得 <code>origin/week1day4-end</code>。第一行把自己的成果留在 <code>my-day4</code>，第二行會移動本機 <code>main</code>。</p>
+          <div class="code">
+            <div class="code-head"><span>終端機 · 選用 Ed 的版本</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>git branch my-day4
+git checkout --no-track -B main origin/week1day4-end
+git checkout -b subagents</code></pre>
+          </div>
+        </details>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>先把以後都能共用的子代理與 CI 合進 <code>main</code>。後續的 <code>multi-user</code> 分支從同一套工作流程起步。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-1"><span>我已在 <code>subagents</code> 分支，確認 Day 4 成果、自己的 fork 和本機檢查可用。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-2">
+      <div class="step-head">
+        <span class="step-no">2</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">準備</span></div>
+          <h2>建立並試跑兩個子代理</h2>
+          <div class="en" lang="en">Create and try two subagents</div>
+        </div>
+        <span class="pill s-none" data-step-status="2">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>讓 Claude 把兩個子代理放在專案的 <code>.claude/agents/</code>，並設定相應的工具權限。<code>reviewer</code> 依審查政策按嚴重度回報，不寫檔。<code>ui-check</code> 透過 Playwright MCP 開頁面、比對規格與品牌，截圖存入 Git 已忽略的 <code>.playwright-mcp/</code>。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Create two project subagents for this coding agent:
+- reviewer: reviews the changes on a branch with docs/REVIEW.md and reports its findings by severity. It reads files and runs commands that only read, such as git diff, git log, git show and grep, and it never changes anything. It runs on Sonnet.
+- ui-check: checks the running app in the browser with the Playwright MCP server. It opens each page, takes a screenshot, checks it against the brand skill and docs/spec.md, and reports anything off-brand or broken. It saves its screenshots in .playwright-mcp/, which git ignores, and it doesn't change any code. It runs on Sonnet.
+Leave the commits to me.</code></pre>
+        </div>
+        <p class="translation">兩個子代理預設用 Sonnet。先用 <code>/model</code> 看主 session 的模型。若主 session 已用 Sonnet，把 reviewer 的模型改成 Haiku，讓另一個模型負責審查。</p>
+        <p>存好後，在 Claude Code 輸入 <code>/exit</code>，回到同一個 repo 根目錄執行 <code>claude</code>。確認 Playwright MCP 可用，再貼下方提示詞。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 試跑兩個子代理</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Start the app, ask ui-check to look at the dashboard and the pipeline, and ask reviewer to review the commit "Deploy: harness improved". Then stop the app.</code></pre>
+        </div>
+        <p>檢查兩份回報和截圖，對照審查政策與品牌規範，再確認 App 已停止。<a href="../docs/REVIEW.md"><code>docs/REVIEW.md</code></a> · <a href="../.claude/skills/brand/SKILL.md">品牌 skill</a></p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交子代理設定</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Subagents: reviewer and ui-check"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>子代理在自己的上下文裡做一項檢查再回報。Ed 也示範用 Agent Teams 協作建置，學員可以在一個主 session 依講義完成實作。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-2"><span>重啟後，<code>reviewer</code> 能回報指定 commit 的檢查，<code>ui-check</code> 能開兩個頁面並把截圖放到 <code>.playwright-mcp/</code>。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-3">
+      <div class="step-head">
+        <span class="step-no">3</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">準備</span></div>
+          <h2>接上快速 CI 並合併 subagents</h2>
+          <div class="en" lang="en">Set up quicker CI</div>
+        </div>
+        <span class="pill s-none" data-step-status="3">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>先在自己的 fork 開啟 <strong>Actions</strong>，依 GitHub 的提示啟用 workflows。這份 repo 在 Day 4 略過 CI，直接建立以快速檢查為主的 workflow。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · Day 4 未設定 CI</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Add .github/workflows/ci.yml with one check job that runs on every push to any branch. Check out the full history, install gitleaks, and scan the git history before installing application dependencies. Set up the project's Node and Python versions and uv, run npm ci and uv sync --locked, then run npm run check:quick. The workflow must cover main so Render can wait for its CI later. Do not add Supabase or Render secrets or Playwright browser and report setup. Keep npm run check as the full local check, update the repo docs that describe CI, and leave the commits to me.</code></pre>
+        </div>
+        <details class="details">
+          <summary>已有 Day 4 workflow 時，改用講義的提示詞</summary>
+          <div class="code wrap">
+            <div class="code-head"><span>給 Claude 的指示</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>Change .github/workflows/ci.yml to run npm run check:quick instead of npm run check, so that CI leaves out the end-to-end tests. Take out any step that only the end-to-end tests need, and update the docs that describe CI. Leave the commits to me.</code></pre>
+          </div>
+          <p>把 CI 改為 <code>npm run check:quick</code>，移除端對端測試專用的瀏覽器安裝和報告上傳，並更新描述 CI 的文件。</p>
+        </details>
+        <p>提交 workflow 後，在本機跑 <code>npm run check</code>，通過才推送該次提交到自己的 fork。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交並讓 fork 跑一次 CI</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "CI: leave out the end-to-end tests"
+npm run check &amp;&amp; git push fork subagents</code></pre>
+        </div>
+        <p>確認 Actions 對應這次提交的 run 成功，再合併。若 run 失敗，可用<a href="#ci-troubleshooting">第 14 步的 CI 排錯提示詞</a>，修好後重推 <code>subagents</code>。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 合併 subagents</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git checkout main
+git merge subagents
+git branch -d subagents</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>CI 讓每次 push 都有共用的檢查結果。本機 <code>npm run check</code> 仍含 Playwright，準備合併時要看待合併提交的本機完整檢查和 CI。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-3"><span>準備合併的提交已通過本機完整檢查與 fork 的快速 CI，<code>subagents</code> 已合回本機 <code>main</code>。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-4">
+      <div class="step-head">
+        <span class="step-no">4</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">準備</span></div>
+          <h2>建立 multi-user 與 Supabase 專案</h2>
+          <div class="en" lang="en">Set up Supabase</div>
+        </div>
+        <span class="pill s-none" data-step-status="4">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 從 main 開功能分支</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git checkout -b multi-user</code></pre>
+        </div>
+        <ol>
+          <li>在 <a href="https://supabase.com/">Supabase</a> 建立專案，選靠近使用者的區域。依講義用英文字母和數字組成資料庫密碼，方便安全地填入連線字串。</li>
+          <li>到 <strong>Connect → Session pooler</strong> 複製 port <code>5432</code> 的連線字串。沿用畫面上的主機，將 <code>[YOUR-PASSWORD]</code> 連方括號一起換成資料庫密碼。</li>
+          <li>從 <strong>Connect → App Frameworks</strong> 取得 Project URL 和以 <code>sb_publishable_</code> 開頭的 publishable key。只複製值，變數名稱用下方的三個。</li>
+          <li>在 <strong>Authentication → Users</strong> 選 <strong>Add user → Create new user</strong>，填電子郵件和登入密碼，保留 <strong>Auto confirm user?</strong>。</li>
+          <li>到 <strong>Authentication → Sign In / Providers</strong> 關閉 <strong>Allow new users to sign up</strong> 並儲存。</li>
+          <li>在 repo 根目錄手動建立 Git 忽略的 <code>.env</code>，用自己的三個值替換範例。憑證留在本機設定和稍後的 Render 設定。</li>
+        </ol>
+        <div class="code">
+          <div class="code-head"><span>檔案範例 · .env</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>DATABASE_URL=postgresql://postgres.abcdefghijklmnopqrst:your-database-password@aws-1-us-east-1.pooler.supabase.com:5432/postgres
+SUPABASE_URL=https://abcdefghijklmnopqrst.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 驗證 Supabase 設定</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>uv run course/check_supabase.py</code></pre>
+        </div>
+        <p>成功時會出現 <strong>All good. Your .env is ready.</strong>。若檢查失敗，依腳本提示核對 pooler 連線、URL、publishable key 和註冊設定。腳本不會印出密碼或金鑰。</p>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>Supabase 提供資料庫與登入。Session pooler 讓正式服務使用相容的連線方式，必要帳號由你在 Supabase 建立。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-4"><span>我已建立可登入的使用者、關閉自行註冊，並通過 <code>course/check_supabase.py</code> 的檢查。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-5">
+      <div class="step-head">
+        <span class="step-no">5</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-prep">準備</span></div>
+          <h2>連接唯讀 Supabase MCP</h2>
+          <div class="en" lang="en">Connect Supabase MCP in read-only mode</div>
+        </div>
+        <span class="pill s-none" data-step-status="5">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>用 <code>SUPABASE_URL</code> 裡 <code>.supabase.co</code> 前面的 project ref 替換指令中的範例。保留完整 URL 的引號，並保留 <code>project_ref</code> 和 <code>read_only=true</code>。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 加入唯讀 MCP，先替換 project ref</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>claude mcp add --transport http supabase "https://mcp.supabase.com/mcp?project_ref=abcdefghijklmnopqrst&amp;read_only=true"</code></pre>
+        </div>
+        <p>重啟 Claude Code。輸入 <code>/mcp</code>，選 <strong>supabase → Authenticate</strong>，再到瀏覽器登入。這個指令用 Claude Code 預設的本機 scope，只在這台電腦的這個專案使用。<a href="https://supabase.com/docs/guides/getting-started/mcp">Supabase MCP 指南</a></p>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>MCP 讓 Claude 稍後檢查線上的資料表與安全設定。資料表由版本控制內的 migrations 在 App 啟動時建立。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-5"><span>Claude Code 的 <code>/mcp</code> 顯示已連上自己的 Supabase 專案，連線使用唯讀模式。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-6">
+      <div class="step-head">
+        <span class="step-no">6</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-1">1 Plan</span></div>
+          <h2>確認登入、搜尋與選單的 intent</h2>
+          <div class="en" lang="en">Agree on the intent</div>
+        </div>
+        <span class="pill s-none" data-step-status="6">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>在 Claude Code 輸入 <code>/clear</code> 開新對話，貼上講義完整的 Intent 提示詞，回答最多三個澄清問題，再核對文字。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 建立並確認 intent</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Create docs/changes/multi-user/intent.md with the text below. Then read it with docs/spec.md and ask me about anything unclear, at most three questions. Update the intent with my answers.
+
+# Intent: sign-in, search and a user menu
+
+## Problem
+
+Accountable runs on one computer for one person. A team can't share it, nobody signs in, and there's no quick way to find a record.
+
+## Proposed outcome
+
+A small team shares one Accountable on the web. Everyone signs in and works on the same organizations, contacts and deals, and each record shows who added it. A search box in the top bar finds any organization, contact or deal. A menu under your initials holds the theme, light, dark or system, and signing out.
+
+## Constraints
+
+- The data lives in Postgres on Supabase, still through SQLAlchemy Core. The tests keep their own SQLite databases.
+- Sign-in uses Supabase Auth with an email and password. The browser holds only the publishable key. The backend checks the token on every request and takes the user from it, never from the request.
+- There's no sign-up page. People are added in Supabase's dashboard.
+- The settings live in .env as DATABASE_URL, SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.
+- Each organization, contact, deal and activity records who added it and who last changed it.
+- The end-to-end tests and ui-check sign in without anyone's real password and never touch Supabase. CI needs no secrets.
+- Search ignores case and works the same on SQLite and Postgres.
+- The theme moves from the dark mode button into the menu. System follows the device's setting.
+- Accountable now needs an internet connection, for Supabase. The tests still run without one.
+- The app deploys to Render's free plan as one web service: FastAPI serves the built frontend and the API, migrations run when it starts, and it answers at its onrender.com address. A render.yaml describes it, with the Supabase settings entered in Render, not written in the file.
+- Every unit test, old and new, runs in under a second on this computer, because CI runs on a much slower machine.
+- No new dependencies unless the plan makes the case for one.
+
+## Not in this change
+
+- Roles and permissions: everyone can do everything.
+- Moving the data in the local SQLite file to Supabase. Supabase starts with the sample data.
+- Signing in with Google, magic links or a password reset.
+
+## Success criteria
+
+1. npm run check passes and never touches Supabase, with or without the settings in .env.
+2. Signed out, every page shows the sign-in screen and every API route refuses. Signed in, everything works as before.
+3. Every record and activity shows who added it.
+4. Search finds an organization, a contact and a deal by part of a name, in any case.
+5. The menu's theme choice is remembered, and System follows the device's setting.
+6. The built app runs on this computer the way Render runs it, signed in against Supabase.</code></pre>
+        </div>
+        <p class="translation">讓小團隊透過 Supabase 帳密登入並共用公司、聯絡人和商機。後端每次請求驗證身分。資料和活動保留新增者及最後修改者，畫面顯示新增者。頂欄可用部分名稱搜尋，忽略大小寫。縮寫選單包含亮色、深色、跟隨系統與登出。既有 SQLite 資料搬遷、角色權限與其他登入方式留在日後。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交已確認的 intent</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Plan: intent.md agreed"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>先把「做完」寫成看得到、試得出來的結果。即使本機有真實 Supabase 設定，自動測試仍使用獨立 SQLite 與虛構使用者。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-6"><span><code>docs/changes/multi-user/intent.md</code> 已確認，登入、稽核資料、搜尋、主題和部署都有成功標準。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-7">
+      <div class="step-head">
+        <span class="step-no">7</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-2">2 Design</span></div>
+          <h2>把現有規格拆成索引與區域文件</h2>
+          <div class="en" lang="en">Split the spec by product area</div>
+        </div>
+        <span class="pill s-none" data-step-status="7">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 拆分現有 spec</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Split docs/spec.md by product area. Keep docs/spec.md at the same path as a short summary of the whole product with an index, and move the detail into one file per area in docs/specs/, such as docs/specs/deals.md. Don't change what the spec says, only where it lives. Update AGENTS.md: read docs/spec.md first, then only the area files the current change touches, and keep the files that a change affects up to date in the same change. Update docs/REVIEW.md so its spec checks cover the area files. Don't change any code.</code></pre>
+        </div>
+        <p class="translation">保留 <code>docs/spec.md</code> 作為摘要與索引，把細節移到 <code>docs/specs/</code> 的對應文件，同步讓 <code>AGENTS.md</code> 和 <code>docs/REVIEW.md</code> 指向區域規格。比對搬移前後的內容，確認描述的產品行為一致。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交規格拆分</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Design: split the spec"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>把文件搬移獨立提交，下一步在 diff 裡更容易看出哪些行為真的改了。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-7"><span>規格索引能找到各區域文件，專案指引與審查政策已更新，這個提交只做規格重組。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-8">
+      <div class="step-head">
+        <span class="step-no">8</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-2">2 Design</span></div>
+          <h2>讓規格描述變更後的產品</h2>
+          <div class="en" lang="en">Design the change in the spec</div>
+        </div>
+        <span class="pill s-none" data-step-status="8">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 依 intent 更新規格</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Read docs/changes/multi-user/intent.md and update docs/spec.md and the area files in docs/specs/ so they describe the product with this change, as it will be once it's merged. Add an area file if the change needs one. Use the brand skill. List any concerns at the top of your reply.</code></pre>
+        </div>
+        <p>先解決 Claude 列出的疑問，再從 VS Code 的 <strong>Source Control</strong> 看 diff。核對登入與登出、未登入頁面與 API、紀錄新增者、搜尋、跨頁主題、測試資料來源和部署方式。選單的 <strong>系統</strong> 模式要跟隨裝置設定。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交更新後的規格</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Design: the spec"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>Intent 提供方向，spec 寫下合併後使用者能看到的行為。後續實作與審查靠同一份設計判斷。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-8"><span>已逐段讀過 spec diff，並把本次功能與驗收行為寫進受影響的區域規格。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-9">
+      <div class="step-head">
+        <span class="step-no">9</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-3">3 Build</span></div>
+          <h2>寫出三階段的實作計畫</h2>
+          <div class="en" lang="en">Write the implementation plan</div>
+        </div>
+        <span class="pill s-none" data-step-status="9">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 撰寫 plan.md</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Read docs/changes/multi-user/intent.md and docs/spec.md and write docs/changes/multi-user/plan.md with four sections: Files that change, Order of work, Risks and Proof. Order the work in phases: sign-in and the database first, then search, then the user menu. In Files that change, group the files by part, so that each part could be built by a different agent without two of them editing the same file. Proof lists the unit and end-to-end tests. Don't write any code yet.</code></pre>
+        </div>
+        <p class="translation">計畫包含 <strong>Files that change</strong>、<strong>Order of work</strong>、<strong>Risks</strong> 和 <strong>Proof</strong>。依登入與資料庫、搜尋、使用者選單分組，標清楚會動到哪些檔案。Proof 列出能證明規格成立的單元與端對端測試。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交實作計畫</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Build: plan.md"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>先確定誰負責哪些檔案和每階段用什麼測試驗收，後續遇到問題能定位到對應的變更。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-9"><span><code>docs/changes/multi-user/plan.md</code> 已有三個階段、檔案範圍、風險與 Proof，並已核對 intent。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-10">
+      <div class="step-head">
+        <span class="step-no">10</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-3">3 Build</span></div>
+          <h2>按計畫實作並執行測試</h2>
+          <div class="en" lang="en">Implement the plan</div>
+        </div>
+        <span class="pill s-none" data-step-status="10">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>用 <code>/clear</code> 開新對話，再把計畫當作實作入口。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 實作功能和 Proof 裡的測試</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Implement docs/changes/multi-user/plan.md, following its order of work. Write the tests in its Proof section and run them as you go. Leave the commits to me.</code></pre>
+        </div>
+        <p>逐階段核對測試結果。特別確認登入／資料庫切換、未登入的 API、資料新增者、搜尋大小寫，以及主題記憶與跟隨系統設定。測試和 UI 自動檢查使用虛構使用者，避免讀寫 Supabase。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交功能與測試</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Build: sign-in, search and the user menu"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>先打通登入與資料層，後面的搜尋和選單就能依同一個身分與資料流程驗證。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-10"><span>登入、搜尋與使用者選單已依計畫實作，Proof 列出的測試已執行。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-11">
+      <div class="step-head">
+        <span class="step-no">11</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-4">4 Test</span></div>
+          <h2>跑完整檢查與 ui-check</h2>
+          <div class="en" lang="en">Run local checks and ui-check</div>
+        </div>
+        <span class="pill s-none" data-step-status="11">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 完整檢查與登入後的頁面檢查</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Run npm run check and fix failures until it passes. Then use the ui-check subagent to check every page signed in, and show me its report and the screenshots.</code></pre>
+        </div>
+        <p>看完 ui-check 的回報和截圖。如果問題來自這次變更，請 Claude 修正並重跑完整檢查。截圖留在 <code>.playwright-mcp/</code>。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 修正 ui-check 發現的問題</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Fix the problems ui-check found that this change caused, then run npm run check.</code></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 用自己的終端機重跑</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>npm run check</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>自動測試檢查行為，UI 截圖提供另一個角度確認登入後各頁能正常操作、外觀符合規格。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-11"><span>我已重跑 <code>npm run check</code>，檢視 ui-check 的回報與截圖，並處理這次變更新增的問題。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-12">
+      <div class="step-head">
+        <span class="step-no">12</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-4">4 Test</span></div>
+          <h2>試跑兩種模式並驗證線上資料庫</h2>
+          <div class="en" lang="en">Test both launch modes and check RLS</div>
+        </div>
+        <span class="pill s-none" data-step-status="12">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="兩種啟動方式">
+          <table class="compare">
+            <thead><tr><th scope="col">指令</th><th scope="col">資料與身分</th><th scope="col">要驗證的事</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>npm run dev</code></th><td>本機 SQLite、範例資料、虛構隊友</td><td>用範例身分試登入及走一遍既有 CRM 功能。</td></tr>
+              <tr><th scope="row"><code>npm start</code></th><td>正式建置、Supabase Auth 與共用 Postgres</td><td>用自己建立的帳號逐項試 intent。這個指令會跑 migrations 並寫入 Supabase。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 先試開發模式</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>npm run dev</code></pre>
+        </div>
+        <p>用 <kbd>Ctrl+C</kbd> 停止開發模式，再啟動正式模式。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 用 Render 的方式在本機試跑</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>npm start</code></pre>
+        </div>
+        <p>確認登入前後的畫面和 API、既有操作、每筆新增者、三種紀錄的部分名稱搜尋、主題記憶與跟隨裝置設定，再用 <kbd>Ctrl+C</kbd> 停止。首次正式啟動建立資料表後，請 Claude 走唯讀 MCP 檢查。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 列出資料表、確認 RLS 並執行 Security Advisor</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Use the Supabase MCP server to check the live database: list its tables, confirm that row-level security is on for every table, and run Supabase's security advisors. Report only.</code></pre>
+        </div>
+        <p>核對每個資料表的 <abbr title="Row Level Security">RLS</abbr> 已啟用。若發現缺漏，把結果交給 Claude 修正版本控制內的 migration，再重新驗證。若這一步沒有檔案變更，直接往下。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 有驗收相關變更時才提交</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Test: checks and ui-check"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>兩種啟動方式涵蓋不同風險。本機資料適合反覆驗證，正式試跑可提早驗證真實登入、連線及 migrations。RLS 檢查確認公開資料 API 的存取限制已套用。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-12"><span>我已試過兩種啟動方式，正式模式可用自己的帳號通過 intent 驗收，並確認線上資料表的 RLS 與安全檢查。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-13">
+      <div class="step-head">
+        <span class="step-no">13</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-5">5 Deploy</span></div>
+          <h2>審查分支並依發現改善 harness</h2>
+          <div class="en" lang="en">Review the branch and improve the harness</div>
+        </div>
+        <span class="pill s-none" data-step-status="13">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>在 Claude Code 用 <code>/clear</code> 開新對話，再請 <code>reviewer</code> 依專案的審查政策檢查。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 審查 multi-user 相對 main 的差異</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Use the reviewer subagent to review this branch against main. Report only, skip style.</code></pre>
+        </div>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 修正 Important 發現</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Fix the Important findings from the review. Run npm run check when you're done. Leave the commits to me.</code></pre>
+        </div>
+        <p>用 <code>npm run check</code> 驗證修正。開啟此次實作新增的 <code>render.yaml</code>，確認服務區域靠近 Supabase、Blueprint 可選 <code>main</code>，所需環境變數名稱已宣告。依講義可選 <code>oregon</code>、<code>ohio</code>、<code>virginia</code>、<code>frankfurt</code> 或 <code>singapore</code>。確認使用 Python 3.12，把 <code>TZ</code> 設為團隊時區，並設定 <code>autoDeployTrigger: checksPass</code>。Supabase 的實際值留到 Render 設定。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交審查修正及部署設定</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Deploy: review fixes"</code></pre>
+        </div>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 依審查結果改善 harness</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Follow docs/IMPROVE.md for this change. Leave the commits to me.</code></pre>
+        </div>
+        <p>依改善流程核對原計畫的 Proof 和問題的重現條件，補必要的回歸檢查。<a href="../docs/IMPROVE.md"><code>docs/IMPROVE.md</code></a></p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 有改善時提交</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Deploy: harness improved"</code></pre>
+        </div>
+        <details class="details">
+          <summary>選做 · 讓 Codex 做第二次審查</summary>
+          <p>等目前測試跑完後，在同一個 repo 的另一個終端機執行 <code>codex</code>。Codex 可能自行啟動測試，錯開執行可以避免端到端測試使用相同連接埠。</p>
+          <div class="code wrap">
+            <div class="code-head"><span>給 Codex 的指示 · 只寫審查結果</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>Review this branch against main with docs/REVIEW.md. Write your findings to docs/INDEPENDENT_REVIEW.md and don't change anything else. Skip style.</code></pre>
+          </div>
+          <p>回到 Claude Code 後，請它處理報告中的 Important 發現。</p>
+          <div class="code wrap">
+            <div class="code-head"><span>給 Claude 的指示 · 修正第二次審查的發現</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>Fix the Important findings in docs/INDEPENDENT_REVIEW.md. Run npm run check when you're done. Leave the commits to me.</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head"><span>終端機 · 提交第二次審查</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>git add .
+git commit -m "Deploy: independent review"</code></pre>
+          </div>
+        </details>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>新 session 裡的 <code>reviewer</code> 從差異、規格與測試著手。重要問題修好後，趁脈絡還清楚，更新能及早抓出同類問題的檢查。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-13"><span>我已看過審查結果，修正 Important 發現，核對 Render 設定並依 <code>docs/IMPROVE.md</code> 回顧。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-14">
+      <div class="step-head">
+        <span class="step-no">14</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-5">5 Deploy</span></div>
+          <h2>等 CI 通過、合併並推送 main</h2>
+          <div class="en" lang="en">Pass CI and merge to main</div>
+        </div>
+        <span class="pill s-none" data-step-status="14">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>確認準備合併的提交已通過本機完整檢查，再推送功能分支。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 推到自己的 fork</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git push fork multi-user</code></pre>
+        </div>
+        <p>開啟 fork 的 <strong>Actions</strong>，等待 <code>multi-user</code> 對應該次提交的 run 通過。</p>
+        <details class="details" id="ci-troubleshooting">
+          <summary>CI 失敗時的提示詞與重推方式</summary>
+          <p>從失敗的 run 複製出錯步驟與訊息，移除其中的憑證或個人資料，再填進提示詞。若在第 3 步排錯，重推的分支改成 <code>subagents</code>。</p>
+          <div class="code wrap">
+            <div class="code-head"><span>給 Claude 的指示 · 找出並修正 CI 失敗的原因</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>The CI run failed with this error: [paste the error]. Find the root cause, fix it and run npm run check. Leave the commits to me.</code></pre>
+          </div>
+          <div class="code">
+            <div class="code-head"><span>終端機 · 提交修正並重推 multi-user</span><button class="copy" type="button" hidden>複製</button></div>
+            <pre><code>git add .
+git commit -m "Deploy: CI fix"
+git push fork multi-user</code></pre>
+          </div>
+        </details>
+        <p>分支 CI 通過後合回自己的 <code>main</code> 並推到 fork。到 Actions 再確認 <code>main</code> 的 run 通過。</p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 合併並推送 main</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git checkout main
+git merge multi-user
+git branch -d multi-user
+git push fork main</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>合併前看功能分支的提交，部署前看 fork 的 <code>main</code>。Render 選用的是 <code>main</code> 的 CI 結果。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-14"><span>待合併提交的本機檢查及分支 CI 皆通過，變更已合入並推送 <code>fork/main</code>，且 <code>main</code> 的 CI 通過。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-15">
+      <div class="step-head">
+        <span class="step-no">15</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-5">5 Deploy</span></div>
+          <h2>設定 Render Blueprint 並驗收上線</h2>
+          <div class="en" lang="en">Deploy and verify on Render</div>
+        </div>
+        <span class="pill s-none" data-step-status="15">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <ol>
+          <li>用 GitHub 帳號登入 <a href="https://render.com/">Render</a>，選 <strong>New → Blueprint</strong> 並連接 GitHub。授權時選 <strong>Only select repositories</strong>，勾選自己的 fork。</li>
+          <li>在自己的 fork 旁點 <strong>Connect</strong>，為 Blueprint 命名並選 <code>main</code>。Render 讀取 <code>render.yaml</code>。</li>
+          <li>依畫面填入自己 <code>.env</code> 的三個值。需要的名稱是 <code>DATABASE_URL</code>、<code>SUPABASE_URL</code> 和 <code>SUPABASE_PUBLISHABLE_KEY</code>。</li>
+          <li>點 <strong>Deploy Blueprint</strong>。部署完成後開啟 Render 提供的 <code>onrender.com</code> 網址，用自己在 Supabase 建立的帳號登入，試用搜尋和主題選單。</li>
+        </ol>
+        <div class="callout guide">
+          <h3 class="label">上線後怎麼查</h3>
+          <p>後續推送 <code>main</code> 時，等 GitHub Actions 通過再到 Render 確認部署紀錄。若 Render 沒部署新提交，先核對 fork 的 <code>main</code> 是否有成功的 run，以及 Blueprint 追蹤的分支。依講義，免費服務閒置後可能休眠，首次開啟可等服務喚醒。</p>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>上線的服務會用你剛在本機正式模式驗證過的設定啟動，FastAPI 同時提供編譯好的前端與 API。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-15"><span>Render 顯示部署成功，我可從正式網址用 Supabase 帳號登入並操作。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="step-16">
+      <div class="step-head">
+        <span class="step-no">16</span>
+        <div class="step-titles">
+          <div class="stage-line"><span class="stage-tag st-6">6 Maintain</span></div>
+          <h2>試用線上版本並寫下觀察</h2>
+          <div class="en" lang="en">Use the live app and capture ideas</div>
+        </div>
+        <span class="pill s-none" data-step-status="16">待完成</span>
+      </div>
+      <div class="block">
+        <h3 class="label">要做什麼</h3>
+        <p>登入線上版本，走一次小團隊的日常操作。例如先搜尋一家公司，確認誰新增資料，再打開商機補一筆活動。切換主題、重新整理與登出各試一次。</p>
+        <div class="code wrap">
+          <div class="code-head"><span>給 Claude 的指示 · 將試用觀察加到專案進度</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>Here's what I noticed using the app: [your notes]. Add these to docs/STATUS.md under Ideas for later, one line each.</code></pre>
+        </div>
+        <p>依觀察內容每項記一行，留在專案進度的 Ideas for later。<a href="../docs/STATUS.md#ideas-for-later">Ideas for later</a></p>
+        <div class="code">
+          <div class="code-head"><span>終端機 · 提交維護觀察</span><button class="copy" type="button" hidden>複製</button></div>
+          <pre><code>git add .
+git commit -m "Maintain: ideas for later"</code></pre>
+        </div>
+      </div>
+      <div class="callout plain">
+        <h3 class="label">白話說明</h3>
+        <p>實際操作能看出驗收案例之外哪裡還有摩擦。把看到的情境和結果留在 repo，下一個變更便有明確起點。</p>
+      </div>
+      <div>
+        <h3 class="label checklist-heading">完成判準</h3>
+        <ul class="checklist">
+          <li><label><input type="checkbox" id="done-16"><span>我已試用線上版，並把具體觀察寫到 <code>docs/STATUS.md</code> 的 Ideas for later。</span></label></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="usage">
+      <h2>用量上限與 session</h2>
+      <div class="prose">
+        <p>用 <code>/model</code> 和 <code>/usage</code> 確認模型與方案用量。講義讓 ui-check 使用 Sonnet，因為逐頁檢查截圖會占用較多時間。等額度重置後，可在原 session 從已完成的階段繼續。已關閉終端機時，在同一個 repo 執行 <code>claude --continue</code>。</p>
+        <p>使用 <code>/exit</code> 再執行 <code>claude</code> 以載入新設定。使用 <code>/clear</code> 讓下一階段從 repo 內的 intent、spec 或 plan 重新取得脈絡。</p>
+      </div>
+      <p class="fine"><a href="../course/for_agents/AGENT_GUIDE_WEEK1.md">Week 1 課程指南</a> · <a href="../course/coding_agents/claude_code.md">Claude Code 課程手冊</a></p>
+    </section>
+
+    <section class="panel" id="cheap">
+      <h2>便宜模型路線的差異</h2>
+      <p class="section-note">改走低成本路線時，從自己的 Day 4 成果開始，依替代講義完成同樣六個階段。</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="主線與便宜模型路線比較">
+        <table class="compare">
+          <thead><tr><th scope="col">項目</th><th scope="col">主線</th><th scope="col">便宜模型路線</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">子代理</th><td>reviewer 和 ui-check</td><td>只用 reviewer。工具無子代理時，在新 session 依審查政策檢查。</td></tr>
+            <tr><th scope="row">CI</th><td>CI 用快速檢查，本機仍跑完整檢查</td><td>沿用 Day 4 的快速 CI。</td></tr>
+            <tr><th scope="row">功能</th><td>登入、共用資料庫、新增與修改者紀錄、搜尋、使用者選單</td><td>登入與共用資料庫。</td></tr>
+            <tr><th scope="row">規格與實作</th><td>拆分 spec，按三階段計畫實作</td><td>維持單份 spec，每階段開新 session。</td></tr>
+            <tr><th scope="row">驗收與審查</th><td>ui-check、唯讀 Supabase MCP、選做 Codex 第二次審查</td><td>手動用 Supabase 的 Security Advisor 查 RLS，使用 reviewer 做一次審查。</td></tr>
+            <tr><th scope="row">部署</th><td>Render 追蹤 fork 的 main</td><td>同樣使用 Supabase 和 Render。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine"><a href="../course/cheap_llm_instructions/week1day5.md">Week 1 Day 5 · 便宜模型路線講義</a></p>
+    </section>
+  </main>
+</div>
+
+<footer class="footer">
+  <p>依據 Day 5 講義與 Week 1 課程指南整理。<a href="../course/instructions/week1day5.md">主線講義</a> · <a href="../course/cheap_llm_instructions/week1day5.md">便宜模型路線</a> · <a href="week1day4-claude-code.html">Day 4 筆記</a></p>
+</footer>
+
+<script>
+(function () {
+  // Enable copy controls when JavaScript is available.
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = block.querySelector('.copy');
+    var code = block.querySelector('pre code');
+    if (!btn || !code) return;
+    btn.hidden = false;
+    btn.addEventListener('click', function () {
+      var text = code.textContent;
+      function done(ok) {
+        btn.textContent = ok ? '已複製' : '請手動選取';
+        setTimeout(function () { btn.textContent = '複製'; }, 1600);
+      }
+      function fallback() {
+        try {
+          var range = document.createRange();
+          range.selectNodeContents(code);
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          var ok = document.execCommand('copy');
+          if (ok) sel.removeAllRanges();
+          done(ok);
+        } catch (e) { done(false); }
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+      } catch (e) { fallback(); }
+    });
+  });
+
+  // Keep the overview, both tables of contents, and the checkboxes in sync.
+  var progressKey = 'w1d5-claude-code-checklist';
+  var boxes = Array.from(document.querySelectorAll('.checklist input[type="checkbox"]'));
+  var overview = document.getElementById('progress-total');
+  var nextStep = document.getElementById('next-step');
+  var statusClasses = { '完成': 's-done', '下一步': 's-next', '待完成': 's-none' };
+  var saved = {};
+  try {
+    var stored = JSON.parse(localStorage.getItem(progressKey));
+    if (stored && typeof stored === 'object' && !Array.isArray(stored)) saved = stored;
+  } catch (error) {
+    // Progress still works for this visit if browser storage is unavailable.
+  }
+
+  function updateProgress() {
+    var done = boxes.filter(function (box) { return box.checked; }).length;
+    var next = boxes.find(function (box) { return !box.checked; });
+
+    boxes.forEach(function (box) {
+      var status = box.checked ? '完成' : box === next ? '下一步' : '待完成';
+      var number = box.id.slice('done-'.length);
+      document.querySelectorAll('[data-step-status="' + number + '"]').forEach(function (indicator) {
+        indicator.classList.remove(...Object.values(statusClasses));
+        indicator.classList.add(statusClasses[status]);
+        if (indicator.classList.contains('pill')) {
+          indicator.textContent = status;
+        } else {
+          indicator.title = status;
+          indicator.setAttribute('aria-label', status);
+        }
+      });
+    });
+
+    overview.textContent = '完成 ' + done + ' / ' + boxes.length + ' 步';
+    if (!next) {
+      nextStep.textContent = 'Day 5 的 ' + boxes.length + ' 步皆已完成。';
+      return;
+    }
+    var section = next.closest('section');
+    var link = document.createElement('a');
+    link.href = '#' + section.id;
+    link.textContent = section.querySelector('h2').textContent;
+    nextStep.replaceChildren('下一步是', link, '。');
+  }
+
+  boxes.forEach(function (box) {
+    box.checked = saved[box.id] === true;
+    box.addEventListener('change', function () {
+      saved[box.id] = box.checked;
+      try { localStorage.setItem(progressKey, JSON.stringify(saved)); } catch (error) {}
+      updateProgress();
+    });
+  });
+  updateProgress();
+
+  // Highlight the current section in the side index
+  if ('IntersectionObserver' in window) {
+    var links = {};
+    document.querySelectorAll('.toc-side a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && links[entry.target.id]) {
+          Object.keys(links).forEach(function (k) { links[k].removeAttribute('aria-current'); });
+          links[entry.target.id].setAttribute('aria-current', 'true');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { observer.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

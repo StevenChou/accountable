@@ -45,7 +45,7 @@ h1 { font-size: clamp(30px, 5vw, 42px); }
 h2 { font-size: 24px; }
 h3 { font-size: 17px; }
 a { color: var(--link); text-underline-offset: 3px; }
-a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 3px; }
 code {
   padding: 0.1em 0.35em;
   border-radius: 5px;
@@ -59,7 +59,7 @@ code {
 .eyebrow { color: var(--ink-green); font-size: 13px; font-weight: 700; letter-spacing: 0.05em; }
 .lede { color: var(--ink-soft); font-size: 17px; }
 .jump-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 4px; font-size: 14px; }
-.jump-links .primary {
+.jump-links .primary, .copy-button {
   padding: 7px 13px;
   border-radius: 8px;
   background: var(--midnight);
@@ -67,7 +67,7 @@ code {
   font-weight: 700;
   text-decoration: none;
 }
-.jump-links .primary:hover { text-decoration: underline; }
+.jump-links .primary:hover, .copy-button:hover { text-decoration: underline; }
 
 main { display: grid; gap: 24px; }
 .panel { display: grid; gap: 16px; padding: 24px; border-radius: 16px; background: var(--panel); }
@@ -80,9 +80,20 @@ main { display: grid; gap: 24px; }
 .routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .route-card { display: grid; align-content: start; gap: 6px; padding: 14px 16px; border-radius: 12px; background: var(--bg); }
 .route-card p { font-size: 15px; }
-.harness { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
-.harness summary { color: var(--link); font-weight: 700; cursor: pointer; }
-.harness > :not(summary) { margin-top: 10px; }
+.disclosure { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.disclosure summary { color: var(--link); font-weight: 700; cursor: pointer; }
+.disclosure > :not(summary) { margin-top: 10px; }
+.template-actions:not([hidden]) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.copy-button { border: 0; cursor: pointer; font: 700 15px/1.5 var(--font-body); }
+.template-preview {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg);
+  font: 13px/1.65 var(--font-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
 .flow-row {
   --branch-gap: 36px;
@@ -193,16 +204,56 @@ main { display: grid; gap: 24px; }
 </head>
 <body>
 <header class="masthead">
-  <div class="eyebrow">Accountable 課程筆記 · Week 1 Days 2–4</div>
+  <div class="eyebrow">從 Accountable 課程整理 · Week 1 Days 2–5</div>
   <h1>專案開發流程速查</h1>
-  <p class="lede">從設定 coding agent 到合併後試用。選擇你的起點，用流程圖確認每一步要做什麼、交出什麼證據。</p>
+  <p class="lede">把檢核表貼到自己的專案或 PR。每次從本機驗收起步，有共用 CI、外部服務或部署需求時，再加上對應的檢查。</p>
   <nav class="jump-links" aria-label="頁面導覽">
-    <a class="primary" href="#starting-points">選擇專案起點</a>
+    <a class="primary" href="#workflow-template">取得 workflow 檢核表</a>
+    <a href="#starting-points">選擇專案起點</a>
     <a href="#workflow">跳到開發流程圖</a>
   </nav>
 </header>
 
 <main>
+  <section class="panel" id="workflow-template" aria-labelledby="template-heading">
+    <h2 id="template-heading">我的 workflow 檢核表</h2>
+    <p>首次採用時填入專案設定。每次變更用同一份完成判準檢查，依這次的範圍加入適用項目。</p>
+    <div class="template-actions" id="template-actions" hidden>
+      <button class="copy-button" type="button" id="copy-template">複製 Markdown</button>
+      <p class="section-note" id="copy-status" role="status"></p>
+    </div>
+    <details class="disclosure" id="template-details">
+      <summary>展開 Markdown 全文</summary>
+      <pre class="template-preview" id="template-markdown"># 專案開發 workflow
+
+## 專案設定
+
+- 主分支、規格與審查規則所在位置　〈填寫〉
+- 本機快速檢查指令　〈填寫〉
+- 本機完整檢查指令　〈填寫〉
+- 共用 CI 的工作名稱與結果連結　〈啟用時填寫〉
+- 正式啟動指令、部署環境與上線驗收方式　〈適用時填寫〉
+
+## 每次變更
+
+- [ ] 開分支。確認工作區與起始提交，從主分支開始。
+- [ ] Plan。確認 intent 裡的問題、對象、範圍和成功標準。
+- [ ] Design。核對規格差異與變更後的產品行為。
+- [ ] Build。計畫列出順序、風險和 Proof，分段實作並驗證。
+- [ ] Test。本機完整檢查已通過，成功標準都有驗收證據。
+- [ ] Deploy。獨立審查、修正 Important 問題，再依結果改善既有的 harness。
+- [ ] 合併。待合併提交取得完整檢查與適用的 CI 結果，由人核對後合併。
+- [ ] Maintain。在交付版本走一次日常操作，記下具體觀察和後續想法。
+
+## 依變更啟用
+
+- [ ] Test 有介面變更時，用 ui-check 或手動檢查並保存畫面證據。
+- [ ] Test 有外部服務時，用授權的驗收環境試跑正式啟動方式，核對適用的 migration 與存取規則。
+- [ ] 合併前有共用 CI 時，確認同一個待合併提交的分支 CI 已通過。
+- [ ] 合併後需要部署時，確認主分支 CI 已通過，再核對部署版本並從正式網址驗收關鍵操作。</pre>
+    </details>
+  </section>
+
   <section class="panel" id="setup" aria-labelledby="setup-heading">
     <h2 id="setup-heading">開工前確認環境</h2>
     <ul class="setup-list" role="list">
@@ -215,8 +266,8 @@ main { display: grid; gap: 24px; }
         <p>允許 agent 執行明確的測試指令。<code>git&nbsp;push</code> 由人確認，限制 agent 讀取 <code>.env</code>。<a href="week1day2-claude-code.html#step-6">Day 2 權限設定</a></p>
       </li>
       <li>
-        <h3>介面工具</h3>
-        <p>有介面工作時，用<a href="week1day2-claude-code.html#step-9">品牌 skill</a> 統一設計。讓 agent 用 <a href="week1day2-claude-code.html#step-7">Playwright MCP</a> 操作瀏覽器、比對畫面及截圖。</p>
+        <h3>介面工具與子代理</h3>
+        <p>有介面工作時，用品牌 skill 統一設計，並用 Playwright MCP 比對畫面及截圖。工具支援子代理時，可預先設定 <code>ui-check</code> 和唯讀的 <code>reviewer</code>。<a href="week1day2-claude-code.html#step-9">Day 2 品牌 skill</a> · <a href="week1day2-claude-code.html#step-7">Day 2 瀏覽器工具</a> · <a href="week1day5-claude-code.html#step-2">Day 5 子代理設定</a></p>
       </li>
     </ul>
   </section>
@@ -235,7 +286,7 @@ main { display: grid; gap: 24px; }
         <p><a href="#open-branch">開分支做變更</a></p>
       </div>
     </div>
-    <details class="harness">
+    <details class="disclosure">
       <summary>展開 Harness 設定清單</summary>
       <ul class="setup-list" role="list">
         <li>
@@ -248,7 +299,7 @@ main { display: grid; gap: 24px; }
         </li>
         <li>
           <h3>CI 與秘密保護</h3>
-          <p>啟用 Day 4 的 CI 流程時，每次推送先掃秘密，再跑完整檢查。將金鑰留在 Git 已忽略的 <code>.env</code>。agent 支援時，加入阻擋編輯該檔案的 hook。</p>
+          <p>啟用共用 CI 時，先掃秘密，再跑專案設定的檢查。Day 5 在 CI 跑快速檢查，本機完整檢查涵蓋端對端測試。將金鑰留在 Git 已忽略的 <code>.env</code> 或平台的秘密設定。<a href="week1day5-claude-code.html#step-3">Day 5 快速 CI</a></p>
         </li>
       </ul>
       <p class="section-note">Accountable 用 <code>npm run check:quick</code> 與 <code>npm run check</code>。套用到其他專案時，換成該專案的指令。<a href="week1day4-claude-code.html#step-1">Day 4 的 Harness 設定步驟</a></p>
@@ -277,6 +328,7 @@ main { display: grid; gap: 24px; }
         <div class="node">
           <div class="node-top"><span class="tag tag-design" lang="en">Design</span><h3>審閱變更後的產品行為</h3></div>
           <p>新產品建立 <code>spec.md</code>，依需要選定介面設計稿。既有產品用規格差異審閱變更後的行為，並標出要用原畫面比對的部分。<a href="week1day4-claude-code.html#step-10">Day 4 規格差異</a></p>
+          <p>若規格已難以查找，先把摘要與索引留在原路徑，將細節按產品區域拆開。規格重組單獨提交，再寫這次的行為變更。<a href="week1day5-claude-code.html#step-7">Day 5 拆分規格</a></p>
           <p class="criterion"><strong>完成判準</strong> 已確認變更後的產品行為及本次要採用的設計。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
@@ -284,7 +336,7 @@ main { display: grid; gap: 24px; }
       <li class="flow-row" id="build">
         <div class="node">
           <div class="node-top"><span class="tag tag-build" lang="en">Build</span><h3>先排計畫，再分段實作</h3></div>
-          <p>在 <code>plan.md</code> 列出改動、順序、風險，並在 Proof 寫明對應的測試。開新 session，依計畫分段做、分段測。學員審閱差異與結果後再提交。</p>
+          <p>在 <code>plan.md</code> 列出改動、依賴順序與風險，用 Proof 對照每段的驗證。開新 session，依計畫分段做、分段測。如果多人並行，先劃清檔案範圍與相依關係。核對差異與結果後再提交。<a href="week1day5-claude-code.html#step-9">Day 5 分階段計畫</a></p>
           <p class="criterion"><strong>完成判準</strong> 計畫中的改動和測試已完成，開發中的檢查通過。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
@@ -293,7 +345,8 @@ main { display: grid; gap: 24px; }
         <div class="node">
           <div class="node-top"><span class="tag tag-test" lang="en">Test</span><h3>跑完整檢查，親手驗收</h3></div>
           <p>首次 MVP 用 <code>npm test</code> 跑單元和端對端測試。已設定 harness 就跑完整檢查，例如 <code>npm run check</code>。</p>
-          <p>親手走過 <code>intent.md</code> 的成功標準。有介面改動時，用瀏覽器留下畫面證據。首版介面比對設計稿。既有介面沿用相同資料與視窗尺寸，比對要保留的外觀，再依新規格驗收改動。<a href="week1day3-claude-code.html#step-9">Day 3 設計稿驗收</a> · <a href="week1day4-claude-code.html#step-13">Day 4 主題驗收</a></p>
+          <p>親手走過 <code>intent.md</code> 的成功標準。有介面改動時，用 <code>ui-check</code> 或手動操作瀏覽器並留存截圖。首版比對設計稿，既有介面用相同資料與視窗尺寸核對畫面。<a href="week1day3-claude-code.html#step-9">Day 3 設計稿驗收</a> · <a href="week1day4-claude-code.html#step-13">Day 4 主題驗收</a> · <a href="week1day5-claude-code.html#step-11">Day 5 UI 檢查</a></p>
+          <p>有外部服務時，自動測試仍用隔離資料。另在授權的驗收環境，以正式啟動方式走關鍵操作，核對這次涉及的 migration 與存取規則。<a href="week1day5-claude-code.html#step-12">Day 5 Supabase 驗收</a></p>
           <p class="criterion"><strong>完成判準</strong> 完整檢查通過，成功標準都有驗收證據。</p>
         </div>
         <div class="recovery">
@@ -307,8 +360,8 @@ main { display: grid; gap: 24px; }
         <ol class="deploy-list" role="list" aria-label="Deploy 階段">
           <li class="flow-row" id="review">
             <div class="node">
-              <div class="node-top"><span class="tag tag-deploy" lang="en">Deploy</span><h3>開新 session 獨立審查</h3></div>
-              <p>依 <code>REVIEW.md</code> 審查分支相對主分支的差異。</p>
+              <div class="node-top"><span class="tag tag-deploy" lang="en">Deploy</span><h3>獨立審查分支差異</h3></div>
+              <p>請唯讀的 <code>reviewer</code> 依 <code>REVIEW.md</code> 檢查分支相對主分支的差異，只回報發現。沒有子代理時，開新 session 用同一套規則。<a href="week1day5-claude-code.html#step-13">Day 5 審查與改善</a></p>
               <p class="criterion"><strong>完成判準</strong> 已完成審查，發現的 Important 問題都已修正並驗證。</p>
               <p class="route-note">若尚未建立 harness 改善流程（例如首次 MVP），審查修正驗證後可直接<a href="#merge-check">驗證待合併提交</a>。</p>
             </div>
@@ -332,16 +385,16 @@ main { display: grid; gap: 24px; }
               <h3>驗證待合併提交</h3>
               <div class="routes">
                 <div class="route-card" id="local-check">
-                  <h4>本機驗收</h4>
-                  <p>專案允許本機驗收時，對待合併提交跑完整檢查。Accountable 有 harness 時用 <code>npm run check</code>，首次 MVP 用 <code>npm test</code>。</p>
+                  <h4>每次做 · 本機完整檢查</h4>
+                  <p>對待合併提交跑完整檢查，記下通過的提交。Accountable 有 harness 時用 <code>npm run check</code>，首次 MVP 用 <code>npm test</code>。</p>
                   <p><a href="week1day4-claude-code.html#step-15">Day 4 本機版</a></p>
                 </div>
                 <div class="route-card" id="ci">
-                  <h4>CI 驗收</h4>
-                  <p>專案啟用 CI 時，推送待合併的分支，確認通過的 CI 結果對應到待合併的提交。</p>
+                  <h4>有共用 CI 再做 · 分支 CI</h4>
+                  <p>把已通過本機完整檢查的同一提交推到遠端，等該提交的分支 CI 通過。<a href="week1day5-claude-code.html#step-14">Day 5 分支 CI 與合併</a></p>
                 </div>
               </div>
-              <p class="criterion"><strong>完成判準</strong> 已取得待合併提交的檢查通過紀錄。</p>
+              <p class="criterion"><strong>完成判準</strong> 待合併的同一提交有本機完整檢查紀錄，啟用共用 CI 時也有通過的分支 CI 紀錄。</p>
             </div>
             <div class="recovery">
               <h4>檢查未通過</h4>
@@ -353,16 +406,30 @@ main { display: grid; gap: 24px; }
           <li class="flow-row" id="merge">
             <div class="node">
               <h3>核對證據，由你決定合併</h3>
-              <p>核對驗收證據、審查修正，以及待合併提交的檢查結果。確認接受變更後，合回主分支。</p>
+              <p>核對驗收證據、審查修正和待合併提交的檢查結果，再由你決定合併。有共用 CI 或部署時，確認合併結果已到遠端主分支。</p>
+              <p><a href="#maintain">合併後直接試用</a> · <a href="#release">需要部署時先驗收上線</a></p>
             </div>
-            <div class="flow-next" aria-hidden="true"></div>
+            <div class="flow-next" aria-hidden="true"><span>需要部署</span></div>
+          </li>
+          <li class="flow-row" id="release">
+            <div class="node">
+              <h3>需要部署時，驗收正式版本</h3>
+              <p>確認遠端主分支該次提交的 CI 已通過，再核對部署紀錄與正式版本。開啟正式網址，試一次這次變更的關鍵操作。<a href="week1day5-claude-code.html#step-15">Day 5 Render 上線</a></p>
+              <p class="criterion"><strong>完成判準</strong> 正式環境已部署預期版本，關鍵操作通過。<a href="#maintain">接著試用與記錄</a></p>
+            </div>
+            <div class="recovery">
+              <h4>部署或上線驗收失敗</h4>
+              <p>核對主分支 CI、部署版本與紀錄。修正後等新版本通過檢查，再重做正式環境驗收。</p>
+              <a href="#release">回到上線驗收</a>
+            </div>
+            <div class="flow-next" aria-hidden="true"><span>通過</span></div>
           </li>
         </ol>
       </li>
       <li class="flow-row" id="maintain">
         <div class="node">
-          <div class="node-top"><span class="tag tag-maintain" lang="en">Maintain</span><h3>在合併後的版本試用</h3></div>
-          <p>走一遍日常操作，把發現記到 <code>docs/STATUS.md</code> 的 Ideas for later。</p>
+          <div class="node-top"><span class="tag tag-maintain" lang="en">Maintain</span><h3>在交付版本試用</h3></div>
+          <p>用合併後的本機版或已驗收的正式版走一遍日常操作，把發現記到專案的後續想法，例如 <code>docs/STATUS.md</code> 的 Ideas for later。<a href="week1day5-claude-code.html#step-16">Day 5 線上試用</a></p>
           <p>例如在窄視窗捲到看板右側，從商機詳情返回時發現捲動位置歸零。<a href="../docs/STATUS.md#ideas-for-later">深色模式的試用觀察</a></p>
           <p class="criterion"><strong>完成判準</strong> 記下具體情境，下一次規劃時有據可查。</p>
         </div>
@@ -382,7 +449,27 @@ main { display: grid; gap: 24px; }
     <a href="week1day2-claude-code.html">Day 2 · Claude Code 設定</a>
     <a href="week1day3-claude-code.html">Day 3 · 建置 MVP</a>
     <a href="week1day4-claude-code.html">Day 4 · Harness 與深色模式</a>
+    <a href="week1day5-claude-code.html">Day 5 · 子代理、多人共用與上線</a>
   </nav>
 </footer>
+
+<script>
+  const templateActions = document.getElementById('template-actions');
+  const templatePreview = document.getElementById('template-details');
+  const templateMarkdown = document.getElementById('template-markdown');
+  const copyStatus = document.getElementById('copy-status');
+
+  document.getElementById('copy-template').addEventListener('click', async () => {
+    copyStatus.textContent = '';
+    try {
+      await navigator.clipboard.writeText(templateMarkdown.textContent);
+      copyStatus.textContent = '已複製 Markdown';
+    } catch {
+      templatePreview.open = true;
+      copyStatus.textContent = '請在下方選取全文，再手動複製。';
+    }
+  });
+  templateActions.hidden = false;
+</script>
 </body>
 </html>

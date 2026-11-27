@@ -1,104 +1,109 @@
-import { expect, test } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { accountMenu, chooseTheme, test } from './fixtures'
 
 test('預設亮色，跨頁與重新整理後保留選擇，找不到頁面也能切換', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/')
-  const toggle = page.getByRole('button', { name: '亮色與深色模式' })
+  const menu = accountMenu(page)
   const html = page.locator('html')
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  await expect(menu).toBeVisible()
   await expect(html).toHaveCSS('background-color', 'rgb(240, 244, 245)')
-
-  await toggle.click()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await chooseTheme(page, '深色')
   await expect(html).toHaveCSS('background-color', 'rgb(4, 35, 46)')
-  await expect(page.getByRole('heading', { name: '儀表板', exact: true })).toBeVisible()
 
   const navigation = page.getByRole('navigation')
   for (const name of ['公司', '聯絡人', '商機', '商機看板']) {
     await navigation.getByRole('link', { name, exact: true }).click()
     await expect(page.getByRole('heading', { name, exact: true })).toBeVisible()
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await expect(html).toHaveAttribute('data-theme', 'dark')
   }
   await page.reload()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await expect(menu).toBeVisible()
   await expect(html).toHaveCSS('background-color', 'rgb(4, 35, 46)')
 
   await page.goto('/missing')
   await expect(page.getByText('找不到頁面。')).toBeVisible()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
-  await toggle.focus()
+  await menu.focus()
   await page.keyboard.press('Space')
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
-  await expect(page).toHaveURL(/\/missing$/)
+  const light = page.getByRole('button', { name: '亮色', exact: true })
+  await light.focus()
+  await page.keyboard.press('Space')
+  await expect(light).toHaveAttribute('aria-pressed', 'true')
   await page.reload()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
   await expect(html).toHaveCSS('background-color', 'rgb(240, 244, 245)')
 })
 
-test('主程式尚未載入時，重新整理已套用已儲存的深色背景', async ({ page }) => {
+test('主程式尚未載入時，重新整理已套用已儲存的系統配色', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/missing')
-  const toggle = page.getByRole('button', { name: '亮色與深色模式' })
-  await toggle.click()
+  await chooseTheme(page, '跟隨系統')
 
   const mainRequested = Promise.withResolvers<void>()
   const resumeMain = Promise.withResolvers<void>()
-  await page.route('**/src/main.tsx', async (route) => {
-    mainRequested.resolve()
-    await resumeMain.promise
-    await route.continue()
-  }, { times: 1 })
+  await page.route(
+    '**/src/main.tsx',
+    async (route) => {
+      mainRequested.resolve()
+      await resumeMain.promise
+      await route.continue()
+    },
+    { times: 1 },
+  )
 
   try {
     await page.reload({ waitUntil: 'commit' })
     await mainRequested.promise
     await expect(page.locator('html')).toHaveCSS('background-color', 'rgb(4, 35, 46)')
-    await expect(toggle).toHaveCount(0)
+    await expect(accountMenu(page)).toHaveCount(0)
   } finally {
     resumeMain.resolve()
   }
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await expect(accountMenu(page)).toBeVisible()
 })
 
-test('無效或無法存取的瀏覽器偏好使用亮色，仍能切換', async ({ page }) => {
-  const toggle = page.getByRole('button', { name: '亮色與深色模式' })
+test('無效或無法存取的主題偏好使用亮色，仍能切換', async ({ page }) => {
   await page.goto('/missing')
-  await page.evaluate(() => window.localStorage.setItem('accountable-theme', 'unknown'))
+  await page.evaluate(() => localStorage.setItem('accountable-theme', 'unknown'))
   await page.reload()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  const html = page.locator('html')
+  await expect(html).toHaveAttribute('data-theme', 'light')
 
   await page.addInitScript(() => {
-    Object.defineProperty(window, 'localStorage', {
-      get() {
-        throw new DOMException('Storage unavailable', 'SecurityError')
-      },
-    })
+    const getItem = Storage.prototype.getItem
+    const setItem = Storage.prototype.setItem
+    Storage.prototype.getItem = function (key) {
+      if (key === 'accountable-theme') throw new DOMException('Storage unavailable', 'SecurityError')
+      return getItem.call(this, key)
+    }
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'accountable-theme') throw new DOMException('Storage unavailable', 'SecurityError')
+      setItem.call(this, key, value)
+    }
   })
   await page.reload()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
-  await toggle.click()
-  await expect(page.locator('html')).toHaveCSS('background-color', 'rgb(4, 35, 46)')
+  await expect(html).toHaveAttribute('data-theme', 'light')
+  await chooseTheme(page, '深色')
+  await expect(html).toHaveAttribute('data-theme', 'dark')
   await page.reload()
-  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  await expect(html).toHaveAttribute('data-theme', 'light')
 })
 
-test('較窄的桌機視窗保留單列導覽並顯示目前主題', async ({ page }) => {
+test('較窄的桌機視窗保留單列導覽、搜尋和選單', async ({ page }) => {
   await page.goto('/missing')
   const navigation = page.getByRole('navigation')
-  const toggle = page.getByRole('button', { name: '亮色與深色模式' })
+  await expect(navigation.getByRole('link')).toHaveCount(5)
   await page.evaluate(() => document.fonts.ready)
-  for (const width of [731, 780, 850]) {
+  for (const width of [731, 780, 850, 1024]) {
     await page.setViewportSize({ width, height: 768 })
-    await expect(navigation.getByRole('link')).toHaveCount(5)
-    const rows = await navigation.getByRole('link').evaluateAll(
-      (links) => new Set(links.map(link => link.getBoundingClientRect().top)).size,
-    )
+    const rows = await navigation
+      .getByRole('link')
+      .evaluateAll((links) => new Set(links.map((link) => link.getBoundingClientRect().top)).size)
     expect(rows).toBe(1)
-    await expect(toggle.locator('.theme-toggle-compact')).toBeVisible()
-    await expect(toggle.locator('.theme-toggle-compact')).toHaveText('亮色')
+    await expect(page.getByRole('searchbox', { name: '全站搜尋' })).toBeInViewport()
+    await expect(accountMenu(page)).toBeInViewport()
   }
-  await toggle.click()
-  await expect(toggle.locator('.theme-toggle-compact')).toHaveText('深色')
-  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await chooseTheme(page, '深色')
+  await expect(page.getByRole('button', { name: '深色', pressed: true })).toBeVisible()
 })
 
 test('圖表、階段標記、對話框與錯誤訊息使用目前主題', async ({ page }) => {
@@ -130,7 +135,7 @@ test('圖表、階段標記、對話框與錯誤訊息使用目前主題', async
 
   for (const theme of themes) {
     await page.goto('/')
-    if (theme.dark) await page.getByRole('button', { name: '亮色與深色模式' }).click()
+    if (theme.dark) await chooseTheme(page, '深色')
 
     const chart = page.getByRole('img', { name: /每月成交金額折線圖/ })
     await expect(chart.locator('.recharts-cartesian-axis-tick-value').first()).toHaveCSS('fill', theme.chartTick)

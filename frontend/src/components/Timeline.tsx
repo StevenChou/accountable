@@ -184,6 +184,7 @@ export function Timeline({ resource, id }: { resource: Owner; id: number }) {
             </div>
             <div className="timeline-text">
               <p>{entry.content}</p>
+              <p className="muted">新增者 {entry.created_by_email}</p>
               {entry.follow_up && (
                 <p className="muted">
                   跟進日期 <time className="num">{entry.follow_up}</time>

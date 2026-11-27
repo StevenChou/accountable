@@ -19,7 +19,7 @@ import {
 } from '../domain'
 
 type CompanyDetail = Company & { contacts: Named[]; deals: Named[] }
-type Detail = CompanyDetail | Contact | Deal
+type Detail = (CompanyDetail | Contact | Deal) & { created_by_email: string }
 
 function Relation({ resource, id, name }: { resource: Resource; id: number | null; name: string | null }) {
   return id ? (
@@ -55,6 +55,7 @@ function Details({ resource, row }: { resource: Resource; row: Detail }) {
             ['網站', company.website],
             ['產業', company.industry],
             ['備註', company.notes],
+            ['新增者', row.created_by_email],
           ]}
         />
         <div className="related">
@@ -89,6 +90,7 @@ function Details({ resource, row }: { resource: Resource; row: Detail }) {
           ['職稱', contact.title],
           ['電子郵件', contact.email],
           ['電話', contact.phone],
+          ['新增者', row.created_by_email],
         ]}
       />
     )
@@ -103,6 +105,7 @@ function Details({ resource, row }: { resource: Resource; row: Detail }) {
         ['階段', stages[deal.stage].label],
         ['金額', <span className="num">{money(deal.amount_cents)}</span>],
         ['成交機率', <span className="num">{deal.probability}%</span>],
+        ['新增者', row.created_by_email],
         [
           isClosed(deal.stage) ? '實際結案日' : '預計結案日',
           <span className="date-cell">

@@ -8,6 +8,7 @@ beforeEach(() => {
 afterEach(() => {
   window.localStorage.removeItem('accountable-theme')
   delete document.documentElement.dataset.theme
+  delete document.documentElement.dataset.themePreference
   delete document.documentElement.dataset.themeStorageKey
 })
 
@@ -33,4 +34,12 @@ it('瀏覽器拒絕儲存時仍可套用主題', () => {
   saveTheme('dark')
   expect(document.documentElement.dataset.theme).toBe('dark')
   expect(window.localStorage.getItem('accountable-theme')).toBeNull()
+})
+
+it('系統偏好與解析後的首屏配色各自保留', () => {
+  vi.stubGlobal('matchMedia', () => ({ matches: true }))
+  saveTheme('system')
+  expect(document.documentElement.dataset.theme).toBe('dark')
+  expect(window.localStorage.getItem('accountable-theme')).toBe('system')
+  expect(readInitialTheme()).toBe('system')
 })

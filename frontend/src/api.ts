@@ -14,15 +14,26 @@ export class ApiError extends Error {
 
 export function errorMessage(error: unknown) {
   if (error instanceof ApiError) return error.message
-  return '無法連線到本機服務。請確認應用程式正在執行後重試。'
+  return '無法連線到 Accountable。請稍後重試。'
+}
+
+let session: { token: string; expired: () => void } | undefined
+
+export function setApiSession(next?: typeof session) {
+  session = next
 }
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const active = session
+  const headers = new Headers(options.headers)
+  if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (active) headers.set('Authorization', `Bearer ${active.token}`)
   const response = await fetch(`/api${path}`, {
     ...options,
-    headers: options.body ? { 'Content-Type': 'application/json', ...options.headers } : options.headers,
+    headers,
   })
   if (!response.ok) {
+    if (response.status === 401 && active && session === active && !options.signal?.aborted) active.expired()
     const error: ErrorData = await response.json().catch(() => ({}))
     throw new ApiError(response.status, error)
   }

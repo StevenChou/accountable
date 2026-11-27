@@ -7,7 +7,13 @@
     <script>
       try {
         const { dataset } = document.documentElement
-        if (window.localStorage.getItem(dataset.themeStorageKey) === 'dark') dataset.theme = 'dark'
+        const preference = window.localStorage.getItem(dataset.themeStorageKey)
+        if (preference === 'system') {
+          dataset.themePreference = 'system'
+          dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        } else if (preference === 'dark') {
+          dataset.theme = 'dark'
+        }
       } catch {
         // The document defaults to light when browser storage is unavailable.
       }

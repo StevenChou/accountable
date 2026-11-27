@@ -1,12 +1,14 @@
 import os
 from pathlib import Path
 
-from sqlalchemy import URL, create_engine, event, select
-from sqlalchemy.engine import Engine
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import URL, create_engine, event, select, text
+from sqlalchemy.engine import Connection, Engine
 
-from backend.schema import activities, companies, contacts, deals, initialized, metadata
+from backend.config import PROJECT_ROOT, Settings
+from backend.schema import activities, companies, contacts, deals, initialized
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB = PROJECT_ROOT / "data" / "accountable.sqlite3"
 WEB_ROOTS = (PROJECT_ROOT / "frontend", PROJECT_ROOT / "node_modules")
 
@@ -30,7 +32,9 @@ def database_path() -> Path:
     return path
 
 
-def make_engine() -> Engine:
+def make_engine(settings: Settings | None = None) -> Engine:
+    if settings is not None and settings.database_url is not None:
+        return create_engine(settings.database_url, pool_pre_ping=True, hide_parameters=True)
     path = database_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     engine = create_engine(
@@ -50,11 +54,21 @@ def make_engine() -> Engine:
     return engine
 
 
+def lock_writes(connection: Connection) -> None:
+    if connection.dialect.name == "postgresql":
+        connection.execute(text("SELECT pg_advisory_xact_lock(7569271940288146083)"))
+
+
 def initialize(engine: Engine, *, reset: bool = False) -> None:
     from backend.examples import populate
 
+    if reset and engine.dialect.name != "sqlite":
+        raise RuntimeError("只可重設本機 SQLite 資料。")
     with engine.begin() as connection:
-        metadata.create_all(connection)
+        lock_writes(connection)
+        config = Config(str(PROJECT_ROOT / "alembic.ini"))
+        config.attributes["connection"] = connection
+        command.upgrade(config, "head")
         if connection.scalar(select(initialized.c.id)) and not reset:
             return
         if reset:

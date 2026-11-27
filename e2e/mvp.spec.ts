@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process'
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test'
+import { expect, type APIRequestContext, type Page } from '@playwright/test'
 import { localDate } from '../frontend/src/domain'
+import { test } from './fixtures'
 
 test.beforeEach(() => {
   execFileSync('uv', ['run', '--no-sync', 'python', '-m', 'backend.seed'], { stdio: 'pipe' })
@@ -90,7 +91,7 @@ for (const sample of [
     await dialog.getByLabel(new RegExp(nameField)).fill('Acme 測試紀錄')
     if (path === 'deals') await dialog.getByLabel(/金額（新臺幣）/).fill('1234.56')
     await dialog.getByRole('button', { name: '儲存' }).click()
-    const search = page.getByRole('searchbox')
+    const search = page.getByRole('main').getByRole('searchbox')
     await search.fill('  ACME  ')
     const row = page.getByRole('row').filter({ hasText: 'Acme 測試紀錄' })
     await expect(row).toBeVisible()

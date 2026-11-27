@@ -9,6 +9,8 @@
 
 正式模式採用 Supabase Auth，瀏覽器端使用 `@supabase/supabase-js` 登入。Render 部署單一 Web Service，由 FastAPI 提供建置後的前端及 API。[執行模式與部署規格](specs/runtime.md)
 
+後端透過 Psycopg 連線至 Postgres，以 Alembic 管理 Postgres 與 SQLite 的資料庫結構版本，並用 HTTPX 向 Supabase Auth 驗證請求的登入權杖。
+
 開發指令定義在 repo 根目錄的 `package.json`，`frontend/` 設為 npm workspace。macOS、Linux 與 Windows 都使用相同指令。
 
 - `npm run dev` 同時啟動前端與後端。

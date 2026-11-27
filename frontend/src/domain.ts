@@ -40,6 +40,7 @@ export type Deal = Named & {
 }
 export type Rows = { companies: Company; contacts: Contact; deals: Deal }
 export type Activity = {
+  created_by_email: string
   id: number
   kind: keyof typeof activityKinds
   content: string

@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from backend.main import create_app
 from backend.schema import MAX_SAFE_INTEGER
 from backend.services import activities as activity_service
+from backend.tests.conftest import sign_in
 
 
 def add(client, route, **values):
@@ -156,6 +157,7 @@ def test_stage_transition_and_sorting_are_persisted(client):
     assert len(client.get(f"{url}/activities").json()) == 1
 
     with TestClient(create_app(), base_url="http://127.0.0.1") as restarted:
+        sign_in(restarted)
         assert [card["id"] for card in lane(restarted, "negotiation")["cards"]] == [
             second["id"],
             first["id"],

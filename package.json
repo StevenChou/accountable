@@ -10,7 +10,8 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others --success first npm:dev:api npm:dev:web",
-    "dev:api": "uv run --no-sync python -m backend.main",
+    "dev:api": "uv run --no-sync python -m backend.main --mode development",
+    "start:production": "uv run --no-sync --env-file .env python -m backend.main --mode production",
     "dev:web": "npm run dev --workspace frontend",
     "seed": "uv run --no-sync python -m backend.seed",
     "test": "npm run test:unit && npm run test:e2e",

@@ -11,7 +11,6 @@ from backend.services.deals import move_deal
 router = APIRouter(tags=["views"])
 
 
-@router.get("/health")
 def health(run_id: str | None = None):
     if run_id is not None and run_id != os.environ.get("ACCOUNTABLE_RUN_ID"):
         raise missing()
@@ -33,5 +32,5 @@ def pipeline(request: Request):
 @router.post("/deals/{record_id}/move")
 def move(request: Request, record_id: int, body: MoveInput):
     with write(request) as connection:
-        move_deal(connection, record_id, body.stage, body.before_id)
+        move_deal(connection, record_id, body.stage, body.before_id, request.state.actor)
         return summary.pipeline(connection)

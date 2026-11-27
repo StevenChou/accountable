@@ -5,6 +5,10 @@ import App from '../src/App'
 import type { Dashboard } from '../src/domain'
 import { activity, company, contact } from './fixtures'
 
+vi.mock('../src/auth', () => ({
+  useAuth: () => ({ state: { status: 'signed-in', member: { email: 'alex@example.test' } } }),
+}))
+
 const fetchMock = vi.fn<typeof fetch>()
 const months = ['2025-08', '2025-09', '2025-10', '2025-11', '2025-12', '2026-01'].map((month) => ({
   month,
@@ -88,23 +92,23 @@ it('共用頁首可用鍵盤切換，跨頁仍維持選擇', async () => {
   const user = userEvent.setup()
   render(<App />)
 
-  const toggle = screen.getByRole('button', { name: '亮色與深色模式' })
-  expect(toggle.textContent).toContain('關閉')
-  toggle.focus()
+  const menu = screen.getByRole('button', { name: '使用者選單' })
+  menu.focus()
   await user.keyboard('{Enter}')
-  expect(toggle.getAttribute('aria-pressed')).toBe('true')
-  expect(toggle.textContent).toContain('開啟')
+  const dark = screen.getByRole('button', { name: '深色' })
+  dark.focus()
+  await user.keyboard(' ')
+  expect(dark.getAttribute('aria-pressed')).toBe('true')
   expect(document.documentElement.dataset.theme).toBe('dark')
 
   await user.click(screen.getByRole('link', { name: '公司' }))
   expect(await screen.findByRole('link', { name: company.name })).toBeTruthy()
-  expect(screen.getByRole('button', { name: '亮色與深色模式', pressed: true })).toBe(toggle)
+  expect(document.documentElement.dataset.theme).toBe('dark')
 
   window.history.back()
   expect(await screen.findByText('找不到頁面。')).toBeTruthy()
-  expect(screen.getByRole('button', { name: '亮色與深色模式', pressed: true })).toBe(toggle)
-  toggle.focus()
-  await user.keyboard(' ')
-  expect(toggle.getAttribute('aria-pressed')).toBe('false')
+  await user.click(menu)
+  expect(screen.getByRole('button', { name: '深色', pressed: true })).toBeTruthy()
+  await user.click(screen.getByRole('button', { name: '亮色' }))
   expect(document.documentElement.dataset.theme).toBe('light')
 })

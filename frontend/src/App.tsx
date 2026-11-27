@@ -1,9 +1,13 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router'
 import { RecordList } from './pages/RecordList'
 import { RecordDetail } from './pages/RecordDetail'
 import { resourceNames, type Resource } from './domain'
-import { saveTheme, type Theme } from './theme'
+import { useAuth } from './auth'
+import { SignIn } from './pages/SignIn'
+import { GlobalSearch } from './components/GlobalSearch'
+import { UserMenu } from './components/UserMenu'
+import { useTheme, type Theme } from './theme'
 
 const DashboardPage = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.DashboardPage })))
 const PipelinePage = lazy(() => import('./pages/Pipeline').then((module) => ({ default: module.PipelinePage })))
@@ -17,17 +21,33 @@ const navigation = [
 ]
 
 export default function App({ initialTheme = 'light' }: { initialTheme?: Theme }) {
-  const [theme, setTheme] = useState(initialTheme)
-  const dark = theme === 'dark'
+  const auth = useAuth()
+  const state = auth.state
+  const [theme, changeTheme] = useTheme(initialTheme)
 
-  function toggleTheme() {
-    const nextTheme = dark ? 'light' : 'dark'
-    saveTheme(nextTheme)
-    setTheme(nextTheme)
-  }
+  if (state.status === 'loading')
+    return (
+      <main>
+        <p className="loading" role="status">
+          驗證登入中…
+        </p>
+      </main>
+    )
+  if (state.status === 'error')
+    return (
+      <main>
+        <div className="panel empty">
+          <p role="alert">{state.message}</p>
+          <button className="secondary" onClick={auth.retry}>
+            重試
+          </button>
+        </div>
+      </main>
+    )
+  if (state.status === 'signed-out') return <SignIn demo={state.demo} signIn={auth.signIn} />
 
   return (
-    <BrowserRouter>
+    <BrowserRouter key={state.member.email}>
       <header className="masthead">
         <Link to="/" className="brand">
           <span className="brand-mark" aria-hidden="true">
@@ -47,18 +67,15 @@ export default function App({ initialTheme = 'light' }: { initialTheme?: Theme }
             </NavLink>
           ))}
         </nav>
-        <button
-          type="button"
-          className="secondary theme-toggle"
-          aria-label="亮色與深色模式"
-          aria-pressed={dark}
-          onClick={toggleTheme}
-        >
-          <span className="theme-toggle-label">
-            深色模式 <span className="theme-toggle-state">{dark ? '開啟' : '關閉'}</span>
-          </span>
-          <span className="theme-toggle-compact">{dark ? '深色' : '亮色'}</span>
-        </button>
+        <div className="header-tools">
+          <GlobalSearch />
+          <UserMenu
+            email={state.member.email}
+            theme={theme}
+            changeTheme={changeTheme}
+            signOut={() => void auth.signOut()}
+          />
+        </div>
       </header>
       <main>
         <Suspense

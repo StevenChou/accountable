@@ -2,6 +2,7 @@ from sqlalchemy import func, select
 
 from backend import clock
 from backend.api.errors import invalid, missing
+from backend.auth import Actor
 from backend.schema import CLOSED, activities, companies, contacts, deals
 
 RECORDS = {"companies": companies, "contacts": contacts, "deals": deals}
@@ -36,8 +37,15 @@ def record_query(table):
     ).select_from(deals.outerjoin(companies).outerjoin(contacts, deals.c.contact_id == contacts.c.id))
 
 
-def present(table, row, today):
+def public_record(row):
     result = dict(row)
+    for field in ("created_by_id", "updated_by_id", "updated_by_email"):
+        result.pop(field, None)
+    return result
+
+
+def present(table, row, today):
+    result = public_record(row)
     if table is deals:
         closed = result["stage"] in CLOSED
         close = result["actual_close"] if closed else result["expected_close"]
@@ -92,3 +100,12 @@ def delete_impact(connection, table, record_id: int):
     if table is contacts:
         result["deals"] = connection.scalar(select(func.count()).where(deals.c.contact_id == record_id))
     return result
+
+
+def mark_related_on_delete(connection, table, record_id: int, actor: Actor) -> None:
+    relations = {
+        companies: ((contacts, contacts.c.company_id), (deals, deals.c.company_id)),
+        contacts: ((deals, deals.c.contact_id),),
+    }
+    for related, foreign_key in relations.get(table, ()):
+        connection.execute(related.update().where(foreign_key == record_id).values(**actor.modification()))

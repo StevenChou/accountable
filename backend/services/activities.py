@@ -4,8 +4,9 @@ from sqlalchemy import select
 
 from backend import clock
 from backend.api.errors import ApiError
+from backend.auth import Actor
 from backend.schema import STAGES, activities, contacts, deals
-from backend.services.records import get_row
+from backend.services.records import get_row, public_record
 
 
 def utc_text(value):
@@ -25,7 +26,7 @@ def activity_query():
 
 
 def present_activity(row):
-    activity = dict(row)
+    activity = public_record(row)
     if row["contact_id"] is None:
         activity.update(owner_type="deals", owner_id=row["deal_id"], owner_name=row["deal_name"])
     else:
@@ -62,7 +63,7 @@ def manual_values(values):
     }
 
 
-def log_stage_change(connection, deal_id, previous, target):
+def log_stage_change(connection, deal_id, previous, target, actor: Actor):
     connection.execute(
         activities.insert().values(
             deal_id=deal_id,
@@ -70,5 +71,6 @@ def log_stage_change(connection, deal_id, previous, target):
             content=f"從{STAGES[previous][0]}移至{STAGES[target][0]}",
             occurred_at=utc_text(clock.now()),
             completed=False,
+            **actor.creation(),
         )
     )

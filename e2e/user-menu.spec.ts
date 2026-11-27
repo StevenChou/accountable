@@ -1,0 +1,28 @@
+import { expect } from '@playwright/test'
+import { accountMenu, chooseTheme, test } from './fixtures'
+
+test('跟隨系統即時變更且保留設定，固定模式忽略裝置變更', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await page.goto('/missing')
+  const html = page.locator('html')
+  const menu = accountMenu(page)
+  await expect(menu).toHaveText('AL')
+  await expect(html).toHaveAttribute('data-theme', 'light')
+  await chooseTheme(page, '跟隨系統')
+  await expect(page.getByRole('button', { name: '跟隨系統' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(html).toHaveAttribute('data-theme', 'dark')
+  await page.emulateMedia({ colorScheme: 'light' })
+  await expect(html).toHaveAttribute('data-theme', 'light')
+  await page.reload()
+  await expect(menu).toBeVisible()
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await expect(html).toHaveAttribute('data-theme', 'dark')
+  await chooseTheme(page, '亮色')
+  await page.emulateMedia({ colorScheme: 'light' })
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await expect(html).toHaveAttribute('data-theme', 'light')
+  await chooseTheme(page, '深色')
+  await page.getByRole('button', { name: '登出' }).click()
+  await expect(page.getByRole('heading', { name: '登入' })).toBeVisible()
+  await expect(html).toHaveAttribute('data-theme', 'dark')
+})

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: accountable
+    runtime: python
+    plan: free
+    branch: main
+    autoDeployTrigger: checksPass
+    buildCommand: npm ci --include=dev && npm run build && uv sync --locked --no-dev
+    startCommand: uv run --no-sync python -m backend.main --mode production
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: '3.12.16'
+      - key: NODE_VERSION
+        value: '26.13.1'
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false

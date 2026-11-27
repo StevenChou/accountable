@@ -36,6 +36,7 @@ export const deal: Deal = {
 }
 
 export const activity: Activity = {
+  created_by_email: 'alex@example.test',
   id: 4,
   kind: 'call',
   content: '確認交貨日期',

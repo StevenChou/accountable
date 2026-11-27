@@ -1,0 +1,54 @@
+.user-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.account-trigger {
+  min-width: 42px;
+  height: 42px;
+  padding-inline: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--green-tint);
+  color: var(--deep-green);
+  font-weight: 700;
+}
+
+.account-options {
+  position: absolute;
+  z-index: 5;
+  inset-block-start: calc(100% + 8px);
+  inset-inline-end: 0;
+  width: min(205px, calc(100vw - 40px));
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.account-email {
+  padding: 8px 10px;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.account-options button {
+  display: block;
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: start;
+}
+
+.account-options button:hover {
+  background: var(--secondary-bg);
+}
+
+.account-options button[aria-pressed='true'] {
+  background: var(--green-tint);
+  color: var(--deep-green);
+  font-weight: 700;
+}

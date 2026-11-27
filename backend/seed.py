@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 from backend.db import database_path, initialize, make_engine
 
 
@@ -11,4 +13,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    ArgumentParser(description="重設本機 SQLite 範例資料").parse_args()
     main()

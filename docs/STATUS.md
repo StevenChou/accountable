@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-27｜Day 5 第 10 步「按計畫實作並執行測試」程式已實作
+
+- 已接上登入與 CRM API 驗證、操作人與 SQLite 升級、全站搜尋、使用者選單及三種主題模式。已建立正式啟動入口和 [Render 設定](../render.yaml)。[實作計畫](changes/multi-user/plan.md)
+- 無正式設定和帶虛構正式設定時，`npm run check:quick` 均通過 74 項測試。前端正式建置通過，另以程序內 HTTP 檢查確認其靜態資源、紀錄直連及未登入的 API 回應。測試使用暫存 SQLite 與虛構使用者。
+- Playwright 已辨識 20 項端對端測試。瀏覽器執行仍待授權，因此第 10 步的完成判準尚未勾選。Supabase 與 Render 的線上驗收依課程在後續步驟執行。[Day 5 第 10 步](../notes/week1day5-claude-code.html#step-10)
+
 ## 2026-11-27｜Day 5 第 9 步「寫出三階段的實作計畫」完成
 
 - 實作依序分為登入與資料庫、全站搜尋、使用者選單。記錄各階段的檔案範圍與共用入口的整合責任，並為六項成功標準規劃單元測試、端對端測試與正式驗收。[多人版實作計畫](changes/multi-user/plan.md)
@@ -271,13 +277,17 @@ uv sync --locked --python 3.12
 npm run dev
 ```
 
-在 Chrome 開啟 `http://127.0.0.1:5173/`。完成安裝後可離線執行 `npm run dev` 及使用應用程式。在同一個終端機按 Ctrl+C 停止前後端。
+在瀏覽器開啟 `http://127.0.0.1:5173/`。本機開發可用虛構帳號 `alex@example.test` 或 `sam@example.test` 登入，密碼均為 `accountable-demo`。完成安裝後可離線執行 `npm run dev` 及使用應用程式。在同一個終端機按 Ctrl+C 停止前後端。
 
 - `npm test` 執行三套測試。Playwright 會啟停自己的服務，並用暫存資料庫。
 - 完整或快速檢查需要先安裝 gitleaks，並確認 `gitleaks version` 可執行。[安裝步驟](../notes/week1day4-claude-code.html#step-1)
 - `npm ci` 後可用 `npm run hooks:install` 安裝或確認本機 Git pre-commit hook。
-- `npm run seed` 會**清除目前選定的資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。
+- `npm run seed` 會**清除目前選定的本機 SQLite 資料庫內容**，再填入初始範例。重設完成後重新整理瀏覽器。
 - 日常資料預設存於 `data/accountable.sqlite3`。若需要獨立資料庫，可在啟動與重設時皆設定相同的 `ACCOUNTABLE_DB_PATH`。請將資料庫放在 `frontend/` 與 `node_modules/` 之外。
+
+### 在本機啟動正式模式
+
+備妥 Supabase 設定後，從 repo 根目錄執行 `npm run build` 與 `npm run start:production`。此入口讀取 Git 忽略的 `.env`，連到 Supabase 並執行資料庫升級，再於 `http://127.0.0.1:8000/` 提供前端和 API。登入使用管理者已建立的正式帳號。[執行模式與部署規格](specs/runtime.md)
 
 ## 2026-11-23｜MVP 實作計畫
 

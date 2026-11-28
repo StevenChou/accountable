@@ -1,5 +1,12 @@
 # 專案進度
 
+## 2026-11-28｜Day 5 第 12 步「試跑兩種模式並驗證線上資料庫」完成
+
+- 以 `npm run dev` 啟動暫存 SQLite，確認五個區塊可讀取。以兩組虛構帳號驗證紀錄新增與編輯、操作人、搜尋和登出。與 Supabase Postgres 比對七個搜尋案例，結果一致。
+- 正式建置與 `npm run start:production` 通過，已套用 [Alembic 版本表 RLS migration](../migrations/versions/0003_protect_migration_version.py) 並初始化範例資料。未登入或使用無效權杖的受保護 API 請求回傳 401。Supabase Auth 自行註冊已關閉。
+- 唯讀 Supabase MCP 確認 `public` 的六張表皆啟用 RLS。匿名 Data API 讀取六張表皆遭拒，Postgres 權限查核也確認 `authenticated` 角色沒有直接讀寫權限。Security Advisor 回報 0 項錯誤、1 項外洩密碼防護警告及 6 項預期內的「RLS 已開啟且無公開政策」提示。外洩密碼防護適用 Pro 以上方案。[Supabase 密碼安全文件](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)
+- 使用者確認以自己的 Supabase 帳號登入及操作成功。服務紀錄確認登入驗證、五個功能區塊、全站搜尋和紀錄詳情 API 均回傳 200。快速檢查通過 74 項測試，本機試跑服務已關閉。下一步是[審查分支並依發現改善 harness](../notes/week1day5-claude-code.html#step-13)。
+
 ## 2026-11-27｜Day 5 第 11 步「跑完整檢查與 ui-check」完成
 
 - 使用隔離的 Chromium Headless Shell 重跑 `npm run check`，共通過 94 項測試。Claude 的 `ui-check` 用虛構帳號走訪五個功能區塊、三種紀錄詳情和找不到頁面。主控台錯誤及警告均為 0。

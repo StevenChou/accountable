@@ -13,6 +13,7 @@
 | `backend/main.py`、`backend/config.py`（新增）、`backend/auth.py`（新增） | 選擇執行模式，設置公開健康檢查與登入入口、CRM API 驗證及正式靜態檔案入口。 |
 | `backend/db.py`、`backend/schema.py`、`backend/examples.py`、`backend/seed.py` | 建立 SQLite 和 Postgres 連線、保留整數分精度、初始化範例資料、限制重設指令只操作本機 SQLite。 |
 | `alembic.ini`、`migrations/env.py`、`migrations/versions/0001_crm.py`、`migrations/versions/0002_record_actors.py`（新增） | 將現有結構和操作人欄位寫成版本化 migration，處理既有 SQLite、Postgres 新庫與 CRM 資料表的 RLS。 |
+| `migrations/versions/0003_protect_migration_version.py`、`lefthook.yml` | 驗收及審查補強，保護 Alembic 版本表並將 migrations 納入提交前檢查。 |
 | `backend/api/records.py`、`backend/api/activities.py`、`backend/api/views.py`、`backend/services/records.py`、`backend/services/activities.py`、`backend/services/deals.py` | 沿用讀寫與交易入口，從驗證後的身分記錄操作人。讓詳情和時間軸回傳新增者，並處理拖放、跟進完成、關聯解除與系統活動。 |
 | `pyproject.toml`、`uv.lock`、`package.json`、`render.yaml`（新增）、`docs/TECH_STACK.md`、`docs/STATUS.md` | 鎖定後端依賴、讓本機開發與正式模式使用各自的入口、宣告 Render 建置與啟動方式，以及記錄可用指令。 |
 | `frontend/src/App.tsx`、`frontend/src/api.ts`、`frontend/src/auth.ts`（新增）、`frontend/src/pages/SignIn.tsx`（新增）、`frontend/src/styles.css` | 保護頁面與管理登入狀態，統一附加 Bearer 權杖及處理失效狀態，在共用頁首預留搜尋、帳號操作區域。 |

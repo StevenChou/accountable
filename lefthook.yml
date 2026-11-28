@@ -15,7 +15,7 @@ pre-commit:
       stage_fixed: true
 
     - name: ruff format
-      glob: 'backend/**/*.py'
+      glob: ['backend/**/*.py', 'migrations/**/*.py']
       run: uv run --no-sync ruff format --force-exclude -- {staged_files}
       stage_fixed: true
 
@@ -27,7 +27,7 @@ pre-commit:
       run: npm exec -- eslint --max-warnings=0 --no-warn-ignored -- {staged_files}
 
     - name: ruff check
-      glob: 'backend/**/*.py'
+      glob: ['backend/**/*.py', 'migrations/**/*.py']
       run: uv run --no-sync ruff check --force-exclude -- {staged_files}
 
     - name: types

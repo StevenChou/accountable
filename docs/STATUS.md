@@ -1,5 +1,12 @@
 # 專案進度
 
+## 2026-11-28｜Day 5 第 13 步「審查分支並依發現改善 harness」完成
+
+- Claude reviewer 審查本分支相對 main 的變更，Codex 分別審查標準與規格。已修正登入後驗證暫時失敗會清除工作階段、Supabase 限流被誤判，以及 Render 缺少區域和時區三項 Important。[審查與修正紀錄](changes/multi-user/review.md)
+- Render 設定為 singapore、Asia/Taipei，保留 main、Python 3.12、checksPass 及必要環境變數。補上登入和還原遇到 429、登入後遇到 503 的回歸測試，後端補上 403 和 429 的回應案例。
+- 依改善流程將 migrations 納入 Ruff、型別檢查與 pre-commit，並補上登入與部署的審查規則。完整檢查通過 99 項測試，包含 40 項 Vitest、39 項 pytest 和 20 項 Playwright。[harness 改善紀錄](IMPROVE.md)
+- 講義已完成 13／16 步。下一步是[等 CI 通過、合併並推送 main](../notes/week1day5-claude-code.html#step-14)。
+
 ## 2026-11-28｜Day 5 第 12 步「試跑兩種模式並驗證線上資料庫」完成
 
 - 以 `npm run dev` 啟動暫存 SQLite，確認五個區塊可讀取。以兩組虛構帳號驗證紀錄新增與編輯、操作人、搜尋和登出。與 Supabase Postgres 比對七個搜尋案例，結果一致。

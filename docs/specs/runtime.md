@@ -6,6 +6,7 @@ React 頁面透過同來源的 `/api` 呼叫 FastAPI 的 JSON API。API 提供�
 
 - Supabase 提供帳密登入及共用的 Postgres 資料庫，正式模式需要網路。本機正式模式以 Git 忽略的 `.env` 設定 `DATABASE_URL`、`SUPABASE_URL` 與 `SUPABASE_PUBLISHABLE_KEY`。瀏覽器取得的公開設定只有 Supabase Project URL 與 publishable key，`DATABASE_URL` 留在後端。
 - Render 使用免費方案的單一 Web Service，從 `onrender.com` 網址經由 HTTPS 提供服務。FastAPI 同時提供建置後的前端與 API，啟動時先執行資料庫 migrations。以 `render.yaml` 宣告服務與所需環境變數名稱，變數實際值在 Render 設定。本機可透過相同的正式啟動流程執行建置後的應用程式。
+- Render 區域為 singapore，鄰近 Supabase 的新加坡資料庫。團隊時區為 Asia/Taipei，透過 `TZ` 設定部署環境的日期計算。CRM 資料表、初始化標記和 Alembic 版本表都啟用 RLS，並限制公開資料 API 的存取。
 
 ## 本機開發與測試
 

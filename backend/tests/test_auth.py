@@ -30,7 +30,7 @@ def test_local_login_session_expiry_and_revocation(client):
     assert client.get("/api/companies").status_code == 401
 
 
-@pytest.mark.parametrize("status", [200, 401, 503, None])
+@pytest.mark.parametrize("status", [200, 401, 403, 429, 503, None])
 def test_production_verifies_each_token_and_distinguishes_upstream_error(production_client, monkeypatch, status):
     client = production_client
     calls = []
@@ -44,7 +44,7 @@ def test_production_verifies_each_token_and_distinguishes_upstream_error(product
         )
 
     monkeypatch.setattr(client.app.state.auth.client, "get", get)
-    expected = status if status is not None else 503
+    expected = {200: 200, 401: 401, 403: 401, 429: 503, 503: 503, None: 503}[status]
     assert client.get("/api/auth/session", headers={"Authorization": "Bearer sample-token"}).status_code == expected
     assert client.get("/api/companies", headers={"Authorization": "Bearer sample-token"}).status_code == expected
     assert len(calls) == 2

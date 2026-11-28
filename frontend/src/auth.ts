@@ -94,12 +94,14 @@ async function createProvider(config: Config): Promise<Provider> {
   return {
     async restore() {
       const { data, error } = await auth.getSession()
-      if (error?.status === 0 || (error?.status ?? 0) >= 500) throw new Error('Auth unavailable')
+      if (error?.status === 0 || error?.status === 429 || (error?.status ?? 0) >= 500)
+        throw new Error('Auth unavailable')
       return data.session?.access_token ?? null
     },
     async signIn(email, password) {
       const { data, error } = await auth.signInWithPassword({ email, password })
-      if (error?.status === 0 || (error?.status ?? 0) >= 500) throw new Error('Auth unavailable')
+      if (error?.status === 0 || error?.status === 429 || (error?.status ?? 0) >= 500)
+        throw new Error('Auth unavailable')
       if (!data.session) throw new ApiError(401, { message: invalidLogin })
       return data.session.access_token
     },
@@ -199,8 +201,13 @@ export function useAuth() {
     try {
       await establish(active, operation)
     } catch (error) {
-      await client.signOut(active).catch(() => undefined)
-      throw error
+      if (version.current !== operation) return
+      if (error instanceof ApiError && error.status === 401) {
+        await client.signOut(active).catch(() => undefined)
+        throw error
+      }
+      detach()
+      setState({ status: 'error', message: errorMessage(error) })
     }
   }
 

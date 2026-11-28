@@ -14,6 +14,54 @@ vi.mock('@supabase/supabase-js', () => ({ createClient: () => ({ auth: supabase 
 
 afterEach(() => window.localStorage.clear())
 
+it.each(['restore', 'signIn'])('Supabase 429 在 %s 時顯示服務錯誤並可重試', async (phase) => {
+  window.history.replaceState(null, '', '/missing')
+  supabase.onAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } })
+  supabase.getSession.mockResolvedValue({ data: { session: null }, error: null })
+  const limited = { data: { session: null }, error: { status: 429 } }
+  if (phase === 'restore') supabase.getSession.mockResolvedValueOnce(limited)
+  else supabase.signInWithPassword.mockResolvedValueOnce(limited)
+  vi.stubGlobal(
+    'fetch',
+    vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json({
+        mode: 'supabase',
+        url: 'https://auth.example.test',
+        publishableKey: 'sb_publishable_example',
+      }),
+    ),
+  )
+  render(<App />)
+  if (phase === 'signIn') {
+    await screen.findByRole('heading', { name: '登入' })
+    fireEvent.change(screen.getByLabelText('電子郵件'), { target: { value: 'member@example.test' } })
+    fireEvent.change(screen.getByLabelText('密碼'), { target: { value: 'example-password' } })
+    fireEvent.click(screen.getByRole('button', { name: '登入' }))
+  }
+  expect((await screen.findByRole('alert')).textContent).toContain('無法連線到 Accountable')
+})
+
+it('帳密通過後若驗證服務暫時失敗，保留工作階段供重試', async () => {
+  window.history.replaceState(null, '', '/missing')
+  const fetchMock = vi
+    .fn<typeof fetch>()
+    .mockResolvedValueOnce(Response.json({ mode: 'local' }))
+    .mockResolvedValueOnce(Response.json({ token: 'valid-local-token' }))
+    .mockResolvedValueOnce(Response.json({ message: '暫時無法驗證登入，請稍後重試。' }, { status: 503 }))
+    .mockResolvedValueOnce(Response.json({ mode: 'local' }))
+    .mockResolvedValueOnce(Response.json({ email: 'alex@example.test' }))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<App />)
+  await screen.findByRole('heading', { name: '登入' })
+  fireEvent.change(screen.getByLabelText('電子郵件'), { target: { value: 'alex@example.test' } })
+  fireEvent.change(screen.getByLabelText('密碼'), { target: { value: 'accountable-demo' } })
+  fireEvent.click(screen.getByRole('button', { name: '登入' }))
+  await screen.findByRole('alert')
+  expect(window.localStorage.getItem('accountable-local-session')).toBe('valid-local-token')
+  fireEvent.click(screen.getByRole('button', { name: '重試' }))
+  expect(await screen.findByText('找不到頁面。')).toBeTruthy()
+})
+
 it('登入後保留紀錄網址，失效後移除資料與儲存的工作階段', async () => {
   window.history.replaceState(null, '', '/companies/1')
   const fetchMock = vi.fn<typeof fetch>()

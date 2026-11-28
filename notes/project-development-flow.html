@@ -224,7 +224,7 @@ main { display: grid; gap: 24px; }
 <main>
   <section class="panel" id="workflow-template" aria-labelledby="template-heading">
     <h2 id="template-heading">我的 workflow 檢核表</h2>
-    <p>首次採用時填入專案設定。每次變更用同一份完成判準檢查，依這次的範圍加入適用項目。</p>
+    <p>首次採用時填入專案設定。每次變更先跑本機驗收，再依範圍勾選適用項目，並填入這次的驗收證據。</p>
     <div class="template-actions" id="template-actions" hidden>
       <button class="copy-button" type="button" id="copy-template">複製 Markdown</button>
       <p class="section-note" id="copy-status" role="status"></p>
@@ -239,7 +239,9 @@ main { display: grid; gap: 24px; }
 - 規格入口、區域規格目錄（適用時）、變更紀錄目錄及審查政策所在位置　〈填寫〉
 - 本機快速檢查指令　〈填寫〉
 - 本機完整檢查指令　〈填寫〉
-- 共用 CI 的工作名稱與結果連結　〈啟用時填寫〉
+- 自動測試的資料與帳號來源、瀏覽器隔離方式　〈適用時填寫〉
+- 外部服務的驗收環境、角色或工具的權限範圍、憑證存放位置　〈適用時填寫，只記位置〉
+- 遠端儲存庫與共用 CI 的工作名稱　〈適用時填寫〉
 - 正式啟動指令、部署環境與上線驗收方式　〈適用時填寫〉
 
 ## 每次變更
@@ -247,19 +249,30 @@ main { display: grid; gap: 24px; }
 - [ ] 開分支。確認工作區與起始提交，從主分支開始。
 - [ ] Plan。確認 intent 裡的問題、對象、範圍和成功標準。
 - [ ] Design。先讀規格入口，再沿索引查閱受影響的區域與共用規則。更新規格與驗收條件，核對規格差異是否符合已確認的變更意圖。
-- [ ] Build。計畫列出順序、風險和 Proof，分段實作並驗證。
-- [ ] Test。本機完整檢查已通過，成功標準都有驗收證據。
-- [ ] Deploy。獨立核對受影響的規格、實作及測試，修正 Important 問題，再依結果改善既有的 harness。
-- [ ] 合併。待合併提交取得完整檢查與適用的 CI 結果，由人核對後合併。
+- [ ] Build。計畫列出順序與風險，讓 Proof 對應每條成功標準及需要驗證的失敗情境。分段實作並驗證。
+- [ ] Test。自動測試使用隔離資料，有帳號時用虛構帳號，有瀏覽器時用獨立環境。本機完整檢查已通過，成功標準都有驗收證據。
+- [ ] Deploy。獨立核對受影響的規格、實作及測試，修正 Important 問題。用實際觸發條件核對 Proof，確認回歸測試可重現問題並由標準檢查執行，再依結果改善既有的 harness。
+- [ ] 合併。記下待合併提交和本機完整檢查結果，完成適用的分支 CI 後，由人核對證據並合併。
 - [ ] Maintain。在交付版本走一次日常操作，記下具體觀察和後續想法。
 
 ## 依變更啟用
 
+- [ ] 開工前。使用外部服務前核對驗收環境與工具的授權範圍。只需查閱時用唯讀權限，共用設定只記連線與授權方式，憑證放在指定位置。
 - [ ] Design 需要拆分規格時，保留原入口作為摘要與索引，按功能搬移細節，核對內容與連結，更新代理閱讀指引和審查政策。先獨立提交規格搬移，再提交產品行為的變更。
-- [ ] Test 有介面變更時，用 ui-check 或手動檢查並保存畫面證據。
-- [ ] Test 有外部服務時，用授權的驗收環境試跑正式啟動方式，核對適用的 migration 與存取規則。
-- [ ] 合併前有共用 CI 時，確認同一個待合併提交的分支 CI 已通過。
-- [ ] 合併後需要部署時，確認主分支 CI 已通過，再核對部署版本並從正式網址驗收關鍵操作。</pre>
+- [ ] Test 有介面變更時，用 ui-check 或手動檢查並保存畫面證據。使用相同的測試資料和視窗尺寸比對。
+- [ ] Test 有外部服務時，在授權的驗收環境以正式啟動方式驗證關鍵操作。
+- [ ] Test 涉及資料庫升級時，用代表性的既有資料驗證 migration 成功且資料保留。涉及存取權限時，驗證各角色應允許及應拒絕的操作。
+- [ ] 改善 harness。新增程式目錄或 migration 時，確認納入適用的格式、lint、型別與測試檢查。
+- [ ] 合併前有共用 CI 時，記下與本機驗證相同提交的分支 CI 通過紀錄。
+- [ ] 合併後有共用 CI 時，確認遠端主分支的交付提交已通過 CI 並記錄結果。未部署的專案也適用。
+- [ ] 需要部署時，使用已驗證的交付提交（啟用共用 CI 時須通過主分支 CI）。核對實際部署版本，從正式網址驗收關鍵操作並記下結果。
+
+## 本次驗收證據
+
+- 各成功標準的測試或手動驗收結果　〈填寫〉
+- 待合併提交與本機完整檢查結果　〈填寫〉
+- 分支 CI 結果連結、遠端主分支交付提交與 CI 結果連結　〈啟用共用 CI 時填寫〉
+- 正式啟動驗收、部署版本及正式網址驗收結果　〈依適用項目填寫〉</pre>
     </details>
   </section>
 
@@ -273,6 +286,7 @@ main { display: grid; gap: 24px; }
       <li>
         <h3>權限</h3>
         <p>允許 agent 執行明確的測試指令。<code>git&nbsp;push</code> 由人確認，限制 agent 讀取 <code>.env</code>。<a href="week1day2-claude-code.html#step-6">Day 2 權限設定</a></p>
+        <p>接外部服務時，先確認授權的驗收環境、允許操作的資源及憑證存放位置。工具只需查資料時，限定到所需專案並給予唯讀權限。共用設定記錄連線與授權方式，各自完成授權。<a href="week1day5-claude-code.html#step-5">Accountable 範例 · 唯讀 Supabase MCP</a></p>
       </li>
       <li>
         <h3>介面工具與子代理</h3>
@@ -394,7 +408,7 @@ main { display: grid; gap: 24px; }
       <li class="flow-row" id="build">
         <div class="node">
           <div class="node-top"><span class="tag tag-build" lang="en">Build</span><h3>先排計畫，再分段實作</h3></div>
-          <p>在 <code>plan.md</code> 列出改動、依賴順序與風險，用 Proof 對照每段的驗證。開新 session，依計畫分段做、分段測。如果多人並行，先劃清檔案範圍與相依關係。核對差異與結果後再提交。<a href="week1day5-claude-code.html#step-9">Day 5 分階段計畫</a></p>
+          <p>在 <code>plan.md</code> 列出改動、依賴順序與風險。用 Proof 把每條成功標準對應到測試或手動驗收，列出必要的失敗情境及預期結果。開新 session，依計畫分段做、分段測。如果多人並行，先劃清檔案範圍與相依關係。核對差異與結果後再提交。<a href="week1day5-claude-code.html#step-9">Day 5 分階段計畫</a></p>
           <p class="criterion"><strong>完成判準</strong> 計畫中的改動和測試已完成，開發中的檢查通過。</p>
         </div>
         <div class="flow-next" aria-hidden="true"></div>
@@ -402,9 +416,11 @@ main { display: grid; gap: 24px; }
       <li class="flow-row" id="test">
         <div class="node">
           <div class="node-top"><span class="tag tag-test" lang="en">Test</span><h3>跑完整檢查，親手驗收</h3></div>
-          <p>首次 MVP 用 <code>npm test</code> 跑單元和端對端測試。已設定 harness 就跑完整檢查，例如 <code>npm run check</code>。</p>
+          <p>執行專案的本機完整檢查。自動測試使用隔離資料，涉及登入時使用虛構帳號，涉及瀏覽器時使用獨立的瀏覽器環境。Accountable 首次 MVP 用 <code>npm test</code>，建立 harness 後用 <code>npm run check</code>。</p>
           <p>親手走過 <code>intent.md</code> 的成功標準。有介面改動時，用 <code>ui-check</code> 或手動操作瀏覽器並留存截圖。首版比對設計稿，既有介面用相同資料與視窗尺寸核對畫面。<a href="week1day3-claude-code.html#step-9">Day 3 設計稿驗收</a> · <a href="week1day4-claude-code.html#step-13">Day 4 主題驗收</a> · <a href="week1day5-claude-code.html#step-11">Day 5 UI 檢查</a></p>
-          <p>有外部服務時，自動測試仍用隔離資料。另在授權的驗收環境，以正式啟動方式走關鍵操作，核對這次涉及的 migration 與存取規則。<a href="week1day5-claude-code.html#step-12">Day 5 Supabase 驗收</a></p>
+          <p>有外部服務時，另在授權的驗收環境以正式啟動方式走過關鍵操作。</p>
+          <p>涉及資料庫升級時，用代表性的既有資料核對 migration 成功且資料保留。涉及存取權限時，依規格驗證各角色應允許及應拒絕的操作。</p>
+          <p class="route-note">Accountable 的自動測試用暫存 SQLite 與虛構使用者，另以正式啟動方式連到 Supabase，驗證登入、搜尋及匿名存取限制。<a href="week1day5-claude-code.html#step-12">Day 5 兩種模式的驗收</a></p>
           <p class="criterion"><strong>完成判準</strong> 完整檢查通過，成功標準都有驗收證據。</p>
         </div>
         <div class="recovery">
@@ -434,7 +450,8 @@ main { display: grid; gap: 24px; }
             <div class="node">
               <h3>改善 harness</h3>
               <p>依 <code>IMPROVE.md</code> 記下 Important 問題的實際觸發條件，和原計畫的 Proof 對照。確認回歸測試重現該情境，且會由完整檢查執行。</p>
-              <p>同一錯誤出現兩次時，能自動檢查就加到工具，其餘補到指示或審查規則。深色模式用延遲載入重現亮色閃現，並在窄視窗重現導覽換列。<a href="../docs/IMPROVE.md">改善流程</a></p>
+              <p>同一錯誤出現兩次時，能自動檢查就加到工具，其餘補到指示或審查規則。新增程式目錄或 migration 時，核對格式、lint、型別及測試的涵蓋範圍，並確認 Git hook 與 CI 執行各自應跑的檢查。<a href="../docs/IMPROVE.md">改善流程</a></p>
+              <p class="route-note">Accountable 曾發現新增的 migration 目錄漏在檢查範圍之外，後來把它納入格式、lint、型別檢查和 Git hook。<a href="week1day5-claude-code.html#step-13">Day 5 審查與修正</a></p>
             </div>
             <div class="flow-next" aria-hidden="true"></div>
           </li>
@@ -449,7 +466,7 @@ main { display: grid; gap: 24px; }
                 </div>
                 <div class="route-card" id="ci">
                   <h4>有共用 CI 再做 · 分支 CI</h4>
-                  <p>把已通過本機完整檢查的同一提交推到遠端，等該提交的分支 CI 通過。<a href="week1day5-claude-code.html#step-14">Day 5 分支 CI 與合併</a></p>
+                  <p>把已通過本機完整檢查的同一提交推到遠端。核對 CI 紀錄的提交雜湊，通過後留下結果連結。<a href="week1day5-claude-code.html#step-14">Day 5 分支 CI 與合併</a></p>
                 </div>
               </div>
               <p class="criterion"><strong>完成判準</strong> 待合併的同一提交有本機完整檢查紀錄，啟用共用 CI 時也有通過的分支 CI 紀錄。</p>
@@ -464,20 +481,27 @@ main { display: grid; gap: 24px; }
           <li class="flow-row" id="merge">
             <div class="node">
               <h3>核對證據，由你決定合併</h3>
-              <p>核對驗收證據、審查修正和待合併提交的檢查結果，再由你決定合併。有共用 CI 或部署時，確認合併結果已到遠端主分支。</p>
-              <p><a href="#maintain">合併後直接試用</a> · <a href="#release">需要部署時先驗收上線</a></p>
+              <p>核對驗收證據、審查修正和待合併提交的檢查結果，再由你決定合併。使用遠端主分支交付時，確認合併結果已到預期的儲存庫與分支。</p>
+              <p>啟用共用 CI 時，確認遠端主分支最新的交付提交也有通過的 CI，並保留結果連結。若合併或後續提交產生新的雜湊，按新提交核對結果。有共用 CI 的專案即使不部署，也在這一步完成驗證。</p>
+              <p><a href="#maintain">完成適用檢查後試用</a> · <a href="#release">需要部署時先驗收上線</a></p>
+            </div>
+            <div class="recovery">
+              <h4>主分支 CI 未通過</h4>
+              <p>用同一套分支驗證流程修正，合併後再確認遠端主分支的新提交已通過。</p>
+              <a href="#open-branch">開修正分支</a>
             </div>
             <div class="flow-next" aria-hidden="true"><span>需要部署</span></div>
           </li>
           <li class="flow-row" id="release">
             <div class="node">
               <h3>需要部署時，驗收正式版本</h3>
-              <p>確認遠端主分支該次提交的 CI 已通過，再核對部署紀錄與正式版本。開啟正式網址，試一次這次變更的關鍵操作。<a href="week1day5-claude-code.html#step-15">Day 5 Render 上線</a></p>
+              <p>部署已驗證的交付提交。啟用共用 CI 時，先確認該提交在遠端主分支的 CI 已通過。核對部署紀錄中的實際版本並從正式網址驗收本次變更的關鍵操作，留下版本與結果。</p>
+              <p class="route-note">Accountable 已完成主分支 CI，Render Blueprint 的線上驗收仍待完成。<a href="week1day5-claude-code.html#step-15">Day 5 Render 上線步驟</a></p>
               <p class="criterion"><strong>完成判準</strong> 正式環境已部署預期版本，關鍵操作通過。<a href="#maintain">接著試用與記錄</a></p>
             </div>
             <div class="recovery">
               <h4>部署或上線驗收失敗</h4>
-              <p>核對主分支 CI、部署版本與紀錄。修正後等新版本通過檢查，再重做正式環境驗收。</p>
+              <p>核對部署版本與紀錄，啟用共用 CI 時也查該提交的主分支結果。修正後等新版本通過適用的檢查，再重做正式環境驗收。</p>
               <a href="#release">回到上線驗收</a>
             </div>
             <div class="flow-next" aria-hidden="true"><span>通過</span></div>

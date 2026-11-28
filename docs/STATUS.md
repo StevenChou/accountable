@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-28｜更新可重用的專案開發模板
+
+- 同步更新可複製的 Markdown 檢核表與流程圖。補上外部服務授權、隔離測試、正式啟動、資料升級與角色存取驗證，以及 Proof 和檢查範圍的核對方式。[專案開發流程速查](../notes/project-development-flow.html#workflow-template)
+- 加入每次變更的驗收證據欄位，分開記錄待合併提交的分支 CI、遠端主分支交付提交的 CI 和正式部署驗收。Supabase、SQLite 與 Render 保留為 Accountable 範例。
+- 走讀純本機、共用 CI 但不部署、接外部服務並部署三種情境。以隔離的 Chromium 驗證桌機版 Markdown 複製、手機版手動複製備援及頁面連結。格式、lint、型別與機密掃描通過，40 項 Vitest、39 項 pytest 與 20 項 Playwright 測試皆通過。
+
 ## 2026-11-28｜Day 5 第 14 步「等 CI 通過、合併並推送 main」完成
 
 - 待合併提交 `0982b1e` 的 `npm run check` 通過 99 項測試，包含 40 項 Vitest、39 項 pytest 和 20 項隔離 Chromium Playwright。

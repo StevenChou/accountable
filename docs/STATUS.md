@@ -1,5 +1,11 @@
 # 專案進度
 
+## 2026-11-28｜Day 5 第 14 步「等 CI 通過、合併並推送 main」完成
+
+- 待合併提交 `0982b1e` 的 `npm run check` 通過 99 項測試，包含 40 項 Vitest、39 項 pytest 和 20 項隔離 Chromium Playwright。
+- 推送 `multi-user` 至自己的 fork，確認同一提交的 [分支 CI](https://github.com/StevenChou/accountable/actions/runs/46099640055) 通過，再快轉合併到本機 `main`、刪除本機 `multi-user` 並推送 `fork/main`。[合併後 main 的 CI](https://github.com/StevenChou/accountable/actions/runs/46099746625) 也已通過。快速 CI 執行格式、lint、型別、機密掃描及 79 項單元測試。
+- 第 3 步待首次推送的 Actions 驗證已補完。講義已完成 14／16 步，下一步是[設定 Render Blueprint 並驗收上線](../notes/week1day5-claude-code.html#step-15)。
+
 ## 2026-11-28｜Day 5 第 13 步「審查分支並依發現改善 harness」完成
 
 - Claude reviewer 審查本分支相對 main 的變更，Codex 分別審查標準與規格。已修正登入後驗證暫時失敗會清除工作階段、Supabase 限流被誤判，以及 Render 缺少區域和時區三項 Important。[審查與修正紀錄](changes/multi-user/review.md)
